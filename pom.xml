@@ -1,20 +1,36 @@
 <project>
 	<parent>
-		<groupId>windh</groupId>
+		<groupId>org.neo4j</groupId>
 		<artifactId>parent-pom</artifactId>
 		<version>1</version>
+		<relativePath>../../pom.xml</relativePath>    		
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>kernel</groupId>
+	<groupId>org.neo4j</groupId>
 	<artifactId>neo-utils</artifactId>
-	<version>neo-1.0-SNAPSHOT</version>
+	<version>1.0-b5-SNAPSHOT</version>
+	<name>Neo utilities</name>
+	<description>
+A set of convenience method and classes built on top of Neo.
+	</description>
 
+	<build>
+		<sourceDirectory>src/java</sourceDirectory>
+		<testSourceDirectory>src/test</testSourceDirectory>
+	</build>
+	
 	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.1</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo</artifactId>
-			<version>1.0-b4-internal-1</version>
+			<version>1.0-b5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>windh</groupId>
