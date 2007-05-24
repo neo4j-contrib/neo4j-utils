@@ -1,0 +1,25 @@
+<project>
+	<parent>
+		<groupId>windh</groupId>
+		<artifactId>parent-pom</artifactId>
+		<version>1</version>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>kernel</groupId>
+	<artifactId>neo-utils</artifactId>
+	<version>neo-1.0-SNAPSHOT</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo</artifactId>
+			<version>1.0-b4-internal-1</version>
+		</dependency>
+		<dependency>
+			<groupId>windh</groupId>
+			<artifactId>windh-utils</artifactId>
+			<version>trunk-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+</project>
