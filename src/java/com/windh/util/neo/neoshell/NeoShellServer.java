@@ -21,6 +21,11 @@ public class NeoShellServer extends SimpleServer
 		this.relTypeClass = relTypeClass;
 		this.setProperty( AbstractClient.PROMPT_KEY, "neo-sh$ " );
 	}
+	
+	public NeoShellServer( EmbeddedNeo neo ) throws RemoteException
+	{
+		this( neo, neo.getRelationshipTypes() );
+	}
 
 	@Override
 	public String welcome()
