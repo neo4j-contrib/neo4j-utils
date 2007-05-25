@@ -51,7 +51,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	
 	protected Direction getInverseDirection()
 	{
-		return directionIsOut() ? Direction.INCOMING : Direction.OUTGOING;
+		return getDirection().reverse();
 	}
 	
 	protected boolean directionIsOut()
