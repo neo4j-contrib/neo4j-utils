@@ -72,8 +72,9 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 			Node otherNode = getNodeFromItem( item );
 			Node startNode = directionIsOut() ? node : otherNode;
 			Node endNode = directionIsOut() ? otherNode : node;
-			startNode.createRelationshipTo( endNode, type );
-			itemAdded( item );
+			Relationship relationship =
+				startNode.createRelationshipTo( endNode, type );
+			itemAdded( item, relationship );
 			tx.success();
 			return true;
 		}
@@ -83,7 +84,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		}
 	}
 	
-	protected void itemAdded( T item )
+	protected void itemAdded( T item, Relationship relationship )
 	{
 	}
 	
