@@ -32,10 +32,5 @@ A set of convenience method and classes built on top of Neo.
 			<artifactId>neo</artifactId>
 			<version>1.0-b6-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>windh</groupId>
-			<artifactId>windh-utils</artifactId>
-			<version>trunk-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 </project>
