@@ -23,11 +23,16 @@ public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 		super( node, direction, type );
 		this.instanceClass = instanceClass;
 	}
+	
+	protected Class<T> getInstanceClass()
+	{
+		return this.instanceClass;
+	}
 
 	@Override
 	protected T newObject( Node node, Relationship relationship )
 	{
-		return NodeWrapper.newInstance( instanceClass, node );
+		return NodeWrapper.newInstance( this.getInstanceClass(), node );
 	}
 	
 	@Override
