@@ -58,7 +58,7 @@ public abstract class NodeWrapper
 	@Override
 	public boolean equals( Object o )
 	{
-		if ( !getClass().equals( o.getClass() ) )
+		if ( o == null || !getClass().equals( o.getClass() ) )
 		{
 			return false;
 		}
