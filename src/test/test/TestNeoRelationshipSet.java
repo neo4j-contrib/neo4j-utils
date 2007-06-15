@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
@@ -13,6 +14,30 @@ import com.windh.util.neo.NodeWrapper;
 
 public class TestNeoRelationshipSet extends NeoTest
 {
+	public void testIllegalDirection()
+	{
+		Transaction tx = Transaction.begin();
+		try
+		{
+			Node node = NodeManager.getManager().createNode();
+			try
+			{
+				new ContainerSet( node, Direction.BOTH );
+				new ContainerSet( node, null );
+				fail( "Shouldn't be able to create a neo relationship set " +
+					"with Direction.BOTH or null as direction" );
+			}
+			catch ( IllegalArgumentException e )
+			{
+				// Good
+			}
+		}
+		finally
+		{
+			tx.finish();
+		}
+	}
+	
 	public void testSome()
 	{
 		Transaction tx = Transaction.begin();
@@ -179,7 +204,12 @@ public class TestNeoRelationshipSet extends NeoTest
 	{
 		private ContainerSet( Node node )
 		{
-			super( node, Relationships.TESTREL );
+			this( node, Direction.OUTGOING );
+		}
+		
+		private ContainerSet( Node node, Direction direction )
+		{
+			super( node, direction, Relationships.TESTREL );
 		}
 
 		@Override

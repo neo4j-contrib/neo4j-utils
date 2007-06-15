@@ -29,6 +29,13 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	public NeoRelationshipSet( Node node, Direction direction,
 		RelationshipType type )
 	{
+		if ( direction == null || direction == Direction.BOTH )
+		{
+			throw new IllegalArgumentException(
+				"Only OUTGOING and INCOMING direction is allowed, since " +
+				"this is a read/write collection" );
+		}
+		
 		this.node = node;
 		this.type = type;
 		this.direction = direction;
