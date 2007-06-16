@@ -50,6 +50,11 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 		return this.direction;
 	}
 	
+	protected T newObject( Node node )
+	{
+		return NodeWrapper.newInstance( this.classType(), node );
+	}
+	
 	public T get()
 	{
 		Transaction tx = Transaction.begin();
@@ -62,8 +67,8 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 				throw new RuntimeException( "No link relationship found for " +
 					this.node() + ":" + this.direction() + ":" + this.type() );
 			}
-			Node node = rel.getOtherNode( this.node() );
-			T result = NodeWrapper.newInstance( this.classType(), node );
+			Node otherNode = rel.getOtherNode( this.node() );
+			T result = this.newObject( otherNode );
 			tx.success();
 			return result;
 		}
