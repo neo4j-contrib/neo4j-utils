@@ -1,7 +1,6 @@
 package com.windh.util.neo;
 
 import java.util.Collection;
-import java.util.Iterator;
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
@@ -49,12 +48,23 @@ public class NeoUtil
 	{
 	}
 	
+	private void assertPropertyKeyNotNull( String key )
+	{
+		if ( key == null )
+		{
+			throw new IllegalArgumentException( "Property key can't be null" );
+		}
+	}
+	
 	public boolean hasProperty( Node node, String key )
 	{
+		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
-			return node.hasProperty( key );
+			boolean result = node.hasProperty( key );
+			tx.success();
+			return result;
 		}
 		finally
 		{
@@ -64,10 +74,13 @@ public class NeoUtil
 
 	public Object getProperty( Node node, String key )
 	{
+		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
-			return node.getProperty( key );
+			Object result = node.getProperty( key );
+			tx.success();
+			return result;
 		}
 		finally
 		{
@@ -77,10 +90,13 @@ public class NeoUtil
 
 	public Object getProperty( Node node, String key, Object defaultValue )
 	{
+		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
-			return node.getProperty( key, defaultValue );
+			Object result = node.getProperty( key, defaultValue );
+			tx.success();
+			return result;
 		}
 		finally
 		{
@@ -90,6 +106,13 @@ public class NeoUtil
 
 	public void setProperty( Node node, String key, Object value )
 	{
+		assertPropertyKeyNotNull( key );
+		if ( value == null )
+		{
+			throw new IllegalArgumentException( "Value for property '" +
+				key + "' can't be null" );
+		}
+		
 		Transaction tx = Transaction.begin();
 		try
 		{
@@ -104,10 +127,12 @@ public class NeoUtil
 	
 	public void removeProperty( Node node, String key )
 	{
+		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
 			node.removeProperty( key );
+			tx.success();
 		}
 		finally
 		{
@@ -121,7 +146,10 @@ public class NeoUtil
 		Transaction tx = Transaction.begin();
 		try
 		{
-			return node.getSingleRelationship( type, direction );
+			Relationship singleRelationship =
+				node.getSingleRelationship( type, direction );
+			tx.success();
+			return singleRelationship;
 		}
 		finally
 		{
@@ -134,12 +162,19 @@ public class NeoUtil
 		Transaction tx = Transaction.begin();
 		try
 		{
-			return NodeManager.getManager().getReferenceNode();
+			Node referenceNode = NodeManager.getManager().getReferenceNode();
+			tx.success();
+			return referenceNode;
 		}
 		finally
 		{
 			tx.finish();
 		}
+	}
+
+	public Node getOrCreateSubReferenceNode( RelationshipType type )
+	{
+		return this.getOrCreateSubReferenceNode( type, Direction.OUTGOING );
 	}
 
 	/**
@@ -152,30 +187,24 @@ public class NeoUtil
 	 * @param type
 	 * @return
 	 */
-	public Node getOrCreateSubReferenceNode( RelationshipType type )
+	public Node getOrCreateSubReferenceNode( RelationshipType type,
+		Direction direction )
 	{
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Node refNode = getReferenceNode();
+			Node referenceNode = getReferenceNode();
 			Node node = null;
-			Iterator<Relationship> rels =
-				refNode.getRelationships( type ).iterator();
-			if ( rels.hasNext() )
+			Relationship singleRelationship =
+				referenceNode.getSingleRelationship( type, direction );
+			if ( singleRelationship != null )
 			{
-				Relationship rel = rels.next();
-				if ( rels.hasNext() )
-				{
-					throw new RuntimeException( "Reference area corrupted" +
-						" there are more than one" +
-						" reference relationships of type " + type );
-				}
-				node = rel.getEndNode();
+				node = singleRelationship.getOtherNode( referenceNode );
 			}
 			else
 			{
 				node = NodeManager.getManager().createNode();
-				refNode.createRelationshipTo( node, type );
+				referenceNode.createRelationshipTo( node, type );
 			}
 			
 			tx.success();
