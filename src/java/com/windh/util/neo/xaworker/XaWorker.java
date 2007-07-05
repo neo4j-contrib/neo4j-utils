@@ -50,7 +50,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 	private void registerShutdownListener()
 	{
 		NeoUtil.getInstance().registerProActiveEventListener(
-			this, Event.KERNEL_SHUTDOWN_STARTED );
+			this, Event.NEO_SHUTDOWN_STARTED );
 	}
 	
 	public void add( XaWorkerLogEntry entry ) throws IOException
@@ -334,7 +334,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 	
 	public boolean proActiveEventReceived( Event event, EventData data )
 	{
-		if ( event == Event.KERNEL_SHUTDOWN_STARTED )
+		if ( event == Event.NEO_SHUTDOWN_STARTED )
 		{
 			this.halted = true;
 		}
