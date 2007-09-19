@@ -1,4 +1,4 @@
-package com.windh.util.neo;
+package org.neo4j.util;
 
 import java.io.PrintStream;
 import java.util.TreeSet;

@@ -4,9 +4,9 @@ import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.impl.core.NodeManager;
-import com.windh.util.neo.Link;
-import com.windh.util.neo.LinkImpl;
-import com.windh.util.neo.NodeWrapper;
+import org.neo4j.util.Link;
+import org.neo4j.util.LinkImpl;
+import org.neo4j.util.NodeWrapper;
 
 public class TestLink extends NeoTest
 {

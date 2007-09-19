@@ -1,4 +1,4 @@
-package com.windh.util.neo;
+package org.neo4j.util;
 
 /**
  * A migrator for migration of one version.

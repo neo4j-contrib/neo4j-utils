@@ -1,4 +1,4 @@
-package com.windh.util.neo;
+package org.neo4j.util;
 
 import org.neo4j.impl.event.Event;
 import org.neo4j.impl.event.EventData;

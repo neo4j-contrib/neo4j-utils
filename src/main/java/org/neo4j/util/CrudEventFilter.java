@@ -1,10 +1,10 @@
-package com.windh.util.neo;
+package org.neo4j.util;
 
 import java.util.HashSet;
 import java.util.Set;
 import org.neo4j.impl.event.Event;
 import org.neo4j.impl.event.EventData;
-import com.windh.util.neo.CrudEventData.AlterationMode;
+import org.neo4j.util.CrudEventData.AlterationMode;
 
 public class CrudEventFilter implements EventFilter
 {

@@ -1,4 +1,4 @@
-package com.windh.util.neo;
+package org.neo4j.util;
 
 import java.util.ArrayList;
 import java.util.Collection;

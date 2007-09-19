@@ -1,11 +1,12 @@
-package com.windh.util.neo;
+package org.neo4j.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.windh.util.neo.CrudEventData.AlterationMode;
+import org.neo4j.util.CrudEventData.AlterationMode;
+
 
 public class CrudEventBufferFilter implements EventBufferFilter
 {

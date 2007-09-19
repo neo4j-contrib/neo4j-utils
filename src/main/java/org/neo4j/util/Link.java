@@ -1,4 +1,4 @@
-package com.windh.util.neo;
+package org.neo4j.util;
 
 /**
  * This interface is used when dealing with a one-to-one relationship

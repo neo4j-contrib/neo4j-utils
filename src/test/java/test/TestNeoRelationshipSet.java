@@ -9,8 +9,8 @@ import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.impl.core.NodeManager;
-import com.windh.util.neo.NeoRelationshipSet;
-import com.windh.util.neo.NodeWrapper;
+import org.neo4j.util.NeoRelationshipSet;
+import org.neo4j.util.NodeWrapper;
 
 public class TestNeoRelationshipSet extends NeoTest
 {

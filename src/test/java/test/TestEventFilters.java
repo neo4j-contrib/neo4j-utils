@@ -3,11 +3,11 @@ package test;
 import java.util.ArrayList;
 import java.util.List;
 import org.neo4j.impl.event.EventData;
-import com.windh.util.neo.CrudEventBufferFilter;
-import com.windh.util.neo.CrudEventData;
-import com.windh.util.neo.CrudEventFilter;
-import com.windh.util.neo.EventContext;
-import com.windh.util.neo.CrudEventData.AlterationMode;
+import org.neo4j.util.CrudEventBufferFilter;
+import org.neo4j.util.CrudEventData;
+import org.neo4j.util.CrudEventFilter;
+import org.neo4j.util.EventContext;
+import org.neo4j.util.CrudEventData.AlterationMode;
 
 public class TestEventFilters extends NeoTest
 {
