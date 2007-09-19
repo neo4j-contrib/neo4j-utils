@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.neo4j</groupId>
 	<artifactId>neo-utils</artifactId>
-	<version>1.0-b6-SNAPSHOT</version>
+	<version>new-neo-api</version>
 	<name>Neo utilities</name>
 	<description>
 A set of convenience method and classes built on top of Neo.
