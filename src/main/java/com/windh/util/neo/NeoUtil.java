@@ -1,12 +1,13 @@
 package com.windh.util.neo;
 
 import java.util.Collection;
+
 import org.neo4j.api.core.Direction;
+import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.core.NodeManager;
 import org.neo4j.impl.event.Event;
 import org.neo4j.impl.event.EventData;
 import org.neo4j.impl.event.EventListenerAlreadyRegisteredException;
@@ -31,21 +32,22 @@ import org.neo4j.impl.event.ReActiveEventListener;
  */
 public class NeoUtil
 {
-	private static final NeoUtil INSTANCE = new NeoUtil();
-	
-	public static NeoUtil getInstance()
-	{
-		return INSTANCE;
-	}
-	
 	public static enum EventType
 	{
 		PRO_ACTIVE,
 		RE_ACTIVE,
 	}
 	
-	private NeoUtil()
+	private EmbeddedNeo neo;
+	
+	public NeoUtil( EmbeddedNeo neo )
 	{
+		this.neo = neo;
+	}
+	
+	public EmbeddedNeo neo()
+	{
+		return this.neo;
 	}
 	
 	private void assertPropertyKeyNotNull( String key )
@@ -162,7 +164,7 @@ public class NeoUtil
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Node referenceNode = NodeManager.getManager().getReferenceNode();
+			Node referenceNode = neo().getReferenceNode();
 			tx.success();
 			return referenceNode;
 		}
@@ -203,7 +205,7 @@ public class NeoUtil
 			}
 			else
 			{
-				node = NodeManager.getManager().createNode();
+				node = neo().createNode();
 				referenceNode.createRelationshipTo( node, type );
 			}
 			
@@ -241,8 +243,8 @@ public class NeoUtil
 		}
 	}
 	
-	public void unregisterReActiveEventListener( ReActiveEventListener listener,
-		Event event )
+	public static void unregisterReActiveEventListener(
+		ReActiveEventListener listener, Event event )
 	{
 		try
 		{
@@ -255,8 +257,8 @@ public class NeoUtil
 		}
 	}
 
-	public void registerProActiveEventListener( ProActiveEventListener listener,
-		Event event )
+	public static void registerProActiveEventListener(
+		ProActiveEventListener listener, Event event )
 	{
 		try
 		{
@@ -273,7 +275,7 @@ public class NeoUtil
 		}
 	}
 	
-	public void unregisterProActiveEventListener(
+	public static void unregisterProActiveEventListener(
 		ProActiveEventListener listener, Event event )
 	{
 		try
@@ -290,7 +292,7 @@ public class NeoUtil
 	/**
 	 * Generates a proactive event
 	 */
-	public boolean proActiveEvent( Event event, Object data )
+	public static boolean proActiveEvent( Event event, Object data )
 	{
 		return event( event, data, EventType.PRO_ACTIVE );
 	}
@@ -298,7 +300,7 @@ public class NeoUtil
 	/**
 	 * Generates a reactive event
 	 */
-	public void reActiveEvent( Event event, Object data )
+	public static void reActiveEvent( Event event, Object data )
 	{
 		event( event, data, EventType.RE_ACTIVE );
 	}
@@ -306,7 +308,7 @@ public class NeoUtil
 	/**
 	 * Generates an event either proactively, reactively or both
 	 */
-	public boolean event( Event event, Object data, EventType... types )
+	public static boolean event( Event event, Object data, EventType... types )
 	{
 		boolean result = true;
 		EventData eventData = new EventData( data );

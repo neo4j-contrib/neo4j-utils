@@ -42,8 +42,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 			Set<String> set = new HashSet<String>();
 			if ( this.node.hasProperty( this.key ) )
 			{
-				String value = ( String ) NeoUtil.getInstance().
-					getProperty( this.node, this.key );
+				String value = ( String ) this.node.getProperty( this.key );
 				if ( value.length() > 0 )
 				{
 					for ( String token :
@@ -86,7 +85,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 		Transaction tx = Transaction.begin();
 		try
 		{
-			NeoUtil.getInstance().setProperty( this.node, this.key, value );
+			this.node.setProperty( this.key, value );
 			tx.success();
 		}
 		finally
@@ -119,7 +118,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 		{
 			if ( this.node.hasProperty( this.key ) )
 			{
-				NeoUtil.getInstance().removeProperty( this.node, this.key );
+				this.node.removeProperty( this.key );
 			}
 			tx.success();
 		}

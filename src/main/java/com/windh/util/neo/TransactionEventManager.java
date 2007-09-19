@@ -62,11 +62,11 @@ public class TransactionEventManager
 	
 	private TransactionEventManager()
 	{
-		NeoUtil.getInstance().registerProActiveEventListener(
+		NeoUtil.registerProActiveEventListener(
 			internalListener, Event.TX_IMMEDIATE_BEGIN );
-		NeoUtil.getInstance().registerProActiveEventListener(
+		NeoUtil.registerProActiveEventListener(
 			internalListener, Event.TX_IMMEDIATE_COMMIT );
-		NeoUtil.getInstance().registerProActiveEventListener(
+		NeoUtil.registerProActiveEventListener(
 			internalListener, Event.TX_IMMEDIATE_ROLLBACK );
 	}
 	

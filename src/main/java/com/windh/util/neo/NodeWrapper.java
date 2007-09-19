@@ -1,39 +1,12 @@
 package com.windh.util.neo;
 
 import java.lang.reflect.Constructor;
+
 import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.core.NodeManager;
-import org.neo4j.impl.core.NotFoundException;
 
 public abstract class NodeWrapper
 {
 	private Node node;
-	
-	protected NodeWrapper( Node node )
-	{
-		this.node = node;
-	}
-	
-	public Node getUnderlyingNode()
-	{
-		return node;
-	}
-	
-	public static <T extends NodeWrapper> T newInstance(
-		Class<T> instanceClass, long nodeId ) throws NotFoundException
-	{
-		Transaction tx = Transaction.begin();
-		try
-		{
-			Node node = NodeManager.getManager().getNodeById( ( int ) nodeId );
-			return newInstance( instanceClass, node );
-		}
-		finally
-		{
-			tx.finish();
-		}
-	}
 	
 	public static <T extends NodeWrapper> T newInstance(
 		Class<T> instanceClass, Node node )
@@ -53,6 +26,16 @@ public abstract class NodeWrapper
 		{
 			throw new RuntimeException( e );
 		}
+	}
+
+	protected NodeWrapper( Node node )
+	{
+		this.node = node;
+	}
+	
+	public Node getUnderlyingNode()
+	{
+		return node;
 	}
 	
 	@Override

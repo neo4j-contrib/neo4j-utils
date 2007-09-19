@@ -1,5 +1,6 @@
 package com.windh.util.neo;
 
+import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.RelationshipType;
 
@@ -11,15 +12,16 @@ public abstract class SimpleMigration extends Migration
 {
 	private String versionClassPrefix;
 	
-	public SimpleMigration( RelationshipType subReferenceType )
+	public SimpleMigration( EmbeddedNeo neo, RelationshipType subReferenceType )
 	{
-		super( getConfigNodeFromType( subReferenceType ) );
+		super( getConfigNodeFromType( neo, subReferenceType ) );
 		this.versionClassPrefix = this.getMigratorPrefix();
 	}
 	
-	private static Node getConfigNodeFromType( RelationshipType type )
+	private static Node getConfigNodeFromType( EmbeddedNeo neo,
+		RelationshipType type )
 	{
-		return NeoUtil.getInstance().getOrCreateSubReferenceNode( type );
+		return new NeoUtil( neo ).getOrCreateSubReferenceNode( type );
 	}
 	
 	protected String getMigratorPrefix()

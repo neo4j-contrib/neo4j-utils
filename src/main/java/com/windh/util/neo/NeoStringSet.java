@@ -1,33 +1,53 @@
 package com.windh.util.neo;
 
+import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
-import org.neo4j.impl.core.NodeManager;
+import org.neo4j.api.core.Transaction;
 
 public class NeoStringSet extends NeoRelationshipSet<String>
 {
 	private static final String VALUE_KEY = "value";
 	
-	public NeoStringSet( Node node, RelationshipType type )
+	private EmbeddedNeo neo;
+	
+	public NeoStringSet( EmbeddedNeo neo, Node node, RelationshipType type )
 	{
 		super( node, type );
+		this.neo = neo;
 	}
 	
 	@Override
 	protected Node getNodeFromItem( Object item )
 	{
 		String value = ( String ) item;
-		Node node = NodeManager.getManager().createNode();
-		NeoUtil.getInstance().setProperty( node, VALUE_KEY, value );
-		return node;
+		Transaction tx = Transaction.begin();
+		try
+		{
+			Node node = neo.createNode();
+			node.setProperty( VALUE_KEY, value );
+			tx.success();
+			return node;
+		}
+		finally
+		{
+			tx.finish();
+		}
 	}
 
 	@Override
 	protected String newObject( Node node, Relationship relationship )
 	{
-		return ( String ) NeoUtil.getInstance().getProperty(
-			node, VALUE_KEY );
+		Transaction tx = Transaction.begin();
+		try
+		{
+			return ( String ) node.getProperty( VALUE_KEY );
+		}
+		finally
+		{
+			tx.finish();
+		}
 	}
 
 	@Override

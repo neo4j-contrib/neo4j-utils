@@ -15,11 +15,6 @@
 A set of convenience method and classes built on top of Neo.
 	</description>
 
-	<build>
-		<sourceDirectory>src/java</sourceDirectory>
-		<testSourceDirectory>src/test</testSourceDirectory>
-	</build>
-	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

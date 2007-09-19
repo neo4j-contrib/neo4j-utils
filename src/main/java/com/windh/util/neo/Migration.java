@@ -126,8 +126,16 @@ public abstract class Migration
 	 */
 	public void setDataVersion( int version )
 	{
-		NeoUtil.getInstance().setProperty( this.getConfigNode(),
-			KEY_CURRENT_VERSION, version );
+		Transaction tx = Transaction.begin();
+		try
+		{
+			this.getConfigNode().setProperty( KEY_CURRENT_VERSION, version );
+			tx.success();
+		}
+		finally
+		{
+			tx.finish();
+		}
 	}
 	
 	/**

@@ -34,14 +34,14 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 	{
 		for ( Event event : getEvents() )
 		{
-			NeoUtil.getInstance().registerProActiveEventListener( this,
+			NeoUtil.registerProActiveEventListener( this,
 				event );
 		}
-		NeoUtil.getInstance().registerProActiveEventListener( this,
+		NeoUtil.registerProActiveEventListener( this,
 			Event.TX_IMMEDIATE_BEGIN );
-		NeoUtil.getInstance().registerProActiveEventListener( this,
+		NeoUtil.registerProActiveEventListener( this,
 			Event.TX_IMMEDIATE_ROLLBACK );
-		NeoUtil.getInstance().registerProActiveEventListener( this,
+		NeoUtil.registerProActiveEventListener( this,
 			Event.TX_IMMEDIATE_COMMIT );
 	}
 	
@@ -49,14 +49,14 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 	{
 		for ( Event event : getEvents() )
 		{
-			NeoUtil.getInstance().unregisterProActiveEventListener(
+			NeoUtil.unregisterProActiveEventListener(
 				this, event );
 		}
-		NeoUtil.getInstance().unregisterProActiveEventListener( this,
+		NeoUtil.unregisterProActiveEventListener( this,
 			Event.TX_IMMEDIATE_BEGIN );
-		NeoUtil.getInstance().unregisterProActiveEventListener( this,
+		NeoUtil.unregisterProActiveEventListener( this,
 			Event.TX_IMMEDIATE_ROLLBACK );
-		NeoUtil.getInstance().unregisterProActiveEventListener( this,
+		NeoUtil.unregisterProActiveEventListener( this,
 			Event.TX_IMMEDIATE_COMMIT );
 	}
 	
