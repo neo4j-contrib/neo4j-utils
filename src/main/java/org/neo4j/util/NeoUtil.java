@@ -218,10 +218,10 @@ public class NeoUtil
 		}
 	}
 	
-	public Collection<? extends NodeWrapper> getSubReferenceNodeCollection(
-		RelationshipType type, Class<? extends NodeWrapper> clazz )
+	public <T extends NodeWrapper> Collection<T> getSubReferenceNodeCollection(
+		RelationshipType type, Class<T> clazz )
 	{
-		return new NodeWrapperRelationshipSet(
+		return new NodeWrapperRelationshipSet<T>(
 			getOrCreateSubReferenceNode( type ), type, clazz );
 	}
 	

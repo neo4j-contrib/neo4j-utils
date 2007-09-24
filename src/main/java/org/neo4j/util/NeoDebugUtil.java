@@ -82,11 +82,11 @@ public abstract class NeoDebugUtil
 	
 	private static String[] sortIndexes( Iterable<String> keys )
 	{
-		TreeSet set = new TreeSet();
+		TreeSet<String> set = new TreeSet<String>();
 		for ( String key : keys )
 		{
 			set.add( key );
 		}
-		return ( String[] ) set.toArray( new String[ set.size() ] );
+		return set.toArray( new String[ set.size() ] );
 	}
 }

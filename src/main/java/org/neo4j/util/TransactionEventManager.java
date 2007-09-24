@@ -43,15 +43,15 @@ public class TransactionEventManager
 		return instance;
 	}
 	
-	private ConcurrentMap < Integer, TransactionHook > transactions =
-		new ConcurrentHashMap();
+	private ConcurrentMap<Integer, TransactionHook> transactions =
+		new ConcurrentHashMap<Integer, TransactionHook>();
 	private InternalEventListener internalListener =
 		new InternalEventListener();
-	private Map < Event, Set < ProActiveEventListener > > listeners =
-		new HashMap();
-	private Set < Event > registeredEvents = new HashSet();
-	private ConcurrentMap < Thread, Integer > threadToTxId =
-		new ConcurrentHashMap();
+	private Map<Event, Set<ProActiveEventListener>> listeners =
+		new HashMap<Event, Set<ProActiveEventListener>>();
+	private Set<Event> registeredEvents = new HashSet<Event>();
+	private ConcurrentMap<Thread, Integer> threadToTxId =
+		new ConcurrentHashMap<Thread, Integer>();
 	private TransactionHookFactory hookFactory = new TransactionHookFactory()
 	{
 		public TransactionHook newHook( int txId )
@@ -114,15 +114,15 @@ public class TransactionEventManager
 	 * @param event the Event
 	 * @return a Set containing the listeners.
 	 */
-	private Set < ProActiveEventListener > getListenersSet( Event event )
+	private Set<ProActiveEventListener> getListenersSet( Event event )
 	{
 		synchronized ( listeners )
 		{
-			Set < ProActiveEventListener > listenersForEvent =
+			Set<ProActiveEventListener> listenersForEvent =
 				listeners.get( event );
 			if ( listenersForEvent == null )
 			{
-				listenersForEvent = new HashSet();
+				listenersForEvent = new HashSet<ProActiveEventListener>();
 				listeners.put( event, listenersForEvent );
 			}
 			return listenersForEvent;
@@ -147,7 +147,8 @@ public class TransactionEventManager
 	{
 		synchronized ( listeners )
 		{
-			Set listenersForEvent = getListenersSet( event );
+			Set<ProActiveEventListener> listenersForEvent =
+				getListenersSet( event );
 			if ( listenersForEvent.contains( listener ) )
 			{
 				throw new RuntimeException( "Listener " + listener +
@@ -315,8 +316,9 @@ public class TransactionEventManager
 	
 	private static class EventList
 	{
-		private Map < ProActiveEventListener, List < EventContext > >
-			eventsPerListener = new HashMap();
+		private Map<ProActiveEventListener, List<EventContext>>
+			eventsPerListener =
+				new HashMap<ProActiveEventListener, List<EventContext>>();
 		
 		void sendEvent( EventContext context )
 		{
@@ -330,11 +332,11 @@ public class TransactionEventManager
 				TransactionEventManager.getManager().getListenersSet(
 				context.getEvent() ) )
 			{
-				List < EventContext > eventList =
+				List<EventContext> eventList =
 					eventsPerListener.get( listener );
 				if ( eventList == null )
 				{
-					eventList = new ArrayList();
+					eventList = new ArrayList<EventContext>();
 					eventsPerListener.put( listener, eventList );
 				}
 				eventList.add( context );
@@ -420,7 +422,7 @@ public class TransactionEventManager
 		{
 			if ( this.events == null )
 			{
-				this.events = new ArrayList();			
+				this.events = new ArrayList<EventContext>();
 			}
 			this.events.add( new EventContext( event, data ) );
 		}

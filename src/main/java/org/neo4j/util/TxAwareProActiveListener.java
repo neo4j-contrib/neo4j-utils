@@ -16,8 +16,8 @@ import org.neo4j.impl.event.ProActiveEventListener;
  */
 public abstract class TxAwareProActiveListener implements ProActiveEventListener
 {
-	private ConcurrentMap < Thread, EventFilter > eventLists =
-		new ConcurrentHashMap();
+	private ConcurrentMap<Thread, EventFilter> eventLists =
+		new ConcurrentHashMap<Thread, EventFilter>();
 	
 	protected abstract Event[] getEvents();
 	

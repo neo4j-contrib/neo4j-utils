@@ -1,20 +1,20 @@
 package org.neo4j.util;
 
 import java.util.Collection;
-import java.util.Set;
+
 import org.neo4j.api.core.Transaction;
 
-public abstract class AbstractNeoSet<T> implements Set<T>
+public abstract class AbstractNeoSet<T> implements Collection<T>
 {
-	public boolean addAll( Collection items )
+	public boolean addAll( Collection<? extends T> items )
 	{
 		Transaction tx = Transaction.begin();
 		try
 		{
 			boolean changed = false;
-			for ( Object item : items )
+			for ( T item : items )
 			{
-				if ( add( ( T ) item ) )
+				if ( add( item ) )
 				{
 					changed = true;
 				}
@@ -28,7 +28,7 @@ public abstract class AbstractNeoSet<T> implements Set<T>
 		}
 	}
 
-	public boolean containsAll( Collection items )
+	public boolean containsAll( Collection<?> items )
 	{
 		Transaction tx = Transaction.begin();
 		try
@@ -51,7 +51,7 @@ public abstract class AbstractNeoSet<T> implements Set<T>
 		}
 	}
 
-	public boolean removeAll( Collection items )
+	public boolean removeAll( Collection<?> items )
 	{
 		Transaction tx = Transaction.begin();
 		try

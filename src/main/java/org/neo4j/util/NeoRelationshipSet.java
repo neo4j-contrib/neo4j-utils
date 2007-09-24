@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
+
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
@@ -16,6 +18,7 @@ import org.neo4j.api.core.TraversalPosition;
 import org.neo4j.api.core.Traverser.Order;
 
 public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
+	implements Set<T>
 {
 	private Node node;
 	private RelationshipType type;
@@ -217,12 +220,12 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		}
 	}
 
-	public boolean retainAll( Collection items )
+	public boolean retainAll( Collection<?> items )
 	{
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Collection itemsToRemove = new HashSet();
+			Collection<T> itemsToRemove = new HashSet<T>();
 			for ( Object item : items )
 			{
 				Relationship rel = findRelationship( item );

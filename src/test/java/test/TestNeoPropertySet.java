@@ -3,7 +3,7 @@ package test;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
+
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.impl.core.NodeManager;
@@ -25,7 +25,7 @@ public class TestNeoPropertySet extends NeoTest
 			tx.finish();
 		}
 		
-		Set<Integer> set = new TestSet( node, "ids" );
+		Collection<Integer> set = new TestSet( node, "ids" );
 		Integer item = 10;
 		Integer item2 = 21211;
 		
@@ -89,7 +89,7 @@ public class TestNeoPropertySet extends NeoTest
 		assertTrue( !iterator.hasNext() );
 		set.clear();
 
-		Collection items = new ArrayList();
+		Collection<Object> items = new ArrayList<Object>();
 		assertTrue( !set.retainAll( items ) );
 		set.add( item );
 		set.add( item2 );

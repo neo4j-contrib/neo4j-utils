@@ -3,7 +3,7 @@ package test;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
+
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
@@ -45,7 +45,7 @@ public class TestNeoRelationshipSet extends NeoTest
 		{
 			Node node = NodeManager.getManager().createNode();
 			SomeContainer container = new SomeContainer( node );
-			Set<SomeOtherContainer> set = container.otherContainers();
+			Collection<SomeOtherContainer> set = container.otherContainers();
 			Node itemNode = NodeManager.getManager().createNode();
 			Node itemNode2 = NodeManager.getManager().createNode();
 			SomeOtherContainer item = new SomeOtherContainer( itemNode );
@@ -193,7 +193,7 @@ public class TestNeoRelationshipSet extends NeoTest
 			super( node );
 		}
 		
-		public Set<SomeOtherContainer> otherContainers()
+		public Collection<SomeOtherContainer> otherContainers()
 		{
 			return new ContainerSet( getUnderlyingNode() );
 		}

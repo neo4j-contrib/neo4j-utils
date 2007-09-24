@@ -10,6 +10,7 @@ import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 
 public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
+	implements Set<T>
 {
 	public static final String DEFAULT_DELIMITER = "|";
 	
@@ -160,7 +161,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 		}
 	}
 
-	public boolean retainAll( Collection realItems )
+	public boolean retainAll( Collection<?> realItems )
 	{
 		Transaction tx = Transaction.begin();
 		try
