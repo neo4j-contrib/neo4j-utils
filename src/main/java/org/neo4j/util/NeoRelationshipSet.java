@@ -17,6 +17,12 @@ import org.neo4j.api.core.Transaction;
 import org.neo4j.api.core.TraversalPosition;
 import org.neo4j.api.core.Traverser.Order;
 
+/**
+ * A {@link Set} implemented with neo.
+ * @author mattias
+ *
+ * @param <T> the type of objects in the set.
+ */
 public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	implements Set<T>
 {
@@ -24,11 +30,20 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	private RelationshipType type;
 	private Direction direction;
 	
+	/**
+	 * @param node the {@link Node} to act as the collection.
+	 * @param type the relationship type to use internally for each object.
+	 */
 	public NeoRelationshipSet( Node node, RelationshipType type )
 	{
 		this( node, Direction.OUTGOING, type );
 	}
 	
+	/**
+	 * @param node the {@link Node} to act as the collection.
+	 * @param direction the direction to use for the relationships.
+	 * @param type the relationship type to use internally for each object.
+	 */
 	public NeoRelationshipSet( Node node, Direction direction,
 		RelationshipType type )
 	{

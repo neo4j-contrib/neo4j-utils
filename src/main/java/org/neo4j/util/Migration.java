@@ -10,11 +10,10 @@ import org.neo4j.impl.transaction.TransactionUtil;
  * adaptation to work with the new version of the code.
  * 
  * Versions begin at zero and increases one per version. Version zero needs
- * no migration. So if the {@link #getCodeVersion()} is zero then no
- * migration is beeing done. If {@link #getCodeVersion()} is more than
- * zero and {@link #getDataVersion()} is less than {@link #getCodeVersion()}
- * then instances of {@link Migrator} are created and executed for each
- * differentiating version.
+ * no migration. So if the "code version" is zero then no migration is
+ * beeing done. If "code version" is more than zero and "data version" is
+ * less than "code version" then instances of {@link Migrator} are created
+ * and executed for each differentiating version.
  */
 public abstract class Migration
 {
@@ -57,9 +56,8 @@ public abstract class Migration
 
 	/**
 	 * Returns the version of the data. The first call to this method will
-	 * return the same version as {@link #getCodeVersion()}, and increase as
-	 * {@link #getCodeVersion()} increases and calls to {@link #syncVersion()}
-	 * are made.
+	 * return the same version as "code version", and increase as
+	 * "code version" increases and calls to {@link #syncVersion()} are made.
 	 * @return the version of the data.
 	 */
 	public int getDataVersion()
@@ -148,11 +146,20 @@ public abstract class Migration
 		this.pretending = pretend;
 	}
 	
+	/**
+	 * Makes the "data version" to be zero the first time, instead of
+	 * same as the "code version".
+	 * @param firstIsZero whether or not to enable this functionality.
+	 */
 	public void setFirstVersionIsAlwaysZero( boolean firstIsZero )
 	{
 		this.firstVersionIsAlwaysZero = firstIsZero;
 	}
 	
+	/**
+	 * Performs an in-the-middle-commit (finish, then start again) of the
+	 * current transaction.
+	 */
 	public void inTheMiddleCommit()
 	{
 		if ( this.pretending )
@@ -167,8 +174,8 @@ public abstract class Migration
 	/**
 	 * This is the method which should be called by the client to tell this
 	 * migration unit to look at differences between {@link #getDataVersion()}
-	 * and {@link #getCodeVersion()} and migrate accordingly from the
-	 * {@link #getDataVersion()} to the {@link #getCodeVersion()}.
+	 * and "code version" and migrate accordingly from the
+	 * {@link #getDataVersion()} to the "code version".
 	 * @throws RuntimeException if the migration (or parts of it) couldn't
 	 * be done. It describes which version failed.
 	 */

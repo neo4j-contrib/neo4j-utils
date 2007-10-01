@@ -12,8 +12,16 @@ import org.neo4j.impl.core.NodeManager;
 import org.neo4j.util.NeoRelationshipSet;
 import org.neo4j.util.NodeWrapper;
 
+/**
+ * Tests the neo relationship sets.
+ * @author mattias
+ *
+ */
 public class TestNeoRelationshipSet extends NeoTest
 {
+	/**
+	 * Tests passing of illegal direction arguments.
+	 */
 	public void testIllegalDirection()
 	{
 		Transaction tx = Transaction.begin();
@@ -38,6 +46,9 @@ public class TestNeoRelationshipSet extends NeoTest
 		}
 	}
 	
+	/**
+	 * Tests some general use of collections.
+	 */
 	public void testSome()
 	{
 		Transaction tx = Transaction.begin();
@@ -125,6 +136,11 @@ public class TestNeoRelationshipSet extends NeoTest
 		}
 	}
 	
+	/**
+	 * Tests so that all collection implementations can manage their own
+	 * transactions.
+	 * @throws Exception if something goes wrong.
+	 */
 	public void testWithoutTx() throws Exception
 	{
 		Node node = null;
@@ -193,6 +209,9 @@ public class TestNeoRelationshipSet extends NeoTest
 			super( node );
 		}
 		
+		/**
+		 * @return a collection of objects contained in this node.
+		 */
 		public Collection<SomeOtherContainer> otherContainers()
 		{
 			return new ContainerSet( getUnderlyingNode() );

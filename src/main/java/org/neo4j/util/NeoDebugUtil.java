@@ -8,8 +8,16 @@ import org.neo4j.api.core.Transaction;
 import org.neo4j.impl.core.NodeManager;
 import org.neo4j.impl.core.NotFoundException;
 
+/**
+ * Simple debugging utility for neo-related objects.
+ */
 public abstract class NeoDebugUtil
 {
+	/**
+	 * Prints information about a node, its properties and relationships.
+	 * @param nodeId the node id to print.
+	 * @param writer the writer to writer to.
+	 */
 	public static void printNodeInfo( int nodeId, PrintStream writer )
 	{
 		Transaction tx = Transaction.begin();
@@ -51,6 +59,11 @@ public abstract class NeoDebugUtil
 		}
 	}
 	
+	/**
+	 * Prints information about a relationship, its properties and nodes.
+	 * @param rel the relationship.
+	 * @param writer the writer to write to.
+	 */
 	public static void printRelationshipInfo( Relationship rel,
 		PrintStream writer )
 	{

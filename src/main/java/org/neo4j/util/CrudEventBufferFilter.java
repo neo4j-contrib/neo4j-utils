@@ -7,7 +7,11 @@ import java.util.Set;
 
 import org.neo4j.util.CrudEventData.AlterationMode;
 
-
+/**
+ * Useful filter implementation which functions like a filter for CRUD
+ * operations. Uses {@link CrudEventData}.
+ * @author mattias
+ */
 public class CrudEventBufferFilter implements EventBufferFilter
 {
 	public EventContext[] filter( EventContext[] events )

@@ -32,19 +32,37 @@ import org.neo4j.impl.event.ReActiveEventListener;
  */
 public class NeoUtil
 {
+	/**
+	 * The type of event, neo supports pro-active and re-active.
+	 */
 	public static enum EventType
 	{
+		/**
+		 * A pro-active event, which means that the event reaches its targets
+		 * synchronously.
+		 */
 		PRO_ACTIVE,
+		
+		/**
+		 * A re-active event, which means that the event may reach its targets
+		 * at a later time (a separate thread in neo).
+		 */
 		RE_ACTIVE,
 	}
 	
 	private EmbeddedNeo neo;
 	
+	/**
+	 * @param neo the {@link EmbeddedNeo} to use in methods which needs it.
+	 */
 	public NeoUtil( EmbeddedNeo neo )
 	{
 		this.neo = neo;
 	}
 	
+	/**
+	 * @return the {@link EmbeddedNeo} from the constructor.
+	 */
 	public EmbeddedNeo neo()
 	{
 		return this.neo;
@@ -58,6 +76,12 @@ public class NeoUtil
 		}
 	}
 	
+	/**
+	 * Wraps a single {@link Node#hasProperty(String)} in a transaction.
+	 * @param node the {@link Node}.
+	 * @param key the property key.
+	 * @return the result from {@link Node#hasProperty(String)}.
+	 */
 	public boolean hasProperty( Node node, String key )
 	{
 		assertPropertyKeyNotNull( key );
@@ -74,6 +98,12 @@ public class NeoUtil
 		}
 	}
 
+	/**
+	 * Wraps a single {@link Node#getProperty(String)} in a transaction.
+	 * @param node the {@link Node}.
+	 * @param key the property key.
+	 * @return the result from {@link Node#getProperty(String)}.
+	 */
 	public Object getProperty( Node node, String key )
 	{
 		assertPropertyKeyNotNull( key );
@@ -90,6 +120,13 @@ public class NeoUtil
 		}
 	}
 
+	/**
+	 * Wraps a single {@link Node#getProperty(String, Object)} in a transaction.
+	 * @param node the {@link Node}.
+	 * @param key the property key.
+	 * @param defaultValue the value to return if the property doesn't exist.
+	 * @return the result from {@link Node#getProperty(String, Object)}.
+	 */
 	public Object getProperty( Node node, String key, Object defaultValue )
 	{
 		assertPropertyKeyNotNull( key );
@@ -106,6 +143,12 @@ public class NeoUtil
 		}
 	}
 
+	/**
+	 * Wraps a single {@link Node#setProperty(String, Object)} in a transaction.
+	 * @param node the {@link Node}.
+	 * @param key the property key.
+	 * @param value the property value.
+	 */
 	public void setProperty( Node node, String key, Object value )
 	{
 		assertPropertyKeyNotNull( key );
@@ -127,6 +170,11 @@ public class NeoUtil
 		}
 	}
 	
+	/**
+	 * Wraps a single {@link Node#removeProperty(String)} in a transaction.
+	 * @param node the {@link Node}.
+	 * @param key the property key.
+	 */
 	public void removeProperty( Node node, String key )
 	{
 		assertPropertyKeyNotNull( key );
@@ -142,6 +190,15 @@ public class NeoUtil
 		}
 	}
 	
+	/**
+	 * Wraps a {@link Node#getSingleRelationship(RelationshipType, Direction)}
+	 * in a transaction.
+	 * @param node the {@link Node}.
+	 * @param type the {@link RelationshipType}
+	 * @param direction the {@link Direction}.
+	 * @return the result from
+	 * {@link Node#getSingleRelationship(RelationshipType, Direction)}.
+	 */
 	public Relationship getSingleRelationship( Node node, RelationshipType type,
 		Direction direction )
 	{
@@ -159,6 +216,10 @@ public class NeoUtil
 		}
 	}
 	
+	/**
+	 * Wraps a {@link EmbeddedNeo#getReferenceNode()} in a transaction.
+	 * @return the result from {@link EmbeddedNeo#getReferenceNode()}.
+	 */
 	public Node getReferenceNode()
 	{
 		Transaction tx = Transaction.begin();
@@ -174,6 +235,11 @@ public class NeoUtil
 		}
 	}
 
+	/**
+	 * @see #getOrCreateSubReferenceNode(RelationshipType, Direction) .
+	 * @param type the relationship type.
+	 * @return the sub-reference node for {@code type}.
+	 */
 	public Node getOrCreateSubReferenceNode( RelationshipType type )
 	{
 		return this.getOrCreateSubReferenceNode( type, Direction.OUTGOING );
@@ -186,8 +252,9 @@ public class NeoUtil
 	 * 
 	 * [NodeSpaceReferenceNode] -- type --> [SubReferenceNode]
 	 * 
-	 * @param type
-	 * @return
+	 * @param type the relationship type.
+	 * @param direction the direction of the relationship.
+	 * @return the sub-reference node.
 	 */
 	public Node getOrCreateSubReferenceNode( RelationshipType type,
 		Direction direction )
@@ -218,6 +285,13 @@ public class NeoUtil
 		}
 	}
 	
+	/**
+	 * Returns the sub-reference node for a relationship type as a collection.
+	 * @param <T> the instance class for objects in the result collection.
+	 * @param type the relationship type for the sub-reference node.
+	 * @param clazz the instance class for objects in the result collection.
+	 * @return the sub-reference node for a relationship type as a collection.
+	 */
 	public <T extends NodeWrapper> Collection<T> getSubReferenceNodeCollection(
 		RelationshipType type, Class<T> clazz )
 	{
@@ -225,6 +299,12 @@ public class NeoUtil
 			getOrCreateSubReferenceNode( type ), type, clazz );
 	}
 	
+	/**
+	 * Convenience method for registering a re-active event listener.
+	 * Instead of throwing declared exceptions it throws runtime exceptions.
+	 * @param listener the listener to register with the event.
+	 * @param event the event to register the listener with.
+	 */
 	public void registerReActiveEventListener( ReActiveEventListener listener,
 		Event event )
 	{
@@ -243,6 +323,12 @@ public class NeoUtil
 		}
 	}
 	
+	/**
+	 * Convenience method for unregistering a re-active event listener.
+	 * Instead of throwing declared exceptions it throws runtime exceptions.
+	 * @param listener the listener to unregister from the event.
+	 * @param event the event to unregister the listener from.
+	 */
 	public static void unregisterReActiveEventListener(
 		ReActiveEventListener listener, Event event )
 	{
@@ -257,6 +343,12 @@ public class NeoUtil
 		}
 	}
 
+	/**
+	 * Convenience method for registering a pro-active event listener.
+	 * Instead of throwing declared exceptions it throws runtime exceptions.
+	 * @param listener the listener to register with the event.
+	 * @param event the event to register the listener with.
+	 */
 	public static void registerProActiveEventListener(
 		ProActiveEventListener listener, Event event )
 	{
@@ -275,6 +367,12 @@ public class NeoUtil
 		}
 	}
 	
+	/**
+	 * Convenience method for unregistering a re-active event listener.
+	 * Instead of throwing declared exceptions it throws runtime exceptions.
+	 * @param listener the listener to unregister from the event.
+	 * @param event the event to unregister the listener from.
+	 */
 	public static void unregisterProActiveEventListener(
 		ProActiveEventListener listener, Event event )
 	{
@@ -290,7 +388,12 @@ public class NeoUtil
 	}
 
 	/**
-	 * Generates a proactive event
+	 * Convenience method for generating a pro-active event.
+	 * @param event the event type.
+	 * @param data the event data to send (it gets wrapped in an
+	 * {@link EventData}).
+	 * @return the result of
+	 * {@link EventManager#generateProActiveEvent(Event, EventData)}.
 	 */
 	public static boolean proActiveEvent( Event event, Object data )
 	{
@@ -298,7 +401,10 @@ public class NeoUtil
 	}
 	
 	/**
-	 * Generates a reactive event
+	 * Convenience method for generating a re-active event.
+	 * @param event the event type.
+	 * @param data the event data to send (it gets wrapped in an
+	 * {@link EventData}).
 	 */
 	public static void reActiveEvent( Event event, Object data )
 	{
@@ -306,7 +412,15 @@ public class NeoUtil
 	}
 	
 	/**
-	 * Generates an event either proactively, reactively or both
+	 * Convenience method for generating an event (pro-active, re-active or
+	 * both)
+	 * @param event the event type.
+	 * @param data the event data to send (it gets wrapped in an
+	 * {@link EventData}).
+	 * @param types the types of event to send.
+	 * @return the result of
+	 * {@link EventManager#generateProActiveEvent(Event, EventData)} if any
+	 * of the types is {@link EventType#PRO_ACTIVE}, else {@code true}.
 	 */
 	public static boolean event( Event event, Object data, EventType... types )
 	{

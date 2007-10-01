@@ -8,6 +8,12 @@ import org.neo4j.api.core.Transaction;
 import org.neo4j.impl.transaction.IllegalResourceException;
 import org.neo4j.impl.transaction.LockManager;
 
+/**
+ * The default implementation of {@link Link}.
+ * @author mattias
+ *
+ * @param <T> the type of objects used in this instance.
+ */
 public class LinkImpl<T extends NodeWrapper> implements Link<T>
 {
 	private Node node;
@@ -15,6 +21,12 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	private Class<T> theClass;
 	private Direction direction = Direction.OUTGOING;
 	
+	/**
+	 * @param node the node to act as the link.
+	 * @param type the relationship type to be the link relationship.
+	 * @param thisIsGenericsFault well, even if we have T we must send the
+	 * same class here to make instantiation work.
+	 */
 	public LinkImpl( Node node, RelationshipType type,
 		Class<T> thisIsGenericsFault )
 	{
@@ -23,6 +35,13 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 		this.theClass = thisIsGenericsFault;
 	}
 	
+	/**
+	 * @param node the node to act as the link.
+	 * @param type the relationship type to be the link relationship.
+	 * @param thisIsGenericsFault well, even if we have T we must send the
+	 * same class here to make instantiation work.
+	 * @param direction the direction of the relationship.
+	 */
 	public LinkImpl( Node node, RelationshipType type,
 		Class<T> thisIsGenericsFault, Direction direction )
 	{

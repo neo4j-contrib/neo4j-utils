@@ -9,8 +9,15 @@ import org.neo4j.util.CrudEventFilter;
 import org.neo4j.util.EventContext;
 import org.neo4j.util.CrudEventData.AlterationMode;
 
+/**
+ * Tests THE CRUD event filters.
+ * @author mattias
+ */
 public class TestEventFilters extends NeoTest
 {
+	/**
+	 * Tests the {@link CrudEventFilter} class.
+	 */
 	public void testCrudEventFilter()
 	{
 		CrudEventFilter filter = new CrudEventFilter();
@@ -31,6 +38,9 @@ public class TestEventFilters extends NeoTest
 		assertTrue( !filter.pass( null, data( 2, AlterationMode.MODIFIED ) ) );
 	}
 	
+	/**
+	 * Tests the {@link CrudEventBufferFilter} class.
+	 */
 	public void testCrudEventBufferFilter()
 	{
 		List<EventContext> l = new ArrayList<EventContext>();

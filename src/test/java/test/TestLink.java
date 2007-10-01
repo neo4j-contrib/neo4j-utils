@@ -8,13 +8,26 @@ import org.neo4j.util.Link;
 import org.neo4j.util.LinkImpl;
 import org.neo4j.util.NodeWrapper;
 
+/**
+ * Tests the {@link Link} class and its implementation {@link LinkImpl}.
+ * @author mattias
+ *
+ */
 public class TestLink extends NeoTest
 {
+	/**
+	 * Tests link functionality with normal outgoing direction.
+	 * @throws Exception if something goes wrong.
+	 */
 	public void testOne() throws Exception
 	{
 		this.doSomeTesting( Direction.OUTGOING );
 	}
 	
+	/**
+	 * Tests link functionality with incoming direction.
+	 * @throws Exception if something goes wrong.
+	 */
 	public void testOther() throws Exception
 	{
 		this.doSomeTesting( Direction.INCOMING );
@@ -69,8 +82,15 @@ public class TestLink extends NeoTest
 		}
 	}
 	
+	/**
+	 * Simple node wrapper class for testing.
+	 * @author mattias
+	 */
 	public static class Entity extends NodeWrapper
 	{
+		/**
+		 * @param node the underlying node.
+		 */
 		public Entity( Node node )
 		{
 			super( node );

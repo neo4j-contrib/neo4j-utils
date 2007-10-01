@@ -12,6 +12,11 @@ public abstract class SimpleMigration extends Migration
 {
 	private String versionClassPrefix;
 	
+	/**
+	 * @param neo the {@link EmbeddedNeo} instance to store migration info in.
+	 * @param subReferenceType the {@link RelationshipType} to use a sub
+	 * reference type.
+	 */
 	public SimpleMigration( EmbeddedNeo neo, RelationshipType subReferenceType )
 	{
 		super( getConfigNodeFromType( neo, subReferenceType ) );

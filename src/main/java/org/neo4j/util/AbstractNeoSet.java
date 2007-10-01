@@ -4,6 +4,12 @@ import java.util.Collection;
 
 import org.neo4j.api.core.Transaction;
 
+/**
+ * Abstract super class for implementations of neo collections and sets.
+ * @author mattias
+ *
+ * @param <T> The type of objects in this collection.
+ */
 public abstract class AbstractNeoSet<T> implements Collection<T>
 {
 	public boolean addAll( Collection<? extends T> items )

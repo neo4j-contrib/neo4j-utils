@@ -9,8 +9,15 @@ import org.neo4j.api.core.Transaction;
 import org.neo4j.impl.core.NodeManager;
 import org.neo4j.util.NeoPropertySet;
 
+/**
+ * Tests the {@link NeoPropertySet} class.
+ * @author mattias
+ */
 public class TestNeoPropertySet extends NeoTest
 {
+	/**
+	 * Tests some general use of the {@link NeoPropertySet} class.
+	 */
 	public void testSome()
 	{
 		Node node = null;

@@ -6,6 +6,11 @@ import org.neo4j.impl.event.Event;
 import org.neo4j.impl.event.EventData;
 import org.neo4j.util.CrudEventData.AlterationMode;
 
+/**
+ * Useful filter implementation which functions like a filter for CRUD
+ * operations. Uses {@link CrudEventData}.
+ * @author mattias
+ */
 public class CrudEventFilter implements EventFilter
 {
 	private Set<Long> modified = new HashSet<Long>();

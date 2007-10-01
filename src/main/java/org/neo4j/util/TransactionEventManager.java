@@ -37,7 +37,10 @@ public class TransactionEventManager
 
 	private static TransactionEventManager instance =
 		new TransactionEventManager();
-		
+	
+	/**
+	 * @return the single instance if this manager.
+	 */
 	public static TransactionEventManager getManager()
 	{
 		return instance;
@@ -97,8 +100,7 @@ public class TransactionEventManager
 	/**
 	 * Removes a TransactionHook. This is done when a tx is finished and
 	 * its events have been sent.
-	 * @param id the tx id
-	 * @return the removed TransactionHook
+	 * @param id the transaction id.
 	 */
 	private void removeTransactionHook( TransactionHook hook )
 	{
@@ -129,6 +131,10 @@ public class TransactionEventManager
 		}
 	}
 	
+	/**
+	 * Sets the factory instance for creating transaction hooks.
+	 * @param factory
+	 */
 	public void setTransactionHookFactory( TransactionHookFactory factory )
 	{
 		this.hookFactory = factory;
@@ -356,11 +362,25 @@ public class TransactionEventManager
 		}
 	}
 	
+	/**
+	 * A simple factory interface for creating {@link TransactionHook}
+	 * instances.
+	 * @author mattias
+	 */
 	public static interface TransactionHookFactory
 	{
+		/**
+		 * Creates a new transaction hook for a given id.
+		 * @param txId the transaction id to use.
+		 * @return a new transaction hook for a given id.
+		 */
 		public TransactionHook newHook( int txId );
 	}
 	
+	/**
+	 * A code hook to execute when a transaction is committed.
+	 * @author mattias
+	 */
 	public static class TransactionHook
 	{
 		private int txId;

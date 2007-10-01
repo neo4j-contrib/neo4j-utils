@@ -6,12 +6,20 @@ import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
 import org.neo4j.api.core.Transaction;
 
+/**
+ * A String collection, persistent in neo.
+ */
 public class NeoStringSet extends NeoRelationshipSet<String>
 {
 	private static final String VALUE_KEY = "value";
 	
 	private EmbeddedNeo neo;
 	
+	/**
+	 * @param neo the {@link EmbeddedNeo} to use.
+	 * @param node the {@link Node} which is the collection node.
+	 * @param type the relationship type to use internally for each element.
+	 */
 	public NeoStringSet( EmbeddedNeo neo, Node node, RelationshipType type )
 	{
 		super( node, type );

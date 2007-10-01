@@ -4,11 +4,22 @@ import org.neo4j.impl.event.Event;
 import org.neo4j.impl.event.EventData;
 import org.neo4j.impl.event.ProActiveEventListener;
 
+/**
+ * Listens to events, receives events when a transaction is commited. Use with
+ * {@link TransactionEventManager}.
+ * @author mattias
+ */
 public abstract class TransactionEventListener
 	implements ProActiveEventListener
 {
+	/**
+	 * @return a list of events to listen for.
+	 */
 	protected abstract Event[] getEvents();
 	
+	/**
+	 * Starts listen to events.
+	 */
 	public void start()
 	{
 		for ( Event event : getEvents() )
@@ -18,6 +29,9 @@ public abstract class TransactionEventListener
 		}
 	}
 	
+	/**
+	 * Stops listen to events.
+	 */
 	public void stop()
 	{
 		for ( Event event : getEvents() )

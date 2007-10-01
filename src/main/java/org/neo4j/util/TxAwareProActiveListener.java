@@ -30,6 +30,9 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 		return EventFilter.HOLLOW_EVENT_FILTER;
 	}
 	
+	/**
+	 * Registers this listener to listen to events.
+	 */
 	public void register()
 	{
 		for ( Event event : getEvents() )
@@ -45,6 +48,9 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 			Event.TX_IMMEDIATE_COMMIT );
 	}
 	
+	/**
+	 * Unregisters this listener so that no more events reaches this listener.
+	 */
 	public void unregister()
 	{
 		for ( Event event : getEvents() )

@@ -9,20 +9,41 @@ import java.util.regex.Pattern;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 
+/**
+ * A neo collection implemented with one property where the values are separated
+ * with a delimiter.
+ * @author mattias
+ *
+ * @param <T> the type of objects in the collection.
+ */
 public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	implements Set<T>
 {
+	/**
+	 * The delimiter used for separating values.
+	 */
 	public static final String DEFAULT_DELIMITER = "|";
 	
 	private Node node;
 	private String key;
 	private String delimiter;
 	
+	/**
+	 * @param node the node to act as the collection.
+	 * @param propertyKey the property key to use for the collection node to
+	 * store the values.
+	 */
 	public NeoPropertySet( Node node, String propertyKey )
 	{
 		this( node, propertyKey, DEFAULT_DELIMITER );
 	}
 	
+	/**
+	 * @param node the node to act as the collection.
+	 * @param propertyKey the property key to use for the collection node to
+	 * store the values.
+	 * @param delimiter custom delimiter instead of {@link #DEFAULT_DELIMITER}.
+	 */
 	public NeoPropertySet( Node node, String propertyKey,
 		String delimiter )
 	{
