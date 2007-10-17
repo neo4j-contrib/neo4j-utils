@@ -17,8 +17,6 @@ import org.neo4j.impl.transaction.TransactionUtil;
  */
 public abstract class Migration
 {
-	private static final String KEY_CURRENT_VERSION = "current_version";
-	
 	private Node configNode;
 	private boolean firstVersionIsAlwaysZero;
 	private boolean pretending;
@@ -36,6 +34,11 @@ public abstract class Migration
 	private Node getConfigNode()
 	{
 		return this.configNode;
+	}
+	
+	protected String getCurrentVersionPropertyKey()
+	{
+		return "current_version";
 	}
 	
 	/**
@@ -66,10 +69,10 @@ public abstract class Migration
 		try
 		{
 			int result = 0;
-			if ( this.getConfigNode().hasProperty( KEY_CURRENT_VERSION ) )
+			String key = getCurrentVersionPropertyKey();
+			if ( this.getConfigNode().hasProperty( key ) )
 			{
-				result = ( Integer ) this.getConfigNode().getProperty(
-					KEY_CURRENT_VERSION );
+				result = ( Integer ) this.getConfigNode().getProperty( key );
 			}
 			else
 			{
@@ -85,25 +88,23 @@ public abstract class Migration
 					// starts getting used after a while, when the first
 					// migrator is written.
 					this.getCodeVersion();
-				this.getConfigNode().setProperty( KEY_CURRENT_VERSION, result );
+				this.getConfigNode().setProperty( key, result );
 			}
 			if ( this.firstVersionIsAlwaysZero )
 			{
-				result = ( Integer ) this.getConfigNode().getProperty(
-					KEY_CURRENT_VERSION, 0 );
+				result = ( Integer ) this.getConfigNode().getProperty( key, 0 );
 			}
 			else
 			{
-				if ( this.getConfigNode().hasProperty( KEY_CURRENT_VERSION ) )
+				if ( this.getConfigNode().hasProperty( key ) )
 				{
 					result = ( Integer ) this.getConfigNode().getProperty(
-						KEY_CURRENT_VERSION );
+						key );
 				}
 				else
 				{
 					result = this.getCodeVersion();
-					this.getConfigNode().setProperty( KEY_CURRENT_VERSION,
-						result );
+					this.getConfigNode().setProperty( key, result );
 				}
 			}
 			tx.success();
@@ -127,7 +128,8 @@ public abstract class Migration
 		Transaction tx = Transaction.begin();
 		try
 		{
-			this.getConfigNode().setProperty( KEY_CURRENT_VERSION, version );
+			this.getConfigNode().setProperty( getCurrentVersionPropertyKey(),
+				version );
 			tx.success();
 		}
 		finally
