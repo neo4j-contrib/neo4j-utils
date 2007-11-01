@@ -1,5 +1,7 @@
 package org.neo4j.util;
 
+import java.util.Iterator;
+
 import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
@@ -63,8 +65,10 @@ public class NeoStringSet extends NeoRelationshipSet<String>
     {
 		String value = ( String ) item;
 		Relationship result = null;
-		for ( Relationship rel : this.getAllRelationships() )
+		Iterator<Relationship> itr = this.getAllRelationships();
+		while ( itr.hasNext() )
 		{
+			Relationship rel = itr.next();
 			Node node = rel.getOtherNode( this.getUnderlyingNode() );
 			String nodeValue = newObject( node, rel );
 			if ( value.equals( nodeValue ) )

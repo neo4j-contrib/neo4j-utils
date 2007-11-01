@@ -120,9 +120,10 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		Transaction tx = Transaction.begin();
 		try
 		{
-			for ( Relationship rel : getAllRelationships() )
+			Iterator<Relationship> itr = getAllRelationships();
+			while ( itr.hasNext() )
 			{
-				removeItem( rel );
+				removeItem( itr.next() );
 			}
 			tx.success();
 		}
@@ -152,17 +153,10 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		return true;
 	}
 	
-	protected Relationship[] getAllRelationships()
+	protected Iterator<Relationship> getAllRelationships()
 	{
-		ArrayList<Relationship> list = new ArrayList<Relationship>();
-		for ( Relationship rel : node.getRelationships( type, getDirection() ) )
-		{
-			if ( shouldIncludeRelationship( rel ) )
-			{
-				list.add( rel );
-			}
-		}
-		return list.toArray( new Relationship[ list.size() ] );
+		return new RelationshipIterator(
+			node.getRelationships( type, getDirection() ).iterator() );
 	}
 	
 	protected Relationship findRelationship( Object item )
@@ -186,7 +180,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		Transaction tx = Transaction.begin();
 		try
 		{
-			return getAllRelationships().length == 0;
+			return !getAllRelationships().hasNext();
 		}
 		finally
 		{
@@ -265,9 +259,15 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		Transaction tx = Transaction.begin();
 		try
 		{
-			int result = getAllRelationships().length;
+			int counter = 0;
+			Iterator<Relationship> itr = getAllRelationships();
+			while ( itr.hasNext() )
+			{
+				itr.next();
+				counter++;
+			}
 			tx.success();
-			return result;
+			return counter;
 		}
 		finally
 		{
@@ -287,14 +287,15 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Relationship[] rels = getAllRelationships();
-			Object[] array = new Object[ rels.length ];
-			for ( int i = 0; i < rels.length; i++ )
+			Iterator<Relationship> itr = getAllRelationships();
+			Collection<Object> result = newArrayCollection();
+			while ( itr.hasNext() )
 			{
-				array[ i ] = newObject( getOtherNode( rels[ i ] ), rels[ i ] );
+				Relationship rel = itr.next();
+				result.add( newObject( getOtherNode( rel ), rel ) );
 			}
 			tx.success();
-			return array;
+			return result.toArray();
 		}
 		finally
 		{
@@ -307,11 +308,18 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Relationship[] rels = getAllRelationships();
-			for ( int i = 0;i < rels.length; i++ )
+			Iterator<Relationship> itr = getAllRelationships();
+			Collection<R> result = newArrayCollection();
+			while ( itr.hasNext() )
 			{
-				array[ i ] = ( R )
-					newObject( getOtherNode( rels[ i ] ), rels[ i ] );
+				Relationship rel = itr.next();
+				result.add( ( R ) newObject( getOtherNode( rel ), rel ) );
+			}
+			
+			int i = 0;
+			for ( R item : result )
+			{
+				array[ i++ ] = item;
 			}
 			tx.success();
 			return array;
@@ -319,6 +327,56 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		finally
 		{
 			tx.finish();
+		}
+	}
+	
+	protected <R> Collection<R> newArrayCollection()
+	{
+		return new ArrayList<R>();
+	}
+	
+	protected class RelationshipIterator implements Iterator<Relationship>
+	{
+		private Iterator<Relationship> source;
+		private Relationship next;
+		
+		RelationshipIterator( Iterator<Relationship> source )
+		{
+			this.source = source;
+		}
+		
+		public boolean hasNext()
+		{
+			if ( next != null )
+			{
+				return true;
+			}
+			
+			while ( source.hasNext() && next == null )
+			{
+				Relationship test = source.next();
+				if ( shouldIncludeRelationship( test ) )
+				{
+					next = test;
+				}
+			}
+			return next != null;
+		}
+		
+		public Relationship next()
+		{
+			if ( !hasNext() )
+			{
+				throw new IllegalStateException();
+			}
+			Relationship result = next;
+			next = null;
+			return result;
+		}
+		
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
 		}
 	}
 	

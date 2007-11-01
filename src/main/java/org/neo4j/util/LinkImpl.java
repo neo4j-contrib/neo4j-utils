@@ -144,7 +144,9 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 				this.node() : entityNode;
 			Node endNode = this.direction() == Direction.OUTGOING ?
 				entityNode : this.node();
-			startNode.createRelationshipTo( endNode, this.type() );
+			Relationship rel =
+				startNode.createRelationshipTo( endNode, this.type() );
+			entitySet( entity, rel );
 			tx.success();
 		}
 		catch ( IllegalResourceException e )
@@ -163,5 +165,9 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 			}
 			tx.finish();
 		}
+	}
+	
+	protected void entitySet( T entity, Relationship createdRelationship )
+	{
 	}
 }
