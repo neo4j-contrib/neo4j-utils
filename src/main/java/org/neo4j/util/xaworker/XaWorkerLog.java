@@ -177,12 +177,16 @@ public class XaWorkerLog
 	private void addOne( XaWorkerLogEntry entry )
 		throws IOException
 	{
+		// JS: hack, fix this
+		SearchDataEntry searchEntry = ( SearchDataEntry ) entry.getEntry();
 		buffer.clear();
-		buffer.limit( 1 );
+		buffer.limit( 1 + 1 + 8 + 1 );
 		buffer.put( ENTRY_INCOMPLETE );
+		buffer.put( searchEntry.getType() );
+		buffer.putLong( searchEntry.getId() );
+		buffer.put( searchEntry.getMode() );
 		buffer.flip();
 		channel.write( buffer );
-		entry.writeToFile( channel, buffer );
 	}
 	
 	/**
