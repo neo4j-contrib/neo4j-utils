@@ -174,15 +174,18 @@ public class NeoUtil
 	 * Wraps a single {@link Node#removeProperty(String)} in a transaction.
 	 * @param node the {@link Node}.
 	 * @param key the property key.
+	 * @return the old value of the property or null if the property didn't
+	 * exist
 	 */
-	public void removeProperty( Node node, String key )
+	public Object removeProperty( Node node, String key )
 	{
 		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
-			node.removeProperty( key );
+			Object oldValue = node.removeProperty( key );
 			tx.success();
+			return oldValue;
 		}
 		finally
 		{
