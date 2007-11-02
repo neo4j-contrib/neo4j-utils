@@ -1,6 +1,8 @@
 package org.neo4j.util.xaworker;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import org.neo4j.impl.transaction.xaframework.LogBuffer;
 
 /**
  * Convenience class for a xa data source which handles search entries which
@@ -41,8 +43,7 @@ public class SearchDataHook extends XaWorkerHook
 			return values;
 		}
 
-		@Override
-		protected void writeEntry( ByteBuffer buffer )
+		protected void writeEntry( LogBuffer buffer ) throws IOException
 		{
 			SearchDataEntry entry = ( SearchDataEntry ) this.getEntry();
 			buffer.put( entry.getType() );

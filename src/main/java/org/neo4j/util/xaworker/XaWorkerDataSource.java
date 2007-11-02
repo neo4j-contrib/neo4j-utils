@@ -11,6 +11,7 @@ import javax.transaction.SystemException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import org.neo4j.impl.transaction.TxManager;
+import org.neo4j.impl.transaction.xaframework.LogBuffer;
 import org.neo4j.impl.transaction.xaframework.XaCommand;
 import org.neo4j.impl.transaction.xaframework.XaCommandFactory;
 import org.neo4j.impl.transaction.xaframework.XaConnection;
@@ -289,16 +290,16 @@ public class XaWorkerDataSource extends XaDataSource
 			return this.entry;
 		}
 		
-		public void writeToFile( FileChannel channel, ByteBuffer buffer )
-			throws IOException
-		{
-			entry.writeToFile( channel, buffer );
-		}
-		
 		void readFromFile( FileChannel channel, ByteBuffer buffer )
 			throws IOException
 		{
 			entry.readFromFile( channel, buffer );
 		}
+
+		@Override
+        public void writeToFile( LogBuffer buffer ) throws IOException
+        {
+			entry.writeToFile( buffer );
+        }
 	}
 }

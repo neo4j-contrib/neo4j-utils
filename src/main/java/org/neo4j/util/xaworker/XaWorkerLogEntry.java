@@ -3,6 +3,7 @@ package org.neo4j.util.xaworker;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import org.neo4j.impl.transaction.xaframework.LogBuffer;
 
 public abstract class XaWorkerLogEntry
 {
@@ -56,18 +57,14 @@ public abstract class XaWorkerLogEntry
 		return getCommandSize( this.hook.getEntrySize() );
 	}
 
-	public void writeToFile( FileChannel channel, ByteBuffer buffer )
+	public void writeToFile( LogBuffer buffer )
 		throws IOException
 	{
-		buffer.clear();
-		buffer.limit( this.getCommandSize() );
 		this.writeEntry( buffer );
 		buffer.putInt( this.transactionId );
-		buffer.flip();
-		channel.write( buffer );
 	}
 	
-	protected abstract void writeEntry( ByteBuffer buffer );
+	protected abstract void writeEntry( LogBuffer buffer ) throws IOException;
 	
 	void readFromFile( FileChannel channel, ByteBuffer buffer )
 		throws IOException
