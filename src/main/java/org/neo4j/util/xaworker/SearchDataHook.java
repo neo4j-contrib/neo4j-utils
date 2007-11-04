@@ -43,6 +43,7 @@ public class SearchDataHook extends XaWorkerHook
 			return values;
 		}
 
+		@Override
 		protected void writeEntry( LogBuffer buffer ) throws IOException
 		{
 			SearchDataEntry entry = ( SearchDataEntry ) this.getEntry();

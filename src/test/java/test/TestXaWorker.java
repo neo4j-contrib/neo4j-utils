@@ -20,14 +20,10 @@ public class TestXaWorker extends NeoTest
 	private static XaWorkerHook hook = new SearchDataHook();
 	private static Random random = new Random();
 	
-	public void testNoTest()
-	{
-	}
-	
 	/**
 	 * Add a bunch of entries and see if the worker behaves correctly
 	 */
-	public void notTestSome() throws Exception
+	public void testSome() throws Exception
 	{
 		MyWorker worker = this.newWorker( true );
 		add( worker, 1, 3 );
@@ -83,7 +79,7 @@ public class TestXaWorker extends NeoTest
 		return worker;
 	}
 
-	public void notTestCloseInTheMiddle() throws Exception
+	public void testCloseInTheMiddle() throws Exception
 	{
 		for ( int c = 0; c < 10; c++ )
 		{

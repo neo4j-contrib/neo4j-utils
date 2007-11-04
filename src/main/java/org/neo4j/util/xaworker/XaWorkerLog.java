@@ -180,18 +180,18 @@ public class XaWorkerLog
 		// JS: hack, fix this
 		SearchDataEntry searchEntry = ( SearchDataEntry ) entry.getEntry();
 		buffer.clear();
-		buffer.limit( 1 + 1 + 8 + 1 );
+		buffer.limit( 1 + 1 + 8 + 1 + 4 );
 		buffer.put( ENTRY_INCOMPLETE );
 		buffer.put( searchEntry.getType() );
 		buffer.putLong( searchEntry.getId() );
 		buffer.put( searchEntry.getMode() );
+		buffer.putInt( entry.getTransactionId() );
 		buffer.flip();
 		channel.write( buffer );
 	}
 	
 	/**
 	 * Returns null if there are no more entries
-	 * @return
 	 */
 	public synchronized XaWorkerLogEntry next() throws IOException
 	{
