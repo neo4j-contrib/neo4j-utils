@@ -3,7 +3,7 @@ package org.neo4j.util;
 import java.util.Collection;
 
 import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.EmbeddedNeo;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
@@ -50,20 +50,20 @@ public class NeoUtil
 		RE_ACTIVE,
 	}
 	
-	private EmbeddedNeo neo;
+	private NeoService neo;
 	
 	/**
-	 * @param neo the {@link EmbeddedNeo} to use in methods which needs it.
+	 * @param neo the {@link NeoService} to use in methods which needs it.
 	 */
-	public NeoUtil( EmbeddedNeo neo )
+	public NeoUtil( NeoService neo )
 	{
 		this.neo = neo;
 	}
 	
 	/**
-	 * @return the {@link EmbeddedNeo} from the constructor.
+	 * @return the {@link NeoService} from the constructor.
 	 */
-	public EmbeddedNeo neo()
+	public NeoService neo()
 	{
 		return this.neo;
 	}
@@ -220,8 +220,8 @@ public class NeoUtil
 	}
 	
 	/**
-	 * Wraps a {@link EmbeddedNeo#getReferenceNode()} in a transaction.
-	 * @return the result from {@link EmbeddedNeo#getReferenceNode()}.
+	 * Wraps a {@link NeoService#getReferenceNode()} in a transaction.
+	 * @return the result from {@link NeoService#getReferenceNode()}.
 	 */
 	public Node getReferenceNode()
 	{

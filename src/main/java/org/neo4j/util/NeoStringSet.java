@@ -2,7 +2,7 @@ package org.neo4j.util;
 
 import java.util.Iterator;
 
-import org.neo4j.api.core.EmbeddedNeo;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
@@ -15,14 +15,14 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 {
 	private static final String VALUE_KEY = "value";
 	
-	private EmbeddedNeo neo;
+	private NeoService neo;
 	
 	/**
-	 * @param neo the {@link EmbeddedNeo} to use.
+	 * @param neo the {@link NeoService} to use.
 	 * @param node the {@link Node} which is the collection node.
 	 * @param type the relationship type to use internally for each element.
 	 */
-	public NeoStringSet( EmbeddedNeo neo, Node node, RelationshipType type )
+	public NeoStringSet( NeoService neo, Node node, RelationshipType type )
 	{
 		super( node, type );
 		this.neo = neo;

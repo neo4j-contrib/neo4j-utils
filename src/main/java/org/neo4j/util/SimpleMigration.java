@@ -1,6 +1,6 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.EmbeddedNeo;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.RelationshipType;
 
@@ -13,17 +13,17 @@ public abstract class SimpleMigration extends Migration
 	private String versionClassPrefix;
 	
 	/**
-	 * @param neo the {@link EmbeddedNeo} instance to store migration info in.
+	 * @param neo the {@link NeoService} instance to store migration info in.
 	 * @param subReferenceType the {@link RelationshipType} to use a sub
 	 * reference type.
 	 */
-	public SimpleMigration( EmbeddedNeo neo, RelationshipType subReferenceType )
+	public SimpleMigration( NeoService neo, RelationshipType subReferenceType )
 	{
 		super( getConfigNodeFromType( neo, subReferenceType ) );
 		this.versionClassPrefix = this.getMigratorPrefix();
 	}
 	
-	private static Node getConfigNodeFromType( EmbeddedNeo neo,
+	private static Node getConfigNodeFromType( NeoService neo,
 		RelationshipType type )
 	{
 		return new NeoUtil( neo ).getOrCreateSubReferenceNode( type );

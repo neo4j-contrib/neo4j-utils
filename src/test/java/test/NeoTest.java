@@ -3,6 +3,7 @@ package test;
 import java.io.File;
 import junit.framework.TestCase;
 import org.neo4j.api.core.EmbeddedNeo;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.RelationshipType;
 
 /**
@@ -35,7 +36,7 @@ public class NeoTest extends TestCase
 			}
 		}
 		
-		final EmbeddedNeo neo = new EmbeddedNeo( dbPath );
+		final NeoService neo = new EmbeddedNeo( dbPath );
 		Runtime.getRuntime().addShutdownHook( new Thread()
 		{
 			@Override
