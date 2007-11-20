@@ -35,8 +35,7 @@ public class NeoTest extends TestCase
 			}
 		}
 		
-		final EmbeddedNeo neo = new EmbeddedNeo( Relationships.class,
-			dbPath, true );
+		final EmbeddedNeo neo = new EmbeddedNeo( dbPath );
 		Runtime.getRuntime().addShutdownHook( new Thread()
 		{
 			@Override

@@ -12,6 +12,11 @@ import org.neo4j.util.xaworker.XaWorkerException;
 import org.neo4j.util.xaworker.XaWorkerHook;
 import org.neo4j.util.xaworker.XaWorkerLogEntry;
 
+/**
+ * Tests the xa worker
+ * @author mattias
+ *
+ */
 public class TestXaWorker extends NeoTest
 {
 	private static final String LOG_FILE = "target/log";
@@ -22,6 +27,7 @@ public class TestXaWorker extends NeoTest
 	
 	/**
 	 * Add a bunch of entries and see if the worker behaves correctly
+	 * @throws Exception if an error occurs.
 	 */
 	public void testSome() throws Exception
 	{
@@ -79,6 +85,9 @@ public class TestXaWorker extends NeoTest
 		return worker;
 	}
 
+	/**
+	 * @throws Exception if an error occurs.
+	 */
 	public void testCloseInTheMiddle() throws Exception
 	{
 		for ( int c = 0; c < 10; c++ )
@@ -144,6 +153,9 @@ public class TestXaWorker extends NeoTest
 		private Random random = new Random();
 		private int counter;
 		
+		/**
+		 * @param count how many entries to do.
+		 */
 		public MyWorker( int count )
 		{
 			super( count, hook );
