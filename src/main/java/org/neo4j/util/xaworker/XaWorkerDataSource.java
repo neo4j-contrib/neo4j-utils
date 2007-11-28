@@ -207,7 +207,7 @@ public class XaWorkerDataSource extends XaDataSource
 		{
 			if ( commands == null )
 			{
-				commands = new ArrayList();
+				commands = new ArrayList<XaWorkerCommand>();
 			}
 			this.commands.add( ( XaWorkerCommand ) command );
 		}

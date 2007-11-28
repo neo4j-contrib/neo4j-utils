@@ -26,7 +26,8 @@ public class XaWorker extends Thread implements ProActiveEventListener
 	private boolean halted;
 	private int maxConsumers = 10;
 	private ExecutorService consumers;
-	private Map < Integer, Consumer > consumerMap = new HashMap();
+	private Map<Integer, Consumer> consumerMap =
+		new HashMap<Integer, Consumer>();
 	private XaWorkerLogEntry unhandledEntry;
 	private XaWorkerHook hook;
 	
@@ -85,7 +86,8 @@ public class XaWorker extends Thread implements ProActiveEventListener
 		this.workLog = createLog( logFile );
 		this.consumers = new ThreadPoolExecutor( this.maxConsumers,
 			this.maxConsumers, 30, TimeUnit.SECONDS,
-			new ArrayBlockingQueue( maxConsumers ), new ThreadFactory()
+			new ArrayBlockingQueue<Runnable>( maxConsumers ),
+				new ThreadFactory()
 			{
 				public Thread newThread( Runnable runnable )
 				{
@@ -365,7 +367,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 	{
 		private int txId;
 		private List<XaWorkerLogEntry> entries =
-			Collections.synchronizedList( new LinkedList() );
+			Collections.synchronizedList( new LinkedList<XaWorkerLogEntry>() );
 		
 		private Consumer( int txId )
 		{
