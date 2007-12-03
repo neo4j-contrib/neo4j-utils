@@ -11,9 +11,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import org.neo4j.api.core.NeoService;
 import org.neo4j.impl.event.Event;
 import org.neo4j.impl.event.EventData;
-import org.neo4j.impl.event.EventManager;
 import org.neo4j.impl.event.ProActiveEventListener;
 import org.neo4j.util.NeoUtil;
 
@@ -21,6 +22,8 @@ public class XaWorker extends Thread implements ProActiveEventListener
 {
 	private static final int MAX_TRY_COUNT = 10;
 
+	private NeoService neo;
+	private NeoUtil neoUtil;
 	private XaWorkerLog workLog;
 	private XaWorkerLog failLog;
 	private boolean halted;
@@ -31,15 +34,17 @@ public class XaWorker extends Thread implements ProActiveEventListener
 	private XaWorkerLogEntry unhandledEntry;
 	private XaWorkerHook hook;
 	
-	public XaWorker( int maxConsumers )
+	public XaWorker( NeoService neo, int maxConsumers )
 	{
 		super( "SearchUpdateWorker" );
+		this.neo = neo;
+		this.neoUtil = new NeoUtil( neo );
 		this.maxConsumers = maxConsumers;
 	}
 	
-	public XaWorker( int maxConsumers, XaWorkerHook hook )
+	public XaWorker( NeoService neo, int maxConsumers, XaWorkerHook hook )
 	{
-		this( maxConsumers );
+		this( neo, maxConsumers );
 		this.setHook( hook );
 	}
 	
@@ -50,7 +55,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 	
 	private void registerShutdownListener()
 	{
-		NeoUtil.registerProActiveEventListener(
+		neoUtil.registerProActiveEventListener(
 			this, Event.NEO_SHUTDOWN_STARTED );
 	}
 	
@@ -231,8 +236,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 	protected void perform( XaWorkerEntry entry )
 		throws XaWorkerException
 	{
-		if ( !EventManager.getManager().generateProActiveEvent(
-			XaWorkerEvent.XA_WORKER_EVENT, new EventData( entry ) ) )
+		if ( !neoUtil.proActiveEvent( XaWorkerEvent.XA_WORKER_EVENT, entry ) )
 		{
 			throw new XaWorkerException( "Couldn't perform search updates:" +
 				entry );

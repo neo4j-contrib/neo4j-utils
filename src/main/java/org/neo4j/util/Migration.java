@@ -2,7 +2,6 @@ package org.neo4j.util;
 
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.transaction.TransactionUtil;
 
 /**
  * Used for migrating data between one version of the code to a newer version.
@@ -156,21 +155,6 @@ public abstract class Migration
 	public void setFirstVersionIsAlwaysZero( boolean firstIsZero )
 	{
 		this.firstVersionIsAlwaysZero = firstIsZero;
-	}
-	
-	/**
-	 * Performs an in-the-middle-commit (finish, then start again) of the
-	 * current transaction.
-	 */
-	public void inTheMiddleCommit()
-	{
-		if ( this.pretending )
-		{
-			return;
-		}
-		
-		TransactionUtil.finishTx( true, true );
-		TransactionUtil.beginTx();
 	}
 	
 	/**

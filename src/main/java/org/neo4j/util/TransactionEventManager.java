@@ -8,9 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import org.neo4j.api.core.NeoService;
 import org.neo4j.impl.event.Event;
 import org.neo4j.impl.event.EventData;
-import org.neo4j.impl.event.EventManager;
 import org.neo4j.impl.event.ProActiveEventListener;
 
 /**
@@ -35,17 +36,6 @@ public class TransactionEventManager
 	public static final Event TX_EVENT_BUFFER =
 		new TransactionEvent( "TX_EVENT_BUFFER" );
 
-	private static TransactionEventManager instance =
-		new TransactionEventManager();
-	
-	/**
-	 * @return the single instance if this manager.
-	 */
-	public static TransactionEventManager getManager()
-	{
-		return instance;
-	}
-	
 	private ConcurrentMap<Integer, TransactionHook> transactions =
 		new ConcurrentHashMap<Integer, TransactionHook>();
 	private InternalEventListener internalListener =
@@ -55,6 +45,8 @@ public class TransactionEventManager
 	private Set<Event> registeredEvents = new HashSet<Event>();
 	private ConcurrentMap<Thread, Integer> threadToTxId =
 		new ConcurrentHashMap<Thread, Integer>();
+	private NeoService neo;
+	private NeoUtil neoUtil;
 	private TransactionHookFactory hookFactory = new TransactionHookFactory()
 	{
 		public TransactionHook newHook( int txId )
@@ -63,13 +55,15 @@ public class TransactionEventManager
 		}
 	};
 	
-	private TransactionEventManager()
+	public TransactionEventManager( NeoService neo )
 	{
-		NeoUtil.registerProActiveEventListener(
+		this.neo = neo;
+		this.neoUtil = new NeoUtil( neo );
+		neoUtil.registerProActiveEventListener(
 			internalListener, Event.TX_IMMEDIATE_BEGIN );
-		NeoUtil.registerProActiveEventListener(
+		neoUtil.registerProActiveEventListener(
 			internalListener, Event.TX_IMMEDIATE_COMMIT );
-		NeoUtil.registerProActiveEventListener(
+		neoUtil.registerProActiveEventListener(
 			internalListener, Event.TX_IMMEDIATE_ROLLBACK );
 	}
 	
@@ -167,22 +161,15 @@ public class TransactionEventManager
 	
 	private void registerInternalEventListener( Event event )
 	{
-		try
+		// Only have to register an event for the internal listener once.
+		synchronized ( registeredEvents )
 		{
-			// Only have to register an event for the internal listener once.
-			synchronized ( registeredEvents )
+			if ( !registeredEvents.contains( event ) )
 			{
-				if ( !registeredEvents.contains( event ) )
-				{
-					EventManager.getManager().registerProActiveEventListener(
-						internalListener, event );
-					registeredEvents.add( event );
-				}
+				neoUtil.registerProActiveEventListener(
+					internalListener, event );
+				registeredEvents.add( event );
 			}
-		}
-		catch ( Exception e )
-		{
-			throw new RuntimeException( e );
 		}
 	}
 	
@@ -211,22 +198,15 @@ public class TransactionEventManager
 	
 	private void unregisterInternalEventListener( Event event )
 	{
-		try
+		// Only have to unregister an event for the internal listener once.
+		synchronized ( registeredEvents )
 		{
-			// Only have to unregister an event for the internal listener once.
-			synchronized ( registeredEvents )
+			if ( registeredEvents.contains( event ) )
 			{
-				if ( registeredEvents.contains( event ) )
-				{
-					EventManager.getManager().unregisterProActiveEventListener(
-						internalListener, event );
-					registeredEvents.remove( event );
-				}
+				neoUtil.unregisterProActiveEventListener(
+					internalListener, event );
+				registeredEvents.remove( event );
 			}
-		}
-		catch ( Exception e )
-		{
-			throw new RuntimeException( e );
 		}
 	}
 
@@ -311,8 +291,7 @@ public class TransactionEventManager
 	public void flushEvents()
 	{
 		int txId = getTxIdForThread( Thread.currentThread() );
-		TransactionHook hook = TransactionEventManager.getManager(
-			).getTransactionHook( txId );
+		TransactionHook hook = getTransactionHook( txId );
 		if ( hook == null )
 		{
 			return;
@@ -320,7 +299,7 @@ public class TransactionEventManager
 		hook.flushEvents();
 	}
 	
-	private static class EventList
+	private class EventList
 	{
 		private Map<ProActiveEventListener, List<EventContext>>
 			eventsPerListener =
@@ -328,14 +307,14 @@ public class TransactionEventManager
 		
 		void sendEvent( EventContext context )
 		{
-			TransactionEventManager.getManager().sendEvent( context );
+			TransactionEventManager.this.sendEvent( context );
 			bufferEvent( context );
 		}
 		
 		private void bufferEvent( EventContext context )
 		{
 			for ( ProActiveEventListener listener :
-				TransactionEventManager.getManager().getListenersSet(
+				TransactionEventManager.this.getListenersSet(
 				context.getEvent() ) )
 			{
 				List<EventContext> eventList =
@@ -356,7 +335,7 @@ public class TransactionEventManager
 				List < EventContext > list = eventsPerListener.get( listener );
 				EventContext[] events = list.toArray(
 					new EventContext[ list.size() ] );
-				TransactionEventManager.getManager().sendEventBuffer(
+				TransactionEventManager.this.sendEventBuffer(
 					listener, events ); 
 			}
 		}
@@ -381,7 +360,7 @@ public class TransactionEventManager
 	 * A code hook to execute when a transaction is committed.
 	 * @author mattias
 	 */
-	public static class TransactionHook
+	public class TransactionHook
 	{
 		private int txId;
 		private List < EventContext > events;
@@ -496,17 +475,14 @@ public class TransactionEventManager
 			{
 				// A transaction was started NOW
 				int txId = ( Integer ) data.getData();
-				TransactionEventManager.getManager().createTransactionHook(
-					txId );
-				TransactionEventManager.getManager().mapThreadToTxId(
-					Thread.currentThread(), txId );
+				createTransactionHook( txId );
+				mapThreadToTxId( Thread.currentThread(), txId );
 			}
 			else if ( event == Event.TX_IMMEDIATE_ROLLBACK ||
 				event == Event.TX_IMMEDIATE_COMMIT )
 			{
 				int txId = unmapThreadFromTxId( Thread.currentThread() );
-				TransactionHook hook = TransactionEventManager.getManager(
-					).getTransactionHook( txId );
+				TransactionHook hook = getTransactionHook( txId );
 				if ( hook != null )
 				{
 					removeTransactionHook( hook );
@@ -519,10 +495,8 @@ public class TransactionEventManager
 			else
 			{
 				// Queue an event from the BL layer
-				int txId = TransactionEventManager.getManager(
-					).getTxIdForThread( Thread.currentThread() );
-				TransactionHook hook = TransactionEventManager.getManager(
-					).getTransactionHook( txId );
+				int txId = getTxIdForThread( Thread.currentThread() );
+				TransactionHook hook = getTransactionHook( txId );
 				if ( hook == null )
 				{
 					throw new RuntimeException( "No tx hook " + txId );

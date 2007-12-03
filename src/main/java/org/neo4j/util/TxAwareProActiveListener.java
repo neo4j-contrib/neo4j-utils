@@ -2,6 +2,8 @@ package org.neo4j.util;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import org.neo4j.api.core.NeoService;
 import org.neo4j.impl.event.Event;
 import org.neo4j.impl.event.EventData;
 import org.neo4j.impl.event.ProActiveEventListener;
@@ -16,6 +18,15 @@ import org.neo4j.impl.event.ProActiveEventListener;
  */
 public abstract class TxAwareProActiveListener implements ProActiveEventListener
 {
+	private NeoService neo;
+	private NeoUtil neoUtil;
+	
+	public TxAwareProActiveListener( NeoService neo )
+	{
+		this.neo = neo;
+		this.neoUtil = new NeoUtil( neo );
+	}
+	
 	private ConcurrentMap<Thread, EventFilter> eventLists =
 		new ConcurrentHashMap<Thread, EventFilter>();
 	
@@ -37,14 +48,13 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 	{
 		for ( Event event : getEvents() )
 		{
-			NeoUtil.registerProActiveEventListener( this,
-				event );
+			neoUtil.registerProActiveEventListener( this, event );
 		}
-		NeoUtil.registerProActiveEventListener( this,
+		neoUtil.registerProActiveEventListener( this,
 			Event.TX_IMMEDIATE_BEGIN );
-		NeoUtil.registerProActiveEventListener( this,
+		neoUtil.registerProActiveEventListener( this,
 			Event.TX_IMMEDIATE_ROLLBACK );
-		NeoUtil.registerProActiveEventListener( this,
+		neoUtil.registerProActiveEventListener( this,
 			Event.TX_IMMEDIATE_COMMIT );
 	}
 	
@@ -55,14 +65,13 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 	{
 		for ( Event event : getEvents() )
 		{
-			NeoUtil.unregisterProActiveEventListener(
-				this, event );
+			neoUtil.unregisterProActiveEventListener( this, event );
 		}
-		NeoUtil.unregisterProActiveEventListener( this,
+		neoUtil.unregisterProActiveEventListener( this,
 			Event.TX_IMMEDIATE_BEGIN );
-		NeoUtil.unregisterProActiveEventListener( this,
+		neoUtil.unregisterProActiveEventListener( this,
 			Event.TX_IMMEDIATE_ROLLBACK );
-		NeoUtil.unregisterProActiveEventListener( this,
+		neoUtil.unregisterProActiveEventListener( this,
 			Event.TX_IMMEDIATE_COMMIT );
 	}
 	

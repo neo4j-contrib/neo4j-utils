@@ -6,11 +6,15 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
-import org.neo4j.impl.transaction.TxManager;
+
+import org.neo4j.api.core.EmbeddedNeo;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.impl.transaction.xaframework.LogBuffer;
 import org.neo4j.impl.transaction.xaframework.XaCommand;
 import org.neo4j.impl.transaction.xaframework.XaCommandFactory;
@@ -26,15 +30,17 @@ import org.neo4j.impl.transaction.xaframework.XaTransactionFactory;
 
 public class XaWorkerDataSource extends XaDataSource
 {
+	private NeoService neo;
 	private XaContainer container;
 	private Map<String, String> parameters;
 	private XaWorker worker;
 	private XaWorkerHook hook;
 	
-	public XaWorkerDataSource( Map<String, String> parameters )
+	public XaWorkerDataSource( NeoService neo, Map<String, String> parameters )
 		throws InstantiationException
 	{
 		super( parameters );
+		this.neo = neo;
 		this.parameters = parameters;
 		try
 		{
@@ -45,7 +51,7 @@ public class XaWorkerDataSource extends XaDataSource
 				new XaWorkerTransactionFactory() );
 			this.container.openLogicalLog();
 
-			this.worker = hook.newXaWorker();
+			this.worker = hook.newXaWorker( neo );
 			this.worker.setHook( hook );
 			this.worker.prepareStartUp( logPath );
 		}
@@ -135,10 +141,11 @@ public class XaWorkerDataSource extends XaDataSource
 		
 		public void perform( XaWorkerEntry entry ) throws XaWorkerException
 		{
+			TransactionManager txManager = ( ( EmbeddedNeo )
+				neo ).getConfig().getTxModule().getTxManager();
 			try
 			{
-				TxManager.getManager().getTransaction().enlistResource(
-					this.resource );
+				txManager.getTransaction().enlistResource( this.resource );
 				boolean success = false;
 				try
 				{
@@ -152,7 +159,7 @@ public class XaWorkerDataSource extends XaDataSource
 				}
 				finally
 				{
-					TxManager.getManager().getTransaction().delistResource(
+					txManager.getTransaction().delistResource(
 						this.resource, success ? XAResource.TMSUCCESS :
 						XAResource.TMFAIL );
 				}

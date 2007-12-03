@@ -12,21 +12,20 @@ import org.neo4j.api.core.RelationshipType;
  */
 public class NeoTest extends TestCase
 {
-	private static boolean initialized;
+	private static NeoService neo;
 	
 	@Override
 	public void setUp() throws Exception
 	{
-		if ( !initialized )
+		if ( neo == null )
 		{
 			init();
-			initialized = true;
 		}
 	}
 	
 	private void init() throws Exception
 	{
-		String dbPath = "var/nioneo";
+		String dbPath = "var/neo";
 		File path = new File( dbPath );
 		if ( path.exists() )
 		{
@@ -36,7 +35,7 @@ public class NeoTest extends TestCase
 			}
 		}
 		
-		final NeoService neo = new EmbeddedNeo( dbPath );
+		neo = new EmbeddedNeo( dbPath );
 		Runtime.getRuntime().addShutdownHook( new Thread()
 		{
 			@Override
@@ -45,6 +44,11 @@ public class NeoTest extends TestCase
 				neo.shutdown();
 			}
 		} );
+	}
+	
+	protected static NeoService neo()
+	{
+		return neo;
 	}
 	
 	/**

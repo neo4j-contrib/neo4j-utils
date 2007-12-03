@@ -3,6 +3,7 @@ package org.neo4j.util;
 import java.util.Collection;
 
 import org.neo4j.api.core.Direction;
+import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
@@ -302,6 +303,12 @@ public class NeoUtil
 			getOrCreateSubReferenceNode( type ), type, clazz );
 	}
 	
+	private EventManager getEventManager()
+	{
+		return ( ( EmbeddedNeo )
+			neo() ).getConfig().getEventModule().getEventManager();
+	}
+	
 	/**
 	 * Convenience method for registering a re-active event listener.
 	 * Instead of throwing declared exceptions it throws runtime exceptions.
@@ -313,8 +320,7 @@ public class NeoUtil
 	{
 		try
 		{
-			EventManager.getManager().registerReActiveEventListener(
-				listener, event );
+			getEventManager().registerReActiveEventListener( listener, event );
 		}
 		catch ( EventListenerAlreadyRegisteredException e )
 		{
@@ -332,12 +338,12 @@ public class NeoUtil
 	 * @param listener the listener to unregister from the event.
 	 * @param event the event to unregister the listener from.
 	 */
-	public static void unregisterReActiveEventListener(
+	public void unregisterReActiveEventListener(
 		ReActiveEventListener listener, Event event )
 	{
 		try
 		{
-			EventManager.getManager().unregisterReActiveEventListener(
+			getEventManager().unregisterReActiveEventListener(
 				listener, event );
 		}
 		catch ( EventListenerNotRegisteredException e )
@@ -352,12 +358,12 @@ public class NeoUtil
 	 * @param listener the listener to register with the event.
 	 * @param event the event to register the listener with.
 	 */
-	public static void registerProActiveEventListener(
+	public void registerProActiveEventListener(
 		ProActiveEventListener listener, Event event )
 	{
 		try
 		{
-			EventManager.getManager().registerProActiveEventListener(
+			getEventManager().registerProActiveEventListener(
 				listener, event );
 		}
 		catch ( EventListenerAlreadyRegisteredException e )
@@ -376,12 +382,12 @@ public class NeoUtil
 	 * @param listener the listener to unregister from the event.
 	 * @param event the event to unregister the listener from.
 	 */
-	public static void unregisterProActiveEventListener(
+	public void unregisterProActiveEventListener(
 		ProActiveEventListener listener, Event event )
 	{
 		try
 		{
-			EventManager.getManager().unregisterProActiveEventListener(
+			getEventManager().unregisterProActiveEventListener(
 				listener, event );
 		}
 		catch ( EventListenerNotRegisteredException e )
@@ -398,7 +404,7 @@ public class NeoUtil
 	 * @return the result of
 	 * {@link EventManager#generateProActiveEvent(Event, EventData)}.
 	 */
-	public static boolean proActiveEvent( Event event, Object data )
+	public boolean proActiveEvent( Event event, Object data )
 	{
 		return event( event, data, EventType.PRO_ACTIVE );
 	}
@@ -409,7 +415,7 @@ public class NeoUtil
 	 * @param data the event data to send (it gets wrapped in an
 	 * {@link EventData}).
 	 */
-	public static void reActiveEvent( Event event, Object data )
+	public void reActiveEvent( Event event, Object data )
 	{
 		event( event, data, EventType.RE_ACTIVE );
 	}
@@ -425,21 +431,21 @@ public class NeoUtil
 	 * {@link EventManager#generateProActiveEvent(Event, EventData)} if any
 	 * of the types is {@link EventType#PRO_ACTIVE}, else {@code true}.
 	 */
-	public static boolean event( Event event, Object data, EventType... types )
+	public boolean event( Event event, Object data, EventType... types )
 	{
 		boolean result = true;
 		EventData eventData = new EventData( data );
+		EventManager eventManager = getEventManager();
 		for ( EventType type : types )
 		{
 			if ( type == EventType.PRO_ACTIVE )
 			{
-				result = EventManager.getManager().generateProActiveEvent(
+				result = eventManager.generateProActiveEvent(
 					event, eventData );
 			}
 			else
 			{
-				EventManager.getManager().generateReActiveEvent(
-					event, eventData );
+				eventManager.generateReActiveEvent( event, eventData );
 			}
 		}
 		return result;

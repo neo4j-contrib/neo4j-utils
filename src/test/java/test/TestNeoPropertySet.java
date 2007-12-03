@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.core.NodeManager;
 import org.neo4j.util.NeoPropertySet;
 
 /**
@@ -24,7 +23,7 @@ public class TestNeoPropertySet extends NeoTest
 		Transaction tx = Transaction.begin();
 		try
 		{
-			node = NodeManager.getManager().createNode();
+			node = neo().createNode();
 			tx.success();
 		}
 		finally

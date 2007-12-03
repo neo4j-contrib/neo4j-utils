@@ -1,12 +1,13 @@
 package org.neo4j.util.xaworker;
 
+import org.neo4j.api.core.NeoService;
 import org.neo4j.util.xaworker.XaWorkerLog.LogDisposal;
 
 public abstract class XaWorkerHook
 {
-	public XaWorker newXaWorker()
+	public XaWorker newXaWorker( NeoService neo )
 	{
-		return new XaWorker( 10 );
+		return new XaWorker( neo, 10 );
 	}
 	
 	protected abstract int getEntrySize();

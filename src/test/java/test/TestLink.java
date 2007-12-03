@@ -3,7 +3,6 @@ package test;
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.core.NodeManager;
 import org.neo4j.util.Link;
 import org.neo4j.util.LinkImpl;
 import org.neo4j.util.NodeWrapper;
@@ -35,16 +34,16 @@ public class TestLink extends NeoTest
 
 	private void doSomeTesting( Direction direction ) throws Exception
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
-			Node node1 = NodeManager.getManager().createNode();
-			Node node2 = NodeManager.getManager().createNode();
+			Node node1 = neo().createNode();
+			Node node2 = neo().createNode();
 			
 			Entity entity1 = NodeWrapper.newInstance( Entity.class, node1 );
 			Entity entity2 = NodeWrapper.newInstance( Entity.class, node2 );
 
-			Link<Entity> link = new LinkImpl<Entity>(
+			Link<Entity> link = new LinkImpl<Entity>( neo(),
 				entity1.getUnderlyingNode(), Relationships.TESTREL,
 				Entity.class, direction );
 			assertTrue( !link.has() );

@@ -8,7 +8,6 @@ import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.core.NodeManager;
 import org.neo4j.util.NeoRelationshipSet;
 import org.neo4j.util.NodeWrapper;
 
@@ -27,7 +26,7 @@ public class TestNeoRelationshipSet extends NeoTest
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Node node = NodeManager.getManager().createNode();
+			Node node = neo().createNode();
 			try
 			{
 				new ContainerSet( node, Direction.BOTH );
@@ -54,11 +53,11 @@ public class TestNeoRelationshipSet extends NeoTest
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Node node = NodeManager.getManager().createNode();
+			Node node = neo().createNode();
 			SomeContainer container = new SomeContainer( node );
 			Collection<SomeOtherContainer> set = container.otherContainers();
-			Node itemNode = NodeManager.getManager().createNode();
-			Node itemNode2 = NodeManager.getManager().createNode();
+			Node itemNode = neo().createNode();
+			Node itemNode2 = neo().createNode();
 			SomeOtherContainer item = new SomeOtherContainer( itemNode );
 			SomeOtherContainer item2 = new SomeOtherContainer( itemNode2 );
 			
@@ -149,9 +148,8 @@ public class TestNeoRelationshipSet extends NeoTest
 		Transaction tx = Transaction.begin();
 		try
 		{
-			node = NodeManager.getManager().createNode();
-			entity1 = new SomeOtherContainer(
-				NodeManager.getManager().createNode() );
+			node = neo().createNode();
+			entity1 = new SomeOtherContainer( neo().createNode() );
 			tx.success();
 		}
 		finally

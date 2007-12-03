@@ -158,7 +158,7 @@ public class TestXaWorker extends NeoTest
 		 */
 		public MyWorker( int count )
 		{
-			super( count, hook );
+			super( neo(), count, hook );
 		}
 		
 		@Override

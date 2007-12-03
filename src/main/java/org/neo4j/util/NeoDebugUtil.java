@@ -2,29 +2,37 @@ package org.neo4j.util;
 
 import java.io.PrintStream;
 import java.util.TreeSet;
+
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.core.NodeManager;
 import org.neo4j.impl.core.NotFoundException;
 
 /**
  * Simple debugging utility for neo-related objects.
  */
-public abstract class NeoDebugUtil
+public class NeoDebugUtil
 {
+	private NeoService neo;
+	
+	public NeoDebugUtil( NeoService neo )
+	{
+		this.neo = neo;
+	}
+	
 	/**
 	 * Prints information about a node, its properties and relationships.
 	 * @param nodeId the node id to print.
 	 * @param writer the writer to writer to.
 	 */
-	public static void printNodeInfo( int nodeId, PrintStream writer )
+	public void printNodeInfo( int nodeId, PrintStream writer )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			writer.println( "--- Printing Node info for " + nodeId + " ---" );
-			Node node = NodeManager.getManager().getNodeById( nodeId );
+			Node node = neo.getNodeById( nodeId );
 			writer.println( "Relationships: " );
 			for ( Relationship rel : node.getRelationships() )
 			{
@@ -64,10 +72,9 @@ public abstract class NeoDebugUtil
 	 * @param rel the relationship.
 	 * @param writer the writer to write to.
 	 */
-	public static void printRelationshipInfo( Relationship rel,
-		PrintStream writer )
+	public void printRelationshipInfo( Relationship rel, PrintStream writer )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			writer.println( "--- Printing Relationship info for " +

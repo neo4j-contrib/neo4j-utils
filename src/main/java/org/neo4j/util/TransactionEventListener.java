@@ -12,6 +12,13 @@ import org.neo4j.impl.event.ProActiveEventListener;
 public abstract class TransactionEventListener
 	implements ProActiveEventListener
 {
+	private TransactionEventManager manager;
+	
+	public TransactionEventListener( TransactionEventManager manager )
+	{
+		this.manager = manager;
+	}
+	
 	/**
 	 * @return a list of events to listen for.
 	 */
@@ -24,8 +31,7 @@ public abstract class TransactionEventListener
 	{
 		for ( Event event : getEvents() )
 		{
-			TransactionEventManager.getManager().registerEventListener(
-				this, event );
+			manager.registerEventListener( this, event );
 		}
 	}
 	
@@ -36,8 +42,7 @@ public abstract class TransactionEventListener
 	{
 		for ( Event event : getEvents() )
 		{
-			TransactionEventManager.getManager().unregisterEventListener(
-				this, event );
+			manager.unregisterEventListener( this, event );
 		}
 	}
 	

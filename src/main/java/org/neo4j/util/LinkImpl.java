@@ -1,6 +1,8 @@
 package org.neo4j.util;
 
 import org.neo4j.api.core.Direction;
+import org.neo4j.api.core.EmbeddedNeo;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
@@ -16,6 +18,7 @@ import org.neo4j.impl.transaction.LockManager;
  */
 public class LinkImpl<T extends NodeWrapper> implements Link<T>
 {
+	private NeoService neo;
 	private Node node;
 	private RelationshipType type;
 	private Class<T> theClass;
@@ -27,9 +30,10 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	 * @param thisIsGenericsFault well, even if we have T we must send the
 	 * same class here to make instantiation work.
 	 */
-	public LinkImpl( Node node, RelationshipType type,
+	public LinkImpl( NeoService neo, Node node, RelationshipType type,
 		Class<T> thisIsGenericsFault )
 	{
+		this.neo = neo;
 		this.node = node;
 		this.type = type;
 		this.theClass = thisIsGenericsFault;
@@ -42,10 +46,10 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	 * same class here to make instantiation work.
 	 * @param direction the direction of the relationship.
 	 */
-	public LinkImpl( Node node, RelationshipType type,
+	public LinkImpl( NeoService neo, Node node, RelationshipType type,
 		Class<T> thisIsGenericsFault, Direction direction )
 	{
-		this( node, type, thisIsGenericsFault );
+		this( neo, node, type, thisIsGenericsFault );
 		this.direction = direction;
 	}
 	
@@ -131,9 +135,11 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	public void set( T entity )
 	{
 		Transaction tx = Transaction.begin();
+		LockManager lockManager =
+			( ( EmbeddedNeo ) neo ).getConfig().getLockManager();
 		try
 		{
-			LockManager.getManager().getWriteLock( this.node() );
+			lockManager.getWriteLock( this.node() );
 			if ( has() )
 			{
 				remove();
@@ -157,7 +163,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 		{
 			try
 			{
-				LockManager.getManager().releaseWriteLock( this.node() );
+				lockManager.releaseWriteLock( this.node() );
 			}
 			catch ( Exception e )
 			{
