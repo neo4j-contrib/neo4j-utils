@@ -2,6 +2,8 @@ package org.neo4j.util;
 
 import java.util.Collection;
 
+import javax.transaction.TransactionManager;
+
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.NeoService;
@@ -16,6 +18,7 @@ import org.neo4j.impl.event.EventListenerNotRegisteredException;
 import org.neo4j.impl.event.EventManager;
 import org.neo4j.impl.event.ProActiveEventListener;
 import org.neo4j.impl.event.ReActiveEventListener;
+import org.neo4j.impl.transaction.LockManager;
 
 /**
  * Contains some convenience methods for f.ex. set/get/remove one property
@@ -303,10 +306,21 @@ public class NeoUtil
 			getOrCreateSubReferenceNode( type ), type, clazz );
 	}
 	
-	private EventManager getEventManager()
+	public EventManager getEventManager()
 	{
 		return ( ( EmbeddedNeo )
 			neo() ).getConfig().getEventModule().getEventManager();
+	}
+	
+	public LockManager getLockManager()
+	{
+		return ( ( EmbeddedNeo ) neo() ).getConfig().getLockManager();
+	}
+	
+	public TransactionManager getTransactionManager()
+	{
+		return ( ( EmbeddedNeo )
+			neo() ).getConfig().getTxModule().getTxManager();
 	}
 	
 	/**
