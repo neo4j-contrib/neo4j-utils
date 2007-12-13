@@ -299,8 +299,8 @@ public class NeoUtil
 	 * @param clazz the instance class for objects in the result collection.
 	 * @return the sub-reference node for a relationship type as a collection.
 	 */
-	public <T extends NodeWrapper> Collection<T> getSubReferenceNodeCollection(
-		RelationshipType type, Class<T> clazz )
+	public <T extends NodeWrappable> Collection<T>
+		getSubReferenceNodeCollection( RelationshipType type, Class<T> clazz )
 	{
 		return new NodeWrapperRelationshipSet<T>(
 			getOrCreateSubReferenceNode( type ), type, clazz );

@@ -145,7 +145,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 				remove();
 			}
 			
-			Node entityNode = ( ( NodeWrapper ) entity ).getUnderlyingNode();
+			Node entityNode = ( ( NodeWrappable ) entity ).getUnderlyingNode();
 			Node startNode = this.direction() == Direction.OUTGOING ?
 				this.node() : entityNode;
 			Node endNode = this.direction() == Direction.OUTGOING ?

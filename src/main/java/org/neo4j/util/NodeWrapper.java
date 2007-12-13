@@ -9,7 +9,7 @@ import org.neo4j.api.core.Node;
  * {@link #hashCode()} to make it more useful.
  * @author mattias
  */
-public abstract class NodeWrapper
+public abstract class NodeWrapper implements NodeWrappable
 {
 	private Node node;
 	
@@ -22,7 +22,7 @@ public abstract class NodeWrapper
 	 * {@link #getUnderlyingNode()}.
 	 * @return the new instance wrapping the node.
 	 */
-	public static <T extends NodeWrapper> T newInstance(
+	public static <T extends NodeWrappable> T newInstance(
 		Class<T> instanceClass, Node node )
 	{
 		try
@@ -63,7 +63,7 @@ public abstract class NodeWrapper
 			return false;
 		}
 		return getUnderlyingNode().equals(
-			( ( NodeWrapper ) o ).getUnderlyingNode() );
+			( ( NodeWrappable ) o ).getUnderlyingNode() );
 	}
 	
 	@Override

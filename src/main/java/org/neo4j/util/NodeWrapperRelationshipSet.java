@@ -12,7 +12,7 @@ import org.neo4j.api.core.RelationshipType;
  *
  * @param <T> the class type of each object in the collection.
  */
-public class NodeWrapperRelationshipSet<T extends NodeWrapper>
+public class NodeWrapperRelationshipSet<T extends NodeWrappable>
 	extends NeoRelationshipSet<T>
 {
 	private Class<T> instanceClass;
@@ -56,6 +56,6 @@ public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	@Override
 	protected Node getNodeFromItem( Object item )
 	{
-		return ( ( NodeWrapper ) item ).getUnderlyingNode();
+		return ( ( NodeWrappable ) item ).getUnderlyingNode();
 	}
 }
