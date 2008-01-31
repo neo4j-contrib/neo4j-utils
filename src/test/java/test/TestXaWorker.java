@@ -176,6 +176,7 @@ public class TestXaWorker extends NeoTest
 			catch ( InterruptedException e )
 			{
 				// Ok
+				Thread.interrupted();
 			}
 		}
 		

@@ -60,6 +60,7 @@ public abstract class NeoTransactionQueueWorker extends Thread
 				}
 				catch ( InterruptedException ee )
 				{
+					Thread.interrupted();
 					// It's ok
 				}
 			}
@@ -132,6 +133,7 @@ public abstract class NeoTransactionQueueWorker extends Thread
 		}
 		catch ( InterruptedException e )
 		{
+			Thread.interrupted();
 			// It is ok
 		}
 	}
@@ -146,6 +148,7 @@ public abstract class NeoTransactionQueueWorker extends Thread
 		}
 		catch ( InterruptedException e )
 		{
+			Thread.interrupted();
 			// It is ok
 		}
 	}
@@ -222,6 +225,7 @@ public abstract class NeoTransactionQueueWorker extends Thread
 		}
 		catch ( InterruptedException e )
 		{ // Ok, but log?
+			Thread.interrupted();
 		}
 	}
 	
@@ -305,6 +309,7 @@ public abstract class NeoTransactionQueueWorker extends Thread
 			catch ( InterruptedException e )
 			{
 				// Ok
+				Thread.interrupted();
 			}
 		}
 		

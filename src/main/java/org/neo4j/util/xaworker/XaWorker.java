@@ -125,6 +125,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 		}
 		catch ( InterruptedException e )
 		{
+			Thread.interrupted();
 			throw new RuntimeException( e );
 		}
 		try
@@ -133,6 +134,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 		}
 		catch ( InterruptedException e )
 		{
+			Thread.interrupted();
 			throw new RuntimeException( e );
 		}
 	}
@@ -251,6 +253,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 		}
 		catch ( InterruptedException e )
 		{
+			Thread.interrupted();
 			// TODO:
 		}
 	}
@@ -428,6 +431,7 @@ public class XaWorker extends Thread implements ProActiveEventListener
 				}
 				catch ( InterruptedException e )
 				{
+					Thread.interrupted();
 					// It is ok
 				}
 			}

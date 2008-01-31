@@ -52,6 +52,7 @@ public abstract class DeadlockCapsule<T>
 				}
 				catch ( InterruptedException ie )
 				{
+					Thread.interrupted();
 					ie.printStackTrace();
 				}
 			}
