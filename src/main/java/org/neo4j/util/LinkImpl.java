@@ -16,7 +16,7 @@ import org.neo4j.impl.transaction.LockManager;
  *
  * @param <T> the type of objects used in this instance.
  */
-public class LinkImpl<T extends NodeWrapper> implements Link<T>
+public class LinkImpl<T extends NodeWrapperImpl> implements Link<T>
 {
 	private NeoService neo;
 	private Node node;
@@ -47,7 +47,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	 * @param direction the direction of the relationship.
 	 */
 	public LinkImpl( NeoService neo, Node node, RelationshipType type,
-		Class<T> thisIsGenericsFault, Direction direction )
+		Direction direction, Class<T> thisIsGenericsFault )
 	{
 		this( neo, node, type, thisIsGenericsFault );
 		this.direction = direction;
@@ -75,7 +75,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	
 	protected T newObject( Node node )
 	{
-		return NodeWrapper.newInstance( this.classType(), node );
+		return NodeWrapperImpl.newInstance( this.classType(), node );
 	}
 	
 	public T get()
@@ -145,7 +145,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 				remove();
 			}
 			
-			Node entityNode = ( ( NodeWrappable ) entity ).getUnderlyingNode();
+			Node entityNode = ( ( NodeWrapper ) entity ).getUnderlyingNode();
 			Node startNode = this.direction() == Direction.OUTGOING ?
 				this.node() : entityNode;
 			Node endNode = this.direction() == Direction.OUTGOING ?

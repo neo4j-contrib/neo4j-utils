@@ -36,7 +36,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	 */
 	public NeoRelationshipSet( Node node, RelationshipType type )
 	{
-		this( node, Direction.OUTGOING, type );
+		this( node, type, Direction.OUTGOING );
 	}
 	
 	/**
@@ -44,8 +44,8 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	 * @param direction the direction to use for the relationships.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public NeoRelationshipSet( Node node, Direction direction,
-		RelationshipType type )
+	public NeoRelationshipSet( Node node, RelationshipType type,
+		Direction direction )
 	{
 		if ( direction == null || direction == Direction.BOTH )
 		{

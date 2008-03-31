@@ -5,7 +5,7 @@ import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.util.Link;
 import org.neo4j.util.LinkImpl;
-import org.neo4j.util.NodeWrapper;
+import org.neo4j.util.NodeWrapperImpl;
 
 /**
  * Tests the {@link Link} class and its implementation {@link LinkImpl}.
@@ -40,12 +40,12 @@ public class TestLink extends NeoTest
 			Node node1 = neo().createNode();
 			Node node2 = neo().createNode();
 			
-			Entity entity1 = NodeWrapper.newInstance( Entity.class, node1 );
-			Entity entity2 = NodeWrapper.newInstance( Entity.class, node2 );
+			Entity entity1 = NodeWrapperImpl.newInstance( Entity.class, node1 );
+			Entity entity2 = NodeWrapperImpl.newInstance( Entity.class, node2 );
 
 			Link<Entity> link = new LinkImpl<Entity>( neo(),
-				entity1.getUnderlyingNode(), Relationships.TESTREL,
-				Entity.class, direction );
+				entity1.getUnderlyingNode(), Relationships.TESTREL, direction,
+				Entity.class );
 			assertTrue( !link.has() );
 			try
 			{
@@ -85,7 +85,7 @@ public class TestLink extends NeoTest
 	 * Simple node wrapper class for testing.
 	 * @author mattias
 	 */
-	public static class Entity extends NodeWrapper
+	public static class Entity extends NodeWrapperImpl
 	{
 		/**
 		 * @param node the underlying node.

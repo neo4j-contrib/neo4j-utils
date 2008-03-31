@@ -9,7 +9,7 @@ import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.util.NeoRelationshipSet;
-import org.neo4j.util.NodeWrapper;
+import org.neo4j.util.NodeWrapperImpl;
 
 /**
  * Tests the neo relationship sets.
@@ -200,7 +200,7 @@ public class TestNeoRelationshipSet extends NeoTest
 		}
 	}
 	
-	private static class SomeContainer extends NodeWrapper
+	private static class SomeContainer extends NodeWrapperImpl
 	{
 		private SomeContainer( Node node )
 		{
@@ -226,7 +226,7 @@ public class TestNeoRelationshipSet extends NeoTest
 		
 		private ContainerSet( Node node, Direction direction )
 		{
-			super( node, direction, Relationships.TESTREL );
+			super( node, Relationships.TESTREL, direction );
 		}
 
 		@Override
@@ -239,11 +239,11 @@ public class TestNeoRelationshipSet extends NeoTest
 		@Override
 		protected Node getNodeFromItem( Object item )
 		{
-			return ( ( NodeWrapper ) item ).getUnderlyingNode();
+			return ( ( NodeWrapperImpl ) item ).getUnderlyingNode();
 		}
 	}
 	
-	private static class SomeOtherContainer extends NodeWrapper
+	private static class SomeOtherContainer extends NodeWrapperImpl
 	{
 		private SomeOtherContainer( Node node )
 		{

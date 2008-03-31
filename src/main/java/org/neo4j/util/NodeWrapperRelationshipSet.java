@@ -7,12 +7,12 @@ import org.neo4j.api.core.RelationshipType;
 
 /**
  * A neo relationship set where each element wraps a neo {@link Node},
- * using {@link NodeWrapper}.
+ * using {@link NodeWrapperImpl}.
  * @author mattias
  *
  * @param <T> the class type of each object in the collection.
  */
-public class NodeWrapperRelationshipSet<T extends NodeWrappable>
+public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	extends NeoRelationshipSet<T>
 {
 	private Class<T> instanceClass;
@@ -31,14 +31,14 @@ public class NodeWrapperRelationshipSet<T extends NodeWrappable>
 	
 	/**
 	 * @param node the node with its relationships acting as a collection.
-	 * @param direction the direction of relationships.
 	 * @param type the type of relationships to read/write. 
+	 * @param direction the direction of relationships.
 	 * @param instanceClass the exact class of instances in the collection.
 	 */
-	public NodeWrapperRelationshipSet( Node node, Direction direction,
-		RelationshipType type, Class<T> instanceClass )
+	public NodeWrapperRelationshipSet( Node node, RelationshipType type,
+		Direction direction, Class<T> instanceClass )
 	{
-		super( node, direction, type );
+		super( node, type, direction );
 		this.instanceClass = instanceClass;
 	}
 	
@@ -50,12 +50,12 @@ public class NodeWrapperRelationshipSet<T extends NodeWrappable>
 	@Override
 	protected T newObject( Node node, Relationship relationship )
 	{
-		return NodeWrapper.newInstance( this.getInstanceClass(), node );
+		return NodeWrapperImpl.newInstance( this.getInstanceClass(), node );
 	}
 	
 	@Override
 	protected Node getNodeFromItem( Object item )
 	{
-		return ( ( NodeWrappable ) item ).getUnderlyingNode();
+		return ( ( NodeWrapper ) item ).getUnderlyingNode();
 	}
 }
