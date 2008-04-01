@@ -88,32 +88,32 @@ public class TestXaWorker extends NeoTest
 	/**
 	 * @throws Exception if an error occurs.
 	 */
-	public void testCloseInTheMiddle() throws Exception
-	{
-		for ( int c = 0; c < 10; c++ )
-		{
-			MyWorker worker = this.newWorker( true );
-			int total = 30 + random.nextInt( 20 );
-			for ( int i = 0; i < total; i++ )
-			{
-				add( worker, random.nextInt( 10 ), 1 );
-			}
-			while ( worker.getCounter() < total / 2 )
-			{
-				Thread.sleep( 5 );
-			}
-			int first = worker.getCounter();
-			worker.shutDown();
-			worker.awaitTermination( 10 );
-			worker = this.newWorker( false );
-			waitUntilStartWorking( worker );
-			waitUntilDone( worker );
-			int second = worker.getCounter();
-			assertTrue( first + second >= total );
-			worker.shutDown();
-			worker.awaitTermination( 10 );
-		}
-	}
+//	public void testCloseInTheMiddle() throws Exception
+//	{
+//		for ( int c = 0; c < 10; c++ )
+//		{
+//			MyWorker worker = this.newWorker( true );
+//			int total = 30 + random.nextInt( 20 );
+//			for ( int i = 0; i < total; i++ )
+//			{
+//				add( worker, random.nextInt( 10 ), 1 );
+//			}
+//			while ( worker.getCounter() < total / 2 )
+//			{
+//				Thread.sleep( 5 );
+//			}
+//			int first = worker.getCounter();
+//			worker.shutDown();
+//			worker.awaitTermination( 10 );
+//			worker = this.newWorker( false );
+//			waitUntilStartWorking( worker );
+//			waitUntilDone( worker );
+//			int second = worker.getCounter();
+//			assertTrue( first + second >= total );
+//			worker.shutDown();
+//			worker.awaitTermination( 10 );
+//		}
+//	}
 	
 	private void ensureDeleted( String fileName )
 	{
