@@ -30,14 +30,13 @@ public class EntireGraphDeletor implements NeoDeletor
 				aboutToDeleteRelationship( rel );
 				rel.delete();
 			}
-			if ( deletedNodes.add( sub ) )
-			{
-				removeNodeAndThoseConnectedWith( deletedNodes, deletedRels,
-					sub );
-			}
+			removeNodeAndThoseConnectedWith( deletedNodes, deletedRels, sub );
 		}
-		aboutToDeleteNode( node );
-		node.delete();
+		if ( deletedNodes.add( node ) )
+		{
+			aboutToDeleteNode( node );
+			node.delete();
+		}
 	}
 	
 	protected void aboutToDeleteRelationship( Relationship relationship )
