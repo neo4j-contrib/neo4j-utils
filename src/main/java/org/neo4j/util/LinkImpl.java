@@ -16,7 +16,7 @@ import org.neo4j.impl.transaction.LockManager;
  *
  * @param <T> the type of objects used in this instance.
  */
-public class LinkImpl<T extends NodeWrapperImpl> implements Link<T>
+public class LinkImpl<T extends NodeWrapper> implements Link<T>
 {
 	private NeoService neo;
 	private Node node;

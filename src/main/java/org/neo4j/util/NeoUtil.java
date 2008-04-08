@@ -1,6 +1,7 @@
 package org.neo4j.util;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import javax.transaction.TransactionManager;
 
@@ -216,6 +217,33 @@ public class NeoUtil
 				node.getSingleRelationship( type, direction );
 			tx.success();
 			return singleRelationship;
+		}
+		finally
+		{
+			tx.finish();
+		}
+	}
+	
+	public Relationship getSingleRelationship( Node node,
+		RelationshipType type )
+	{
+		Transaction tx = Transaction.begin();
+		try
+		{
+			Iterator<Relationship> itr =
+				node.getRelationships( type ).iterator();
+			Relationship rel = null;
+			if ( itr.hasNext() )
+			{
+				rel = itr.next();
+				if ( itr.hasNext() )
+				{
+					throw new RuntimeException( node + " has more than one " +
+						"relationship of type '" + type.name() + "'" ); 
+				}
+			}
+			tx.success();
+			return rel;
 		}
 		finally
 		{
