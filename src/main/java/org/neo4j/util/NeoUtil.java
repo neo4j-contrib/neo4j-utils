@@ -224,6 +224,23 @@ public class NeoUtil
 		}
 	}
 	
+	public Node getSingleOtherNode( Node node, RelationshipType type,
+		Direction direction )
+	{
+		Transaction tx = Transaction.begin();
+		try
+		{
+			Relationship rel = getSingleRelationship( node, type, direction );
+			Node result = rel == null ? null : rel.getOtherNode( node );
+			tx.success();
+			return result;
+		}
+		finally
+		{
+			tx.finish();
+		}
+	}
+	
 	public Relationship getSingleRelationship( Node node,
 		RelationshipType type )
 	{
@@ -251,6 +268,22 @@ public class NeoUtil
 		}
 	}
 	
+	public Node getSingleOtherNode( Node node, RelationshipType type )
+	{
+		Transaction tx = Transaction.begin();
+		try
+		{
+			Relationship rel = getSingleRelationship( node, type );
+			Node result = rel == null ? null : rel.getOtherNode( node );
+			tx.success();
+			return result;
+		}
+		finally
+		{
+			tx.finish();
+		}
+	}
+
 	/**
 	 * Wraps a {@link NeoService#getReferenceNode()} in a transaction.
 	 * @return the result from {@link NeoService#getReferenceNode()}.
