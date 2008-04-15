@@ -1,4 +1,4 @@
-package test;
+package org.neo4j.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,8 @@ import org.neo4j.util.CrudEventData;
 import org.neo4j.util.CrudEventFilter;
 import org.neo4j.util.EventContext;
 import org.neo4j.util.CrudEventData.AlterationMode;
+
+import test.NeoTest;
 
 /**
  * Tests THE CRUD event filters.

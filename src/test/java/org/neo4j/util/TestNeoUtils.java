@@ -1,4 +1,4 @@
-package test;
+package org.neo4j.util;
 
 import java.util.Collection;
 
@@ -6,6 +6,8 @@ import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.util.NeoPropertyArraySet;
 import org.neo4j.util.NeoUtil;
+
+import test.NeoTest;
 
 public class TestNeoUtils extends NeoTest
 {

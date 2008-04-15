@@ -1,4 +1,4 @@
-package test;
+package org.neo4j.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +7,8 @@ import java.util.Iterator;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.util.NeoPropertySet;
+
+import test.NeoTest;
 
 /**
  * Tests the {@link NeoPropertySet} class.

@@ -1,4 +1,4 @@
-package test;
+package org.neo4j.util.xaworker;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +11,8 @@ import org.neo4j.util.xaworker.XaWorkerEntry;
 import org.neo4j.util.xaworker.XaWorkerException;
 import org.neo4j.util.xaworker.XaWorkerHook;
 import org.neo4j.util.xaworker.XaWorkerLogEntry;
+
+import test.NeoTest;
 
 /**
  * Tests the xa worker

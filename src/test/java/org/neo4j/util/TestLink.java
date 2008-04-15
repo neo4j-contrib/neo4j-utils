@@ -1,11 +1,10 @@
-package test;
+package org.neo4j.util;
 
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.util.Link;
-import org.neo4j.util.LinkImpl;
-import org.neo4j.util.NodeWrapperImpl;
+
+import test.NeoTest;
 
 /**
  * Tests the {@link Link} class and its implementation {@link LinkImpl}.
