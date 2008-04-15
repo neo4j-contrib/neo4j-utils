@@ -618,6 +618,10 @@ public class NeoUtil
 		{
 			return null;
 		}
+		if ( values.size() == 1 )
+		{
+			return values.iterator().next();
+		}
 		
 		Object array = Array.newInstance( values.iterator().next().getClass(),
 			values.size() );
