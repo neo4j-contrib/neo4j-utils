@@ -1,7 +1,11 @@
 package org.neo4j.util;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.transaction.TransactionManager;
 
@@ -168,6 +172,64 @@ public class NeoUtil
 		{
 			node.setProperty( key, value );
 			tx.success();
+		}
+		finally
+		{
+			tx.finish();
+		}
+	}
+	
+	public Collection<Object> getPropertyValues( Node node, String key )
+	{
+		Transaction tx = neo.beginTx();
+		try
+		{
+			Object value = node.getProperty( key, null );
+			Collection<Object> result = value == null ? new HashSet<Object>() :
+				neoPropertyAsSet( value );
+			tx.success();
+			return result;
+		}
+		finally
+		{
+			tx.finish();
+		}
+	}
+	
+	public boolean addValueToArray( Node node, String key, Object value )
+	{
+		Transaction tx = neo.beginTx();
+		try
+		{
+			Collection<Object> values = getPropertyValues( node, key );
+			boolean result = values.add( value );
+			node.setProperty( key, asNeoProperty( values ) );
+			tx.success();
+			return result;
+		}
+		finally
+		{
+			tx.finish();
+		}
+	}
+	
+	public boolean removeValueFromArray( Node node, String key, Object value )
+	{
+		Transaction tx = neo.beginTx();
+		try
+		{
+			Collection<Object> values = getPropertyValues( node, key );
+			boolean result = values.remove( value );
+			if ( values.isEmpty() )
+			{
+				node.removeProperty( key );
+			}
+			else
+			{
+				node.setProperty( key, asNeoProperty( values ) );
+			}
+			tx.success();
+			return result;
 		}
 		finally
 		{
@@ -524,5 +586,46 @@ public class NeoUtil
 			}
 		}
 		return result;
+	}
+	
+	public Object[] neoPropertyAsArray( Object neoPropertyValue )
+	{
+		try
+		{
+			int length = Array.getLength( neoPropertyValue );
+			Object[] result = new Object[ length ];
+			for ( int i = 0; i < length; i++ )
+			{
+				result[ i ] = Array.get( neoPropertyValue, i );
+			}
+			return result;
+		}
+		catch ( Exception e )
+		{
+			return new Object[] { neoPropertyValue };
+		}
+	}
+	
+	public Set<Object> neoPropertyAsSet( Object neoPropertyValue )
+	{
+		return new HashSet<Object>(
+			Arrays.asList( neoPropertyAsArray( neoPropertyValue ) ) );
+	}
+	
+	public Object asNeoProperty( Collection<Object> values )
+	{
+		if ( values.isEmpty() )
+		{
+			return null;
+		}
+		
+		Object array = Array.newInstance( values.iterator().next().getClass(),
+			values.size() );
+		int index = 0;
+		for ( Object value : values )
+		{
+			Array.set( array, index++, value );
+		}
+		return array;
 	}
 }

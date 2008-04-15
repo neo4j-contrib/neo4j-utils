@@ -1,6 +1,8 @@
 package test;
 
 import java.io.File;
+import java.util.Collection;
+
 import junit.framework.TestCase;
 import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.NeoService;
@@ -68,5 +70,29 @@ public class NeoTest extends TestCase
 		 * A relationship type to use in tests.
 		 */
 		TESTREL
+	}
+	
+	protected <T> void assertCollection( Collection<T> collection, T... items )
+	{
+		String collectionString = join( ", ", collection.toArray() );
+		assertEquals( collectionString, items.length, collection.size() );
+		for ( T item : items )
+		{
+			assertTrue( collection.contains( item ) );
+		}
+	}
+
+	protected <T> String join( String delimiter, T... items )
+	{
+		StringBuffer buffer = new StringBuffer();
+		for ( T item : items )
+		{
+			if ( buffer.length() > 0 )
+			{
+				buffer.append( delimiter );
+			}
+			buffer.append( item.toString() );
+		}
+		return buffer.toString();
 	}
 }
