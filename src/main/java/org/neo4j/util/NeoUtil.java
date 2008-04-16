@@ -590,7 +590,7 @@ public class NeoUtil
 	
 	public Object[] neoPropertyAsArray( Object neoPropertyValue )
 	{
-		try
+		if ( neoPropertyValue.getClass().isArray() )
 		{
 			int length = Array.getLength( neoPropertyValue );
 			Object[] result = new Object[ length ];
@@ -600,7 +600,7 @@ public class NeoUtil
 			}
 			return result;
 		}
-		catch ( Exception e )
+		else
 		{
 			return new Object[] { neoPropertyValue };
 		}
