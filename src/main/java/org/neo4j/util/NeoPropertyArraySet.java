@@ -92,17 +92,21 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 		{
 			Collection<Object> values =
 				neoUtil().getPropertyValues( node(), key() );
-			boolean result = values.retainAll( c );
-			if ( values.isEmpty() )
+			boolean altered = values.retainAll( c );
+			if ( altered )
 			{
-				node().removeProperty( key() );
-			}
-			else
-			{
-				node().setProperty( key(), neoUtil().asNeoProperty( values ) );
+				if ( values.isEmpty() )
+				{
+					node().removeProperty( key() );
+				}
+				else
+				{
+					node().setProperty( key(),
+						neoUtil().asNeoProperty( values ) );
+				}
 			}
 			tx.success();
-			return result;
+			return altered;
 		}
 		finally
 		{

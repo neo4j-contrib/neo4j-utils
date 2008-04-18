@@ -1,5 +1,6 @@
 package org.neo4j.util;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.neo4j.api.core.Node;
@@ -85,6 +86,12 @@ public class TestNeoUtils extends NeoTest
 			assertCollection( values, v1, v3 );
 			values.clear();
 			assertCollection( values );
+			
+			values.addAll( Arrays.asList( v1, v2, v3 ) );
+			assertCollection( values, v1, v2, v3 );
+			values.retainAll( Arrays.asList( v2 ) );
+			assertCollection( values, v2 );
+			
 			node.delete();
 			tx.success();
 		}
