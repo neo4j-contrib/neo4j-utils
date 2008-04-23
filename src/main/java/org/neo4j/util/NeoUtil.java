@@ -202,7 +202,8 @@ public class NeoUtil
 		try
 		{
 			Collection<Object> values = getPropertyValues( node, key );
-			boolean result = values.add( value );
+			boolean result = values.contains( value ) ? false :
+			    values.add( value );
 			node.setProperty( key, asNeoProperty( values ) );
 			tx.success();
 			return result;
