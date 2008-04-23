@@ -32,22 +32,22 @@ public class TestNeoUtils extends NeoTest
 			int v2 = 101;
 			int v3 = 2002;
 			assertTrue( neoUtil.addValueToArray( node, key, v1 ) );
-			assertCollection( neoUtil.neoPropertyAsSet(
+			assertCollection( neoUtil.neoPropertyAsList(
 				node.getProperty( key ) ), v1 );
 			assertFalse( neoUtil.addValueToArray( node, key, v1 ) );
-			assertCollection( neoUtil.neoPropertyAsSet(
+			assertCollection( neoUtil.neoPropertyAsList(
 				node.getProperty( key ) ), v1 );
 			assertTrue( neoUtil.addValueToArray( node, key, v2 ) );
-			assertCollection( neoUtil.neoPropertyAsSet(
+			assertCollection( neoUtil.neoPropertyAsList(
 				node.getProperty( key ) ), v1, v2 );
 			assertTrue( neoUtil.addValueToArray( node, key, v3 ) );
-			assertCollection( neoUtil.neoPropertyAsSet(
+			assertCollection( neoUtil.neoPropertyAsList(
 				node.getProperty( key ) ), v1, v2, v3 );
 			assertTrue( neoUtil.removeValueFromArray( node, key, v2 ) );
-			assertCollection( neoUtil.neoPropertyAsSet(
+			assertCollection( neoUtil.neoPropertyAsList(
 				node.getProperty( key ) ), v1, v3 );
 			assertFalse( neoUtil.removeValueFromArray( node, key, v2 ) );
-			assertCollection( neoUtil.neoPropertyAsSet(
+			assertCollection( neoUtil.neoPropertyAsList(
 				node.getProperty( key ) ), v1, v3 );
 			node.delete();
 			tx.success();
@@ -78,7 +78,7 @@ public class TestNeoUtils extends NeoTest
 			assertCollection( values, v1, v2 );
 			assertTrue( values.add( v3 ) );
 			assertCollection( values, v1, v2, v3 );
-			assertCollection( neoUtil.neoPropertyAsSet(
+			assertCollection( neoUtil.neoPropertyAsList(
 				node.getProperty( key ) ), v1, v2, v3 );
 			assertTrue( values.remove( v2 ) );
 			assertCollection( values, v1, v3 );
