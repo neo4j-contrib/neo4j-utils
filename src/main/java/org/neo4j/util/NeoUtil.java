@@ -13,6 +13,7 @@ import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.EmbeddedNeo;
 import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
+import org.neo4j.api.core.PropertyContainer;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
 import org.neo4j.api.core.Transaction;
@@ -86,18 +87,19 @@ public class NeoUtil
 	}
 	
 	/**
-	 * Wraps a single {@link Node#hasProperty(String)} in a transaction.
-	 * @param node the {@link Node}.
+	 * Wraps a single {@link PropertyContainer#hasProperty(String)}
+	 * in a transaction.
+	 * @param container the {@link PropertyContainer}.
 	 * @param key the property key.
-	 * @return the result from {@link Node#hasProperty(String)}.
+	 * @return the result from {@link PropertyContainer#hasProperty(String)}.
 	 */
-	public boolean hasProperty( Node node, String key )
+	public boolean hasProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
-			boolean result = node.hasProperty( key );
+			boolean result = container.hasProperty( key );
 			tx.success();
 			return result;
 		}
@@ -108,18 +110,19 @@ public class NeoUtil
 	}
 
 	/**
-	 * Wraps a single {@link Node#getProperty(String)} in a transaction.
-	 * @param node the {@link Node}.
+	 * Wraps a single {@link PropertyContainer#getProperty(String)}
+	 * in a transaction.
+	 * @param container the {@link PropertyContainer}.
 	 * @param key the property key.
-	 * @return the result from {@link Node#getProperty(String)}.
+	 * @return the result from {@link PropertyContainer#getProperty(String)}.
 	 */
-	public Object getProperty( Node node, String key )
+	public Object getProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Object result = node.getProperty( key );
+			Object result = container.getProperty( key );
 			tx.success();
 			return result;
 		}
@@ -130,19 +133,22 @@ public class NeoUtil
 	}
 
 	/**
-	 * Wraps a single {@link Node#getProperty(String, Object)} in a transaction.
-	 * @param node the {@link Node}.
+	 * Wraps a single {@link PropertyContainer#getProperty(String, Object)}
+	 * in a transaction.
+	 * @param container the {@link PropertyContainer}.
 	 * @param key the property key.
 	 * @param defaultValue the value to return if the property doesn't exist.
-	 * @return the result from {@link Node#getProperty(String, Object)}.
+	 * @return the result from
+	 * {@link PropertyContainer#getProperty(String, Object)}.
 	 */
-	public Object getProperty( Node node, String key, Object defaultValue )
+	public Object getProperty( PropertyContainer container,
+	    String key, Object defaultValue )
 	{
 		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Object result = node.getProperty( key, defaultValue );
+			Object result = container.getProperty( key, defaultValue );
 			tx.success();
 			return result;
 		}
@@ -153,12 +159,14 @@ public class NeoUtil
 	}
 
 	/**
-	 * Wraps a single {@link Node#setProperty(String, Object)} in a transaction.
-	 * @param node the {@link Node}.
+	 * Wraps a single {@link PropertyContainer#setProperty(String, Object)}
+	 * in a transaction.
+	 * @param container the {@link PropertyContainer}.
 	 * @param key the property key.
 	 * @param value the property value.
 	 */
-	public void setProperty( Node node, String key, Object value )
+	public void setProperty( PropertyContainer container,
+	    String key, Object value )
 	{
 		assertPropertyKeyNotNull( key );
 		if ( value == null )
@@ -170,7 +178,7 @@ public class NeoUtil
 		Transaction tx = Transaction.begin();
 		try
 		{
-			node.setProperty( key, value );
+			container.setProperty( key, value );
 			tx.success();
 		}
 		finally
@@ -179,12 +187,13 @@ public class NeoUtil
 		}
 	}
 	
-	public List<Object> getPropertyValues( Node node, String key )
+	public List<Object> getPropertyValues( PropertyContainer container,
+	    String key )
 	{
 		Transaction tx = neo.beginTx();
 		try
 		{
-			Object value = node.getProperty( key, null );
+			Object value = container.getProperty( key, null );
 			List<Object> result = value == null ?
 			    new ArrayList<Object>() : neoPropertyAsList( value );
 			tx.success();
@@ -196,15 +205,16 @@ public class NeoUtil
 		}
 	}	
 	
-	public boolean addValueToArray( Node node, String key, Object value )
+	public boolean addValueToArray( PropertyContainer container,
+	    String key, Object value )
 	{
 		Transaction tx = neo.beginTx();
 		try
 		{
-			Collection<Object> values = getPropertyValues( node, key );
+			Collection<Object> values = getPropertyValues( container, key );
 			boolean result = values.contains( value ) ? false :
 			    values.add( value );
-			node.setProperty( key, asNeoProperty( values ) );
+			container.setProperty( key, asNeoProperty( values ) );
 			tx.success();
 			return result;
 		}
@@ -214,20 +224,21 @@ public class NeoUtil
 		}
 	}
 	
-	public boolean removeValueFromArray( Node node, String key, Object value )
+	public boolean removeValueFromArray( PropertyContainer container,
+	    String key, Object value )
 	{
 		Transaction tx = neo.beginTx();
 		try
 		{
-			Collection<Object> values = getPropertyValues( node, key );
+			Collection<Object> values = getPropertyValues( container, key );
 			boolean result = values.remove( value );
 			if ( values.isEmpty() )
 			{
-				node.removeProperty( key );
+				container.removeProperty( key );
 			}
 			else
 			{
-				node.setProperty( key, asNeoProperty( values ) );
+				container.setProperty( key, asNeoProperty( values ) );
 			}
 			tx.success();
 			return result;
@@ -239,19 +250,20 @@ public class NeoUtil
 	}
 	
 	/**
-	 * Wraps a single {@link Node#removeProperty(String)} in a transaction.
-	 * @param node the {@link Node}.
+	 * Wraps a single {@link PropertyContainer#removeProperty(String)}
+	 * in a transaction.
+	 * @param container the {@link PropertyContainer}.
 	 * @param key the property key.
 	 * @return the old value of the property or null if the property didn't
 	 * exist
 	 */
-	public Object removeProperty( Node node, String key )
+	public Object removeProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
 		try
 		{
-			Object oldValue = node.removeProperty( key );
+			Object oldValue = container.removeProperty( key );
 			tx.success();
 			return oldValue;
 		}

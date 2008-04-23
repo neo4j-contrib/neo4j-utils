@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
+import org.neo4j.api.core.PropertyContainer;
 import org.neo4j.api.core.Transaction;
 
 /**
@@ -18,14 +18,15 @@ import org.neo4j.api.core.Transaction;
 public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
     implements List<T>
 {
-	private Node node;
+	private PropertyContainer container;
 	private String key;
 	private NeoUtil neoUtil;
 	
-	public NeoPropertyArraySet( NeoService neo, Node node, String key )
+	public NeoPropertyArraySet( NeoService neo, PropertyContainer container,
+	    String key )
 	{
 		this.neoUtil = new NeoUtil( neo );
-		this.node = node;
+		this.container = container;
 		this.key = key;
 	}
 	
@@ -34,9 +35,9 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 		return this.neoUtil;
 	}
 	
-	protected Node node()
+	protected PropertyContainer container()
 	{
-		return this.node;
+		return this.container;
 	}
 	
 	protected String key()
@@ -46,22 +47,22 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 	
 	public boolean add( T o )
 	{
-		return neoUtil().addValueToArray( node(), key(), o );
+		return neoUtil().addValueToArray( container(), key(), o );
 	}
 	
 	public void clear()
 	{
-		neoUtil().removeProperty( node(), key() );
+		neoUtil().removeProperty( container(), key() );
 	}
 	
 	private List<Object> values()
 	{
-	    return neoUtil().getPropertyValues( node(), key() );
+	    return neoUtil().getPropertyValues( container(), key() );
 	}
 	
 	private void setValues( Collection<?> collection )
 	{
-        neoUtil().setProperty( node(), key(),
+        neoUtil().setProperty( container(), key(),
             neoUtil().asNeoProperty( collection ) );
 	}
 	
@@ -78,7 +79,7 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 	public Iterator<T> iterator()
 	{
 		return new CollectionWrapper<T, Object>(
-			neoUtil().getPropertyValues( node(), key() ) )
+			neoUtil().getPropertyValues( container(), key() ) )
 		{
 			@Override
 			protected Object objectToUnderlyingObject( T object )
@@ -96,7 +97,7 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 	
 	public boolean remove( Object o )
 	{
-		return neoUtil().removeValueFromArray( node(), key(), o );
+		return neoUtil().removeValueFromArray( container(), key(), o );
 	}
 	
 	public boolean retainAll( Collection<?> c )
@@ -110,11 +111,11 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 			{
 				if ( values.isEmpty() )
 				{
-					node().removeProperty( key() );
+					container().removeProperty( key() );
 				}
 				else
 				{
-					node().setProperty( key(),
+					container().setProperty( key(),
 						neoUtil().asNeoProperty( values ) );
 				}
 			}
