@@ -2,6 +2,8 @@ package org.neo4j.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
@@ -14,6 +16,7 @@ import org.neo4j.api.core.Transaction;
  * @param <T> the type of values.
  */
 public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
+    implements List<T>
 {
 	private Node node;
 	private String key;
@@ -51,14 +54,25 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 		neoUtil().removeProperty( node(), key() );
 	}
 	
+	private List<Object> values()
+	{
+	    return neoUtil().getPropertyValues( node(), key() );
+	}
+	
+	private void setValues( Collection<?> collection )
+	{
+        neoUtil().setProperty( node(), key(),
+            neoUtil().asNeoProperty( collection ) );
+	}
+	
 	public boolean contains( Object o )
 	{
-		return neoUtil().getPropertyValues( node(), key() ).contains( o );
+		return values().contains( o );
 	}
 	
 	public boolean isEmpty()
 	{
-		return neoUtil().getPropertyValues( node(), key() ).isEmpty();
+		return values().isEmpty();
 	}
 	
 	public Iterator<T> iterator()
@@ -90,8 +104,7 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 		Transaction tx = neoUtil().neo().beginTx();
 		try
 		{
-			Collection<Object> values =
-				neoUtil().getPropertyValues( node(), key() );
+			Collection<Object> values = values();
 			boolean altered = values.retainAll( c );
 			if ( altered )
 			{
@@ -116,16 +129,80 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 	
 	public int size()
 	{
-		return neoUtil().getPropertyValues( node(), key() ).size();
+		return values().size();
 	}
 	
 	public Object[] toArray()
 	{
-		return neoUtil().getPropertyValues( node(), key() ).toArray();
+		return values().toArray();
 	}
 	
 	public <R> R[] toArray( R[] a )
 	{
-		return neoUtil().getPropertyValues( node(), key() ).toArray( a );
+		return values().toArray( a );
 	}
+
+    public T set( int index, T value )
+    {
+        List<Object> values = values();
+        T oldValue = ( T ) values.set( index, value );
+        setValues( values );
+        return oldValue;
+    }
+    
+    public T remove( int index )
+    {
+        List<Object> values = values();
+        T oldValue = ( T ) values.remove( index );
+        setValues( values );
+        return oldValue;
+    }
+    
+    public int lastIndexOf( Object value )
+    {
+        return values().lastIndexOf( value );
+    }
+    
+    public int indexOf( Object value )
+    {
+        return values().indexOf( value );
+    }
+
+    public boolean addAll( int index, Collection collection )
+    {
+        List<Object> values = values();
+        boolean result = values.addAll( collection );
+        if ( result )
+        {
+            setValues( values );
+        }
+        return result;
+    }
+    
+    public void add( int index, T item )
+    {
+        List<Object> values = values();
+        values.add( index, item );
+        setValues( values );
+    }
+    
+    public ListIterator<T> listIterator()
+    {
+        throw new UnsupportedOperationException();
+    }
+    
+    public ListIterator<T> listIterator( int index )
+    {
+        throw new UnsupportedOperationException();
+    }
+    
+    public List<T> subList( int start, int end )
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public T get( int index )
+    {
+        return ( T ) values().get( index );
+    }
 }

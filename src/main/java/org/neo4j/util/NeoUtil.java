@@ -1,11 +1,11 @@
 package org.neo4j.util;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import javax.transaction.TransactionManager;
 
@@ -179,14 +179,14 @@ public class NeoUtil
 		}
 	}
 	
-	public Collection<Object> getPropertyValues( Node node, String key )
+	public List<Object> getPropertyValues( Node node, String key )
 	{
 		Transaction tx = neo.beginTx();
 		try
 		{
 			Object value = node.getProperty( key, null );
-			Collection<Object> result = value == null ? new HashSet<Object>() :
-				neoPropertyAsSet( value );
+			List<Object> result = value == null ?
+			    new ArrayList<Object>() : neoPropertyAsList( value );
 			tx.success();
 			return result;
 		}
@@ -194,7 +194,7 @@ public class NeoUtil
 		{
 			tx.finish();
 		}
-	}
+	}	
 	
 	public boolean addValueToArray( Node node, String key, Object value )
 	{
@@ -606,13 +606,13 @@ public class NeoUtil
 		}
 	}
 	
-	public Set<Object> neoPropertyAsSet( Object neoPropertyValue )
+	public List<Object> neoPropertyAsList( Object neoPropertyValue )
 	{
-		return new HashSet<Object>(
+		return new ArrayList<Object>(
 			Arrays.asList( neoPropertyAsArray( neoPropertyValue ) ) );
 	}
 	
-	public Object asNeoProperty( Collection<Object> values )
+	public Object asNeoProperty( Collection<?> values )
 	{
 		if ( values.isEmpty() )
 		{
