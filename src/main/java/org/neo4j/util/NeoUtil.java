@@ -212,11 +212,14 @@ public class NeoUtil
 		try
 		{
 			Collection<Object> values = getPropertyValues( container, key );
-			boolean result = values.contains( value ) ? false :
+			boolean changed = values.contains( value ) ? false :
 			    values.add( value );
-			container.setProperty( key, asNeoProperty( values ) );
+			if ( changed )
+			{
+	            container.setProperty( key, asNeoProperty( values ) );
+			}
 			tx.success();
-			return result;
+			return changed;
 		}
 		finally
 		{
@@ -231,17 +234,20 @@ public class NeoUtil
 		try
 		{
 			Collection<Object> values = getPropertyValues( container, key );
-			boolean result = values.remove( value );
-			if ( values.isEmpty() )
+			boolean changed = values.remove( value );
+			if ( changed )
 			{
-				container.removeProperty( key );
-			}
-			else
-			{
-				container.setProperty( key, asNeoProperty( values ) );
+    			if ( values.isEmpty() )
+    			{
+    				container.removeProperty( key );
+    			}
+    			else
+    			{
+    				container.setProperty( key, asNeoProperty( values ) );
+    			}
 			}
 			tx.success();
-			return result;
+			return changed;
 		}
 		finally
 		{
