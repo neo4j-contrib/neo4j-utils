@@ -105,28 +105,17 @@ public abstract class CollectionWrapper<T, U> implements Collection<T>
 		return result.toArray( a );
 	}
 	
-	private class WrappingIterator implements Iterator<T>
+	private class WrappingIterator extends IteratorWrapper<T, U>
 	{
-		private Iterator<U> iterator;
-		
 		WrappingIterator( Iterator<U> iterator )
 		{
-			this.iterator = iterator;
+			super( iterator );
 		}
-		
-		public boolean hasNext()
-		{
-			return iterator.hasNext();
-		}
-		
-		public T next()
-		{
-			return underlyingObjectToObject( iterator.next() );
-		}
-		
-		public void remove()
-		{
-			throw new UnsupportedOperationException();
-		}
+
+		@Override
+        protected T underlyingObjectToObject( U object )
+        {
+	        return CollectionWrapper.this.underlyingObjectToObject( object );
+        }
 	}
 }
