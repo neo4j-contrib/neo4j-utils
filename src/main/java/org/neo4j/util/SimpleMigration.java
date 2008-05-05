@@ -23,6 +23,11 @@ public abstract class SimpleMigration extends Migration
 		this.versionClassPrefix = this.getMigratorPrefix();
 	}
 	
+	public SimpleMigration( NeoService neo )
+	{
+		this( neo, MigrationRelationshipTypes.REF_MIGRATION );
+	}
+	
 	private static Node getConfigNodeFromType( NeoService neo,
 		RelationshipType type )
 	{
@@ -55,5 +60,10 @@ public abstract class SimpleMigration extends Migration
 		{
 			throw new RuntimeException( e );
 		}
+	}
+	
+	public static enum MigrationRelationshipTypes implements RelationshipType
+	{
+		REF_MIGRATION,
 	}
 }
