@@ -1,0 +1,159 @@
+Neo Utilities
+
+	Neo-utils is a collection of useful utilities on top of Neo which you
+	very often find yourself needing, but you can't (as of yet) find in
+	the core neo API. The base package is <<org.neo4j.util>> and holds a
+	big variety of utilities, f.ex. utilities for easy handling of array
+	properties and a java Collection implementation of some neo concepts.
+
+NeoUtil class
+
+	The <<org.neo4j.util.NeoUtil>> class is a blob class with many very useful
+	methods, f.ex: methods for single has/get/set/remove property on
+	Node/Relationship which does that single call within a transaction.
+	
+---
+	NeoService neo = ...;
+	NeoUtil neoUtil = new NeoUtil( neo );
+	Node node = ...;
+	
+	// One transaction.
+	neoUtil.setProperty( node, "name", "Some name" );
+	
+	// Another transaction.
+	String name = ( String ) neoUtil.getProperty( node, "name" );
+---
+	
+	Since neo can handle property values which are arrays the NeoUtil class
+	provides some useful array handling methods.
+	
+---
+	neoUtil.setProperty( node, "numbers", 5 );
+	List<Object> oneNumber = neoUtil.getPropertyValues( node, "numbers" );
+	// Will contain one item (5).
+
+	neoUtil.setProperty( node, "numbers", new int[] { 5, 10, 15 } );
+	List<Object> numbers = neoUtil.getPropertyValues( node, "numbers" );
+	// Will contain three items (5, 10, 15).
+	
+	// There's also methods for adding/removing values to/from a property.
+	neoUtil.removeValueFromArray( node, "numbers", 10 );
+	neoUtil.addValueToArray( node, "numbers", 20 );
+	List<Object> newNumbers = neoUtil.getPropertyValues( node, "numbers" );
+	// Will contain three items (5, 15, 20).
+---
+	
+	Furthermore some methods to deal directly with values returned from neo
+	which may or may not be arrays.
+	
+---
+	node.setProperty( "numbers", new int[] { 5, 10, 15 } );
+	Object numbers = node.getProperty( "numbers" );
+	List<Object> numbersAsList = neoUtil.neoPropertyAsList( numbers );
+	numbersAsList.add( 20 );
+	Object newNumbers = neoUtil.asNeoProperty( numbersAsList );
+	node.setProperty( "numbers", newNumbers );
+---
+
+	Often in a neo node space you have some sort of sub-reference nodes
+	connected to the neo reference node (f.ex. one which all users are
+	connected to), there's one method to get or create those sub-reference
+	nodes.
+	
+---
+	NeoUtil neoUtil = new NeoUtil( neo );
+	RelationshipType usersReferenceRelationshipType = ...;
+	Node usersReferenceNode =
+		neoUtil.getOrCreateSubReferenceNode( usersReferenceRelationshipType );
+	
+---
+
+NodeWrapper
+
+	It is a common concept that an application adds a business layer where
+	there are objects which wraps nodes, for that there are the convenient
+	interface <<NodeWrapper>>.
+
+Collection implementations
+
+	There are several implementations of the collection API, f.ex.
+	
+* PureNodeRelationshipSet
+
+	See the collection itself as a neo node and its items relationships
+	(of the same type) to other nodes.
+
+* NodeWrapperRelationshipSet
+
+	Same as the <<PureNodeRelationshipSet>>, but the items are NodeWrapper
+	instances. The collection is given a Class\<? extends NodeWrapper\> in the
+	constructor and the current implementation assumes the NodeWrapper class
+	to have a public constructor which takes a neo <<Node>>.
+
+* NeoPropertyArraySet
+
+	Ability to see a property on a Node/Relationship as a collection of
+	values, using neos array abilities.
+
+Link
+
+	Convenience class where there might be zero or one relationship between
+	two nodes.
+
+Migration
+
+	When code is under development and node/relationship layout is altered over
+	time and there's a neo store which is undesired to be rebuilt from scratch
+	each time such a structural modification occurs, the migration framework may
+	be used. There's a notion of two versions, one version for the code and one
+	for the data in the neo store. For each version there is a migrator which
+	iterates over the neo store and alters what needs to be altered for the
+	neo store to be able to call itself a certain version. So if a structural
+	modification occurs in the code, an integer (in a subclass of
+	<<org.neo4j.util.Migration>>) is incremented and a new class implementing
+	<<org.neo4j.util.Migrator>> is written. The next time neo is started the
+	migration framework will notice the differentiating versions and run the
+	appropriate migrators.
+	
+---
+	// The migration class.
+	class MyMigrator extends SimpleMigration
+	{
+		public MyMigration( NeoService neo )
+		{
+			super( neo );
+		}
+	
+		@Override
+		protected int getCodeVersion()
+		{
+			// Default version is 0, so the first version difference is 1.
+			return 1;
+		}
+	}
+	
+	// The migrator for version 1, notice that SimpleMigration class' default
+	// lookup method for finding a migrator is to find a class in the same
+	// package as itself named "Migrator" + <version>.
+	class Migrator1 implements Migrator
+	{
+		public void performMigration( NeoService neo )
+		{
+			// Go ahead, do your thing... transactions are managed by the
+			// Migration instance.
+		}
+	}
+---
+
+	To use the migration framework, just have it sync the versions after a
+	NeoService has been started.
+
+---
+	NeoService neo = new EmbeddedNeo( "path/to/neo/" );
+	new MyMigration( neo ).syncVersion();
+---
+
+	Remember that the first time a <syncVersion> is performed on a neo store
+	the version is set to that of returned from <getCodeVersion>, unless
+	a call to <setFirstVersionIsAlwaysZero( true )> is made before a call to
+	<syncVersion> is made.
