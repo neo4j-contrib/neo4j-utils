@@ -19,7 +19,7 @@ public abstract class SimpleMigration extends Migration
 	 */
 	public SimpleMigration( NeoService neo, RelationshipType subReferenceType )
 	{
-		super( getConfigNodeFromType( neo, subReferenceType ) );
+		super( neo, getConfigNodeFromType( neo, subReferenceType ) );
 		this.versionClassPrefix = this.getMigratorPrefix();
 	}
 	
@@ -43,8 +43,8 @@ public abstract class SimpleMigration extends Migration
 		String className = this.versionClassPrefix + version;
 		try
 		{
-			Class<? extends Migrator> cls = ( Class<? extends Migrator> )
-				Class.forName( className );
+			Class<? extends Migrator> cls =
+				Class.forName( className ).asSubclass( Migrator.class );
 			return cls.newInstance();
 		}
 		catch ( RuntimeException e )

@@ -1,5 +1,6 @@
 package org.neo4j.util;
 
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 
@@ -16,6 +17,7 @@ import org.neo4j.api.core.Transaction;
  */
 public abstract class Migration
 {
+	private NeoService neo;
 	private Node configNode;
 	private boolean firstVersionIsAlwaysZero;
 	private boolean pretending;
@@ -23,10 +25,12 @@ public abstract class Migration
 	/**
 	 * Creates a new migration object with a reference to a configuration node.
 	 * @param configNode the node to hold configuration data for migration.
+	 * @param neo the {@link NeoService} to use.
 	 * This node should be the same every time in a code base.
 	 */
-	public Migration( Node configNode )
+	public Migration( NeoService neo, Node configNode )
 	{
+		this.neo = neo;
 		this.configNode = configNode;
 	}
 	
@@ -202,7 +206,7 @@ public abstract class Migration
 		Transaction tx = Transaction.begin();
 		try
 		{
-			findMigrator( version ).performMigration();
+			findMigrator( version ).performMigration( this.neo );
 			setDataVersion( version );
 			if ( !this.pretending )
 			{
