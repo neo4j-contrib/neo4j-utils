@@ -11,16 +11,25 @@ import org.neo4j.api.core.TraversalPosition;
 
 public class OneOfRelTypesReturnableEvaluator implements ReturnableEvaluator
 {
-	private Set<RelationshipType> types;
+	private Set<String> types;
 	
 	public OneOfRelTypesReturnableEvaluator( RelationshipType... types )
 	{
-		this.types = new HashSet<RelationshipType>( Arrays.asList( types ) );
+		this.types = new HashSet<String>();
+		for ( RelationshipType type : types )
+		{
+			this.types.add( type.name() );
+		}
+	}
+	
+	public OneOfRelTypesReturnableEvaluator( String... names )
+	{
+		this.types = new HashSet<String>( Arrays.asList( names ) );
 	}
 	
 	public boolean isReturnableNode( TraversalPosition currentPos )
 	{
 		Relationship rel = currentPos.lastRelationshipTraversed();
-		return rel != null && this.types.contains( rel.getType() );
+		return rel != null && this.types.contains( rel.getType().name() );
 	}
 }
