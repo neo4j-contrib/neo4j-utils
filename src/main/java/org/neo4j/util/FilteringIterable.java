@@ -16,10 +16,10 @@ public abstract class FilteringIterable<T> implements Iterable<T>
 		return new FilteringIterator<T>( source.iterator() )
 		{
 			@Override
-            protected boolean passes( T item )
-            {
-	            return FilteringIterable.this.passes( item );
-            }
+			protected boolean passes( T item )
+			{
+				return FilteringIterable.this.passes( item );
+			}
 		};
 	}
 	

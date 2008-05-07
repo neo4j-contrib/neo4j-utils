@@ -142,7 +142,7 @@ public class NeoUtil
 	 * {@link PropertyContainer#getProperty(String, Object)}.
 	 */
 	public Object getProperty( PropertyContainer container,
-	    String key, Object defaultValue )
+		String key, Object defaultValue )
 	{
 		assertPropertyKeyNotNull( key );
 		Transaction tx = Transaction.begin();
@@ -166,7 +166,7 @@ public class NeoUtil
 	 * @param value the property value.
 	 */
 	public void setProperty( PropertyContainer container,
-	    String key, Object value )
+		String key, Object value )
 	{
 		assertPropertyKeyNotNull( key );
 		if ( value == null )
@@ -188,7 +188,7 @@ public class NeoUtil
 	}
 	
 	public List<Object> getPropertyValues( PropertyContainer container,
-	    String key )
+		String key )
 	{
 		Transaction tx = neo.beginTx();
 		try
@@ -206,7 +206,7 @@ public class NeoUtil
 	}	
 	
 	public boolean addValueToArray( PropertyContainer container,
-	    String key, Object value )
+		String key, Object value )
 	{
 		Transaction tx = neo.beginTx();
 		try
@@ -216,7 +216,7 @@ public class NeoUtil
 			    values.add( value );
 			if ( changed )
 			{
-	            container.setProperty( key, asNeoProperty( values ) );
+				container.setProperty( key, asNeoProperty( values ) );
 			}
 			tx.success();
 			return changed;
@@ -228,7 +228,7 @@ public class NeoUtil
 	}
 	
 	public boolean removeValueFromArray( PropertyContainer container,
-	    String key, Object value )
+		String key, Object value )
 	{
 		Transaction tx = neo.beginTx();
 		try
@@ -237,14 +237,14 @@ public class NeoUtil
 			boolean changed = values.remove( value );
 			if ( changed )
 			{
-    			if ( values.isEmpty() )
-    			{
-    				container.removeProperty( key );
-    			}
-    			else
-    			{
-    				container.setProperty( key, asNeoProperty( values ) );
-    			}
+				if ( values.isEmpty() )
+				{
+					container.removeProperty( key );
+				}
+				else
+				{
+					container.setProperty( key, asNeoProperty( values ) );
+				}
 			}
 			tx.success();
 			return changed;

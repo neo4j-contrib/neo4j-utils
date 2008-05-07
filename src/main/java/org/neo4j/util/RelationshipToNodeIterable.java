@@ -16,8 +16,8 @@ public class RelationshipToNodeIterable
 	}
 
 	@Override
-    protected Node underlyingObjectToObject( Relationship relationship )
-    {
+	protected Node underlyingObjectToObject( Relationship relationship )
+	{
 		return relationship.getOtherNode( startNode );
-    }
+	}
 }

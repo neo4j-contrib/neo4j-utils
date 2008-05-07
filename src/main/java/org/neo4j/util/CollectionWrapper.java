@@ -113,9 +113,9 @@ public abstract class CollectionWrapper<T, U> implements Collection<T>
 		}
 
 		@Override
-        protected T underlyingObjectToObject( U object )
-        {
-	        return CollectionWrapper.this.underlyingObjectToObject( object );
-        }
+		protected T underlyingObjectToObject( U object )
+		{
+			return CollectionWrapper.this.underlyingObjectToObject( object );
+		}
 	}
 }

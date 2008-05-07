@@ -72,7 +72,7 @@ public class XaWorkerDataSource extends XaDataSource
 		try
 		{
 			Class<? extends XaWorkerHook> clazz =
-				( Class<? extends XaWorkerHook> ) Class.forName( name );
+				Class.forName( name ).asSubclass( XaWorkerHook.class );
 			return clazz.newInstance();
 		}
 		catch ( Exception e )
@@ -304,9 +304,9 @@ public class XaWorkerDataSource extends XaDataSource
 		}
 
 		@Override
-        public void writeToFile( LogBuffer buffer ) throws IOException
-        {
+		public void writeToFile( LogBuffer buffer ) throws IOException
+		{
 			entry.writeToFile( buffer );
-        }
+		}
 	}
 }

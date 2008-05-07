@@ -62,8 +62,8 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 
 	private void setValues( Collection<?> collection )
 	{
-        neoUtil().setProperty( container(), key(),
-            neoUtil().asNeoProperty( collection ) );
+		neoUtil().setProperty( container(), key(),
+			neoUtil().asNeoProperty( collection ) );
 	}
 
 	public boolean contains( Object o )
@@ -143,67 +143,67 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 		return values().toArray( a );
 	}
 
-    public T set( int index, T value )
-    {
-        List<Object> values = values();
-        T oldValue = ( T ) values.set( index, value );
-        setValues( values );
-        return oldValue;
-    }
+	public T set( int index, T value )
+	{
+		List<Object> values = values();
+		T oldValue = ( T ) values.set( index, value );
+		setValues( values );
+		return oldValue;
+	}
 
-    public T remove( int index )
-    {
-        List<Object> values = values();
-        T oldValue = ( T ) values.remove( index );
-        setValues( values );
-        return oldValue;
-    }
+	public T remove( int index )
+	{
+		List<Object> values = values();
+		T oldValue = ( T ) values.remove( index );
+		setValues( values );
+		return oldValue;
+	}
 
-    public int lastIndexOf( Object value )
-    {
-        return values().lastIndexOf( value );
-    }
+	public int lastIndexOf( Object value )
+	{
+		return values().lastIndexOf( value );
+	}
 
-    public int indexOf( Object value )
-    {
-        return values().indexOf( value );
-    }
+	public int indexOf( Object value )
+	{
+		return values().indexOf( value );
+	}
 
-    public boolean addAll( int index, Collection collection )
-    {
-        List<Object> values = values();
-        boolean result = values.addAll( collection );
-        if ( result )
-        {
-            setValues( values );
-        }
-        return result;
-    }
+	public boolean addAll( int index, Collection collection )
+	{
+		List<Object> values = values();
+		boolean result = values.addAll( collection );
+		if ( result )
+		{
+			setValues( values );
+		}
+		return result;
+	}
 
-    public void add( int index, T item )
-    {
-        List<Object> values = values();
-        values.add( index, item );
-        setValues( values );
-    }
+	public void add( int index, T item )
+	{
+		List<Object> values = values();
+		values.add( index, item );
+		setValues( values );
+	}
 
-    public ListIterator<T> listIterator()
-    {
-        throw new UnsupportedOperationException();
-    }
+	public ListIterator<T> listIterator()
+	{
+		throw new UnsupportedOperationException();
+	}
 
-    public ListIterator<T> listIterator( int index )
-    {
-        throw new UnsupportedOperationException();
-    }
+	public ListIterator<T> listIterator( int index )
+	{
+		throw new UnsupportedOperationException();
+	}
 
-    public List<T> subList( int start, int end )
-    {
-        throw new UnsupportedOperationException();
-    }
+	public List<T> subList( int start, int end )
+	{
+		throw new UnsupportedOperationException();
+	}
 
-    public T get( int index )
-    {
-        return ( T ) values().get( index );
-    }
+	public T get( int index )
+	{
+		return ( T ) values().get( index );
+	}
 }

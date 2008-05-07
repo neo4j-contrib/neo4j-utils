@@ -21,14 +21,14 @@ public abstract class IterableWrapper<T, U> implements Iterable<T>
 	private class MyIteratorWrapper extends IteratorWrapper<T, U>
 	{
 		public MyIteratorWrapper( Iterator<U> iteratorToWrap )
-        {
-	        super( iteratorToWrap );
-        }
+		{
+			super( iteratorToWrap );
+		}
 
 		@Override
-        protected T underlyingObjectToObject( U object )
-        {
-	        return IterableWrapper.this.underlyingObjectToObject( object );
-        }
+		protected T underlyingObjectToObject( U object )
+		{
+			return IterableWrapper.this.underlyingObjectToObject( object );
+		}
 	}
 }

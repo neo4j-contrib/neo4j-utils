@@ -61,8 +61,8 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 	}
 
 	@Override
-    protected Relationship findRelationship( Object item )
-    {
+	protected Relationship findRelationship( Object item )
+	{
 		String value = ( String ) item;
 		Relationship result = null;
 		Iterator<Relationship> itr = this.getAllRelationships();
@@ -78,7 +78,7 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 			}
 		}
 		return result;
-    }
+	}
 	
 	@Override
 	protected void removeItem( Relationship rel )
