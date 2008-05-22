@@ -206,6 +206,7 @@ public abstract class Migration
 		Transaction tx = Transaction.begin();
 		try
 		{
+			System.out.println( "Migrating ==> version " + version );
 			findMigrator( version ).performMigration( this.neo );
 			setDataVersion( version );
 			if ( !this.pretending )
