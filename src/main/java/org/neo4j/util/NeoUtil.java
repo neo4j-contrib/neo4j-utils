@@ -651,4 +651,44 @@ public class NeoUtil
 		}
 		return array;
 	}
+	
+	public Integer incrementAndGetCounter( Node node, String propertyKey )
+	{
+		Transaction tx = neo.beginTx();
+		getLockManager().getWriteLock( node );
+		try
+		{
+			int value = ( Integer ) node.getProperty( propertyKey, 0 );
+			value++;
+			node.setProperty( propertyKey, value );
+			tx.success();
+			return value;
+		}
+		finally
+		{
+			getLockManager().releaseWriteLock( node );
+			tx.finish();
+		}
+	}
+
+	public Integer decrementAndGetCounter( Node node, String propertyKey,
+		int notLowerThan )
+	{
+		Transaction tx = neo.beginTx();
+		getLockManager().getWriteLock( node );
+		try
+		{
+			int value = ( Integer ) node.getProperty( propertyKey, 0 );
+			value--;
+			value = value < notLowerThan ? notLowerThan : value;
+			node.setProperty( propertyKey, value );
+			tx.success();
+			return value;
+		}
+		finally
+		{
+			getLockManager().releaseWriteLock( node );
+			tx.finish();
+		}
+	}
 }
