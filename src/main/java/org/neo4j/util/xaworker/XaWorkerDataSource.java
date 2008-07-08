@@ -113,7 +113,7 @@ public class XaWorkerDataSource extends XaDataSource
 	{
 		public XaWorkerResource( XaResourceManager xaRm ) 
 		{
-			super( xaRm );
+			super( xaRm, null );
 		}
 		
 		@Override
@@ -309,4 +309,18 @@ public class XaWorkerDataSource extends XaDataSource
 			entry.writeToFile( buffer );
 		}
 	}
+
+    @Override
+    public byte[] getBranchId()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setBranchId( byte[] branchId )
+    {
+        // TODO Auto-generated method stub
+        
+    }
 }
