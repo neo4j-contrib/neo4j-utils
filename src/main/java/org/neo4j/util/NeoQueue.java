@@ -16,12 +16,14 @@ public class NeoQueue
 	private NeoService neo;
 	private Node rootNode;
 	private RelationshipType relType;
+	private NeoUtil neoUtil;
 	
 	public NeoQueue( NeoService neo, Node rootNode, RelationshipType relType )
 	{
 		this.neo = neo;
 		this.rootNode = rootNode;
 		this.relType = relType;
+		this.neoUtil = new NeoUtil( neo );
 	}
 	
 	private Relationship getFirstRelationship()
@@ -37,6 +39,7 @@ public class NeoQueue
 	public Node add()
 	{
 		Transaction tx = Transaction.begin();
+		neoUtil.getLockManager().getWriteLock( rootNode );
 		try
 		{
 			Node node = neo.createNode();
@@ -57,6 +60,7 @@ public class NeoQueue
 		}
 		finally
 		{
+			neoUtil.getLockManager().releaseWriteLock( rootNode );
 			tx.finish();
 		}
 	}
@@ -64,6 +68,7 @@ public class NeoQueue
 	public boolean remove()
 	{
 		Transaction tx = Transaction.begin();
+		neoUtil.getLockManager().getWriteLock( rootNode );
 		try
 		{
 			Relationship rel = getFirstRelationship();
@@ -87,6 +92,7 @@ public class NeoQueue
 		}
 		finally
 		{
+			neoUtil.getLockManager().releaseWriteLock( rootNode );
 			tx.finish();
 		}
 	}
