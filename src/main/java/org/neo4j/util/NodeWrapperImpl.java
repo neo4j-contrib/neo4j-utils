@@ -2,7 +2,9 @@ package org.neo4j.util;
 
 import java.lang.reflect.Constructor;
 
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
+import org.neo4j.api.core.Transaction;
 
 /**
  * Wraps a {@link Node}, also overriding {@link #equals(Object)} and
@@ -39,6 +41,23 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 		catch ( Exception e )
 		{
 			throw new RuntimeException( e );
+		}
+	}
+	
+	public static <T extends NodeWrapper> T newInstance(
+		Class<T> instanceClass, NeoService neo, long nodeId )
+	{
+		Transaction tx = neo.beginTx();
+		try
+		{
+			Node node = neo.getNodeById( nodeId );
+			T result = newInstance( instanceClass, node );
+			tx.success();
+			return result;
+		}
+		finally
+		{
+			tx.finish();
 		}
 	}
 

@@ -17,9 +17,9 @@ public class NeoTest extends TestCase
 	private static NeoService neo;
 	
 	@Override
-	public void setUp() throws Exception
+	protected void setUp() throws Exception
 	{
-		if ( neo == null )
+		if ( neo() == null )
 		{
 			init();
 		}
