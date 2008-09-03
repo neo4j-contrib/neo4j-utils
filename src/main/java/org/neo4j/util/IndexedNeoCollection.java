@@ -184,6 +184,11 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 		return toCollection().toArray( array );
 	}
 	
+	/**
+	 * Since this collection creates a sub-root to the supplied collection
+	 * root node, it will have to be explicitly deleted from outside when
+	 * you don't want this collection to exist anymore.
+	 */
 	public void delete()
 	{
 		Transaction tx = neo().beginTx();
