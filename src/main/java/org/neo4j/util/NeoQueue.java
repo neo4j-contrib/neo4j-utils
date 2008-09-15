@@ -38,7 +38,7 @@ public class NeoQueue
 	
 	public Node add()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		neoUtil.getLockManager().getWriteLock( rootNode );
 		try
 		{
@@ -67,7 +67,7 @@ public class NeoQueue
 	
 	public boolean remove()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		neoUtil.getLockManager().getWriteLock( rootNode );
 		try
 		{
@@ -99,7 +99,7 @@ public class NeoQueue
 	
 	public Node peek()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			Relationship rel = getFirstRelationship();

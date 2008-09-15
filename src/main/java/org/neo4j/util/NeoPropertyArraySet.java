@@ -25,6 +25,7 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 	public NeoPropertyArraySet( NeoService neo, PropertyContainer container,
 	    String key )
 	{
+		super( neo );
 		this.neoUtil = new NeoUtil( neo );
 		this.container = container;
 		this.key = key;

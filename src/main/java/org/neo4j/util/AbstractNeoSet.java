@@ -2,6 +2,7 @@ package org.neo4j.util;
 
 import java.util.Collection;
 
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Transaction;
 
 /**
@@ -12,9 +13,21 @@ import org.neo4j.api.core.Transaction;
  */
 public abstract class AbstractNeoSet<T> implements Collection<T>
 {
+	private NeoService neo;
+	
+	public AbstractNeoSet( NeoService neo )
+	{
+		this.neo = neo;
+	}
+	
+	protected NeoService neo()
+	{
+		return this.neo;
+	}
+	
 	public boolean addAll( Collection<? extends T> items )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			boolean changed = false;
@@ -36,7 +49,7 @@ public abstract class AbstractNeoSet<T> implements Collection<T>
 
 	public boolean containsAll( Collection<?> items )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			boolean ok = true;
@@ -59,7 +72,7 @@ public abstract class AbstractNeoSet<T> implements Collection<T>
 
 	public boolean removeAll( Collection<?> items )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			boolean changed = false;

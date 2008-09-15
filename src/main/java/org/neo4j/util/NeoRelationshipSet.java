@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.neo4j.api.core.Direction;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
@@ -34,9 +35,10 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	 * @param node the {@link Node} to act as the collection.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public NeoRelationshipSet( Node node, RelationshipType type )
+	public NeoRelationshipSet( NeoService neo, Node node,
+		RelationshipType type )
 	{
-		this( node, type, Direction.OUTGOING );
+		this( neo, node, type, Direction.OUTGOING );
 	}
 	
 	/**
@@ -44,9 +46,11 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	 * @param direction the direction to use for the relationships.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public NeoRelationshipSet( Node node, RelationshipType type,
+	public NeoRelationshipSet( NeoService neo, Node node, RelationshipType type,
 		Direction direction )
 	{
+		super( neo );
+		
 		if ( direction == null || direction == Direction.BOTH )
 		{
 			throw new IllegalArgumentException(
@@ -86,7 +90,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	
 	public boolean add( T item )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			if ( contains( item ) )
@@ -117,7 +121,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public void clear()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Iterator<Relationship> itr = getAllRelationships();
@@ -135,7 +139,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public boolean contains( Object item )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			boolean result = findRelationship( item ) != null;
@@ -177,7 +181,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public boolean isEmpty()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			return !getAllRelationships().hasNext();
@@ -190,7 +194,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public Iterator<T> iterator()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Iterator<T> result = new ItemIterator();
@@ -210,7 +214,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public boolean remove( Object item )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Relationship rel = findRelationship( item );
@@ -231,7 +235,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public boolean retainAll( Collection<?> items )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Collection<T> itemsToRemove = new HashSet<T>();
@@ -256,7 +260,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public int size()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			int counter = 0;
@@ -284,7 +288,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public Object[] toArray()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Iterator<Relationship> itr = getAllRelationships();
@@ -305,7 +309,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public <R> R[] toArray( R[] array )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Iterator<Relationship> itr = getAllRelationships();
@@ -411,7 +415,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 				return true;
 			}
 			
-			Transaction tx = Transaction.begin();
+			Transaction tx = neo().beginTx();
 			try
 			{
 				// Find the next rel
@@ -435,7 +439,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 		public T next()
 		{
-			Transaction tx = Transaction.begin();
+			Transaction tx = neo().beginTx();
 			try
 			{
 				if ( !this.hasNext() )

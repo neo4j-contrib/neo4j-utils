@@ -1,6 +1,7 @@
 package org.neo4j.util;
 
 import org.neo4j.api.core.Direction;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
@@ -15,17 +16,17 @@ import org.neo4j.api.core.RelationshipType;
 public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	extends NeoRelationshipSet<T>
 {
-	private Class<T> instanceClass;
+	private Class<? extends T> instanceClass;
 	
 	/**
 	 * @param node the node with its relationships acting as a collection.
 	 * @param type the type of relationships to read/write. 
 	 * @param instanceClass the exact class of instances in the collection.
 	 */
-	public NodeWrapperRelationshipSet( Node node, RelationshipType type,
-		Class<T> instanceClass )
+	public NodeWrapperRelationshipSet( NeoService neo, Node node,
+		RelationshipType type, Class<? extends T> instanceClass )
 	{
-		super( node, type );
+		super( neo, node, type );
 		this.instanceClass = instanceClass;
 	}
 	
@@ -35,14 +36,15 @@ public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	 * @param direction the direction of relationships.
 	 * @param instanceClass the exact class of instances in the collection.
 	 */
-	public NodeWrapperRelationshipSet( Node node, RelationshipType type,
-		Direction direction, Class<T> instanceClass )
+	public NodeWrapperRelationshipSet( NeoService neo, Node node,
+		RelationshipType type, Direction direction,
+		Class<? extends T> instanceClass )
 	{
-		super( node, type, direction );
+		super( neo, node, type, direction );
 		this.instanceClass = instanceClass;
 	}
 	
-	protected Class<T> getInstanceClass()
+	protected Class<? extends T> getInstanceClass()
 	{
 		return this.instanceClass;
 	}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.util.NeoPropertySet;
@@ -22,7 +23,7 @@ public class TestNeoPropertySet extends NeoTest
 	public void testSome()
 	{
 		Node node = null;
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			node = neo().createNode();
@@ -33,7 +34,7 @@ public class TestNeoPropertySet extends NeoTest
 			tx.finish();
 		}
 		
-		Collection<Integer> set = new TestSet( node, "ids" );
+		Collection<Integer> set = new TestSet( neo(), node, "ids" );
 		Integer item = 10;
 		Integer item2 = 21211;
 		
@@ -114,7 +115,7 @@ public class TestNeoPropertySet extends NeoTest
 		assertEquals( 1, set.toArray().length );
 		assertEquals( item2, set.toArray( new Integer[ 1 ] )[ 0 ] );
 		
-		tx = Transaction.begin();
+		tx = neo().beginTx();
 		try
 		{
 			node.delete();
@@ -128,9 +129,9 @@ public class TestNeoPropertySet extends NeoTest
 	
 	private static class TestSet extends NeoPropertySet<Integer>
 	{
-		TestSet( Node node, String key )
+		TestSet( NeoService neo, Node node, String key )
 		{
-			super( node, key, "," );
+			super( neo, node, key, "," );
 		}
 
 		@Override

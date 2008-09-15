@@ -264,7 +264,7 @@ public abstract class NeoTransactionQueueWorker extends Thread
 		{
 			this.updateQueue = updateQueue;
 			this.txId = updateQueue.getTxId();
-			this.entryGetter = new EntryGetter( updateQueue );
+			this.entryGetter = new EntryGetter( neo, updateQueue );
 		}
 		
 		public void run()
@@ -340,7 +340,7 @@ public abstract class NeoTransactionQueueWorker extends Thread
 //				( exception == null ? "" : exception.toString() ) );
 			
 			// Add it to the end of the queue
-			Transaction tx = Transaction.begin();
+			Transaction tx = neo.beginTx();
 			try
 			{
 				add( entry );
@@ -356,18 +356,20 @@ public abstract class NeoTransactionQueueWorker extends Thread
 	private static class EntryGetter
 		extends DeadlockCapsule<Map<String, Object>>
 	{
+		private NeoService neo;
 		private TxQueue queue;
 		
-		EntryGetter( TxQueue queue )
+		EntryGetter( NeoService neo, TxQueue queue )
 		{
 			super( "EntryGetter" );
+			this.neo = neo;
 			this.queue = queue;
 		}
 		
 		@Override
 		public Map<String, Object> tryOnce()
 		{
-			Transaction tx = Transaction.begin();
+			Transaction tx = neo.beginTx();
 			try
 			{
 				queue.remove();

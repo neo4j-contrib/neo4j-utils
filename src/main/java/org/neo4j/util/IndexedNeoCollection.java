@@ -16,7 +16,6 @@ import org.neo4j.util.sortedtree.SortedTree;
 public class IndexedNeoCollection<T extends NodeWrapper>
 	extends AbstractNeoSet<T>
 {
-	private NeoService neo;
 	private Node rootNode;
 	private Class<T> instanceClass;
 	private Comparator<T> comparator;
@@ -25,7 +24,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 	public IndexedNeoCollection( NeoService neo, Node rootNode,
 		Comparator<T> comparator, Class<T> instanceClass )
 	{
-		this.neo = neo;
+		super( neo );
 		this.rootNode = rootNode;
 		this.instanceClass = instanceClass;
 		this.comparator = comparator;
@@ -46,7 +45,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 			}
 			else
 			{
-				result = neo.createNode();
+				result = neo().createNode();
 				rootNode.createRelationshipTo( result, RelTypes.TREE_ROOT );
 			}
 			tx.success();
@@ -72,11 +71,6 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 		{
 			tx.finish();
 		}
-	}
-	
-	protected NeoService neo()
-	{
-		return this.neo;
 	}
 	
 	protected Node rootNode()

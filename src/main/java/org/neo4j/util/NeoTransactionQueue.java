@@ -9,10 +9,10 @@ import java.util.Map;
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
+import org.neo4j.api.core.NotFoundException;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.core.NotFoundException;
 
 /**
  * Wraps several {@link NeoQueue} instances (per transaction).
@@ -46,7 +46,7 @@ public class NeoTransactionQueue
 	
 	private void initialize()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			Collection<Relationship> toDelete = new ArrayList<Relationship>();
@@ -123,7 +123,7 @@ public class NeoTransactionQueue
 	
 	public Map<Integer, TxQueue> getQueues()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			Map<Integer, TxQueue> map = new HashMap<Integer, TxQueue>();
@@ -197,7 +197,7 @@ public class NeoTransactionQueue
 				return null;
 			}
 			
-			Transaction tx = Transaction.begin();
+			Transaction tx = neo.beginTx();
 			try
 			{
 				Node node = queue.peek();
@@ -232,7 +232,7 @@ public class NeoTransactionQueue
 				throw new IllegalStateException( "Deleted" );
 			}
 			
-			Transaction tx = Transaction.begin();
+			Transaction tx = neo.beginTx();
 			try
 			{
 				queue.remove();

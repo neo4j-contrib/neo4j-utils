@@ -15,8 +15,6 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 {
 	private static final String VALUE_KEY = "value";
 	
-	private NeoService neo;
-	
 	/**
 	 * @param neo the {@link NeoService} to use.
 	 * @param node the {@link Node} which is the collection node.
@@ -24,18 +22,17 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 	 */
 	public NeoStringSet( NeoService neo, Node node, RelationshipType type )
 	{
-		super( node, type );
-		this.neo = neo;
+		super( neo, node, type );
 	}
 	
 	@Override
 	protected Node getNodeFromItem( Object item )
 	{
 		String value = ( String ) item;
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
-			Node node = neo.createNode();
+			Node node = neo().createNode();
 			node.setProperty( VALUE_KEY, value );
 			tx.success();
 			return node;
@@ -49,7 +46,7 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 	@Override
 	protected String newObject( Node node, Relationship relationship )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			return ( String ) node.getProperty( VALUE_KEY );

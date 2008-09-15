@@ -68,7 +68,7 @@ public abstract class Migration
 	 */
 	public int getDataVersion()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			int result = 0;
@@ -128,7 +128,7 @@ public abstract class Migration
 	 */
 	public void setDataVersion( int version )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			this.getConfigNode().setProperty( getCurrentVersionPropertyKey(),
@@ -203,7 +203,7 @@ public abstract class Migration
 	
 	private void migrateOne( int version )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			System.out.println( "Migrating ==> version " + version );

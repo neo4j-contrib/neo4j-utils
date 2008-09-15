@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 
@@ -33,9 +35,9 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	 * @param propertyKey the property key to use for the collection node to
 	 * store the values.
 	 */
-	public NeoPropertySet( Node node, String propertyKey )
+	public NeoPropertySet( NeoService neo, Node node, String propertyKey )
 	{
-		this( node, propertyKey, DEFAULT_DELIMITER );
+		this( neo, node, propertyKey, DEFAULT_DELIMITER );
 	}
 	
 	/**
@@ -44,9 +46,10 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	 * store the values.
 	 * @param delimiter custom delimiter instead of {@link #DEFAULT_DELIMITER}.
 	 */
-	public NeoPropertySet( Node node, String propertyKey,
+	public NeoPropertySet( NeoService neo, Node node, String propertyKey,
 		String delimiter )
 	{
+		super( neo );
 		this.node = node;
 		this.key = propertyKey;
 		this.delimiter = delimiter;
@@ -58,7 +61,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	
 	private Set<String> tokenize()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Set<String> set = new HashSet<String>();
@@ -104,7 +107,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 			return;
 		}
 		
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			this.node.setProperty( this.key, value );
@@ -118,7 +121,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	
 	public boolean add( T item )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Set<String> set = tokenize();
@@ -135,7 +138,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 
 	public void clear()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			if ( this.node.hasProperty( this.key ) )
@@ -167,7 +170,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 
 	public boolean remove( Object item )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Set<String> set = tokenize();
@@ -184,7 +187,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 
 	public boolean retainAll( Collection<?> realItems )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Collection<String> items = new ArrayList<String>();

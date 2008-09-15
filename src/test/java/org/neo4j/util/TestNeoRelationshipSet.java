@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.neo4j.api.core.Direction;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
@@ -23,14 +24,14 @@ public class TestNeoRelationshipSet extends NeoTest
 	 */
 	public void testIllegalDirection()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Node node = neo().createNode();
 			try
 			{
-				new ContainerSet( node, Direction.BOTH );
-				new ContainerSet( node, null );
+				new ContainerSet( neo(), node, Direction.BOTH );
+				new ContainerSet( neo(), node, null );
 				fail( "Shouldn't be able to create a neo relationship set " +
 					"with Direction.BOTH or null as direction" );
 			}
@@ -50,7 +51,7 @@ public class TestNeoRelationshipSet extends NeoTest
 	 */
 	public void testSome()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Node node = neo().createNode();
@@ -145,7 +146,7 @@ public class TestNeoRelationshipSet extends NeoTest
 		Node node = null;
 		SomeOtherContainer entity1 = null;
 		
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			node = neo().createNode();
@@ -158,7 +159,8 @@ public class TestNeoRelationshipSet extends NeoTest
 		}
 		
 		
-		NeoRelationshipSet<SomeOtherContainer> set = new ContainerSet( node );
+		NeoRelationshipSet<SomeOtherContainer> set =
+			new ContainerSet( neo(), node );
 		Collection<SomeOtherContainer> collection =
 			Arrays.asList( new SomeOtherContainer[] { entity1 } );
 		assertTrue( set.isEmpty() );
@@ -187,7 +189,7 @@ public class TestNeoRelationshipSet extends NeoTest
 		set.toString();
 		set.clear();
 		
-		tx = Transaction.begin();
+		tx = neo().beginTx();
 		try
 		{
 			node.delete();
@@ -200,7 +202,7 @@ public class TestNeoRelationshipSet extends NeoTest
 		}
 	}
 	
-	private static class SomeContainer extends NodeWrapperImpl
+	private class SomeContainer extends NodeWrapperImpl
 	{
 		private SomeContainer( Node node )
 		{
@@ -212,21 +214,21 @@ public class TestNeoRelationshipSet extends NeoTest
 		 */
 		public Collection<SomeOtherContainer> otherContainers()
 		{
-			return new ContainerSet( getUnderlyingNode() );
+			return new ContainerSet( neo(), getUnderlyingNode() );
 		}
 	}
 	
-	private static class ContainerSet
+	private class ContainerSet
 		extends NeoRelationshipSet<SomeOtherContainer>
 	{
-		private ContainerSet( Node node )
+		private ContainerSet( NeoService neo, Node node )
 		{
-			this( node, Direction.OUTGOING );
+			this( neo, node, Direction.OUTGOING );
 		}
 		
-		private ContainerSet( Node node, Direction direction )
+		private ContainerSet( NeoService neo, Node node, Direction direction )
 		{
-			super( node, Relationships.TESTREL, direction );
+			super( neo, node, Relationships.TESTREL, direction );
 		}
 
 		@Override

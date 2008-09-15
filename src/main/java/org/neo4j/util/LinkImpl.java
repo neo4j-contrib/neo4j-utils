@@ -80,7 +80,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	
 	public T get()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			Relationship rel = this.node().getSingleRelationship( this.type(),
@@ -103,7 +103,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 
 	public boolean has()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			boolean result = this.node().getRelationships(
@@ -119,7 +119,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 
 	public void remove()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		try
 		{
 			this.node().getSingleRelationship(
@@ -134,7 +134,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 
 	public void set( T entity )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo.beginTx();
 		LockManager lockManager =
 			( ( EmbeddedNeo ) neo ).getConfig().getLockManager();
 		try

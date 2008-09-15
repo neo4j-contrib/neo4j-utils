@@ -96,7 +96,7 @@ public class NeoUtil
 	public boolean hasProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			boolean result = container.hasProperty( key );
@@ -119,7 +119,7 @@ public class NeoUtil
 	public Object getProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Object result = container.getProperty( key );
@@ -145,7 +145,7 @@ public class NeoUtil
 		String key, Object defaultValue )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Object result = container.getProperty( key, defaultValue );
@@ -175,7 +175,7 @@ public class NeoUtil
 				key + "' can't be null" );
 		}
 		
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			container.setProperty( key, value );
@@ -266,7 +266,7 @@ public class NeoUtil
 	public Object removeProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Object oldValue = container.removeProperty( key );
@@ -291,7 +291,7 @@ public class NeoUtil
 	public Relationship getSingleRelationship( Node node, RelationshipType type,
 		Direction direction )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Relationship singleRelationship =
@@ -308,7 +308,7 @@ public class NeoUtil
 	public Node getSingleOtherNode( Node node, RelationshipType type,
 		Direction direction )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Relationship rel = getSingleRelationship( node, type, direction );
@@ -325,7 +325,7 @@ public class NeoUtil
 	public Relationship getSingleRelationship( Node node,
 		RelationshipType type )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Iterator<Relationship> itr =
@@ -351,7 +351,7 @@ public class NeoUtil
 	
 	public Node getSingleOtherNode( Node node, RelationshipType type )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Relationship rel = getSingleRelationship( node, type );
@@ -371,7 +371,7 @@ public class NeoUtil
 	 */
 	public Node getReferenceNode()
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Node referenceNode = neo().getReferenceNode();
@@ -408,7 +408,7 @@ public class NeoUtil
 	public Node getOrCreateSubReferenceNode( RelationshipType type,
 		Direction direction )
 	{
-		Transaction tx = Transaction.begin();
+		Transaction tx = neo().beginTx();
 		try
 		{
 			Node referenceNode = getReferenceNode();
@@ -444,7 +444,7 @@ public class NeoUtil
 	public <T extends NodeWrapper> Collection<T>
 		getSubReferenceNodeCollection( RelationshipType type, Class<T> clazz )
 	{
-		return new NodeWrapperRelationshipSet<T>(
+		return new NodeWrapperRelationshipSet<T>( neo(),
 			getOrCreateSubReferenceNode( type ), type, clazz );
 	}
 	

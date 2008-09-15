@@ -5,9 +5,9 @@ import java.util.TreeSet;
 
 import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
+import org.neo4j.api.core.NotFoundException;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.core.NotFoundException;
 
 /**
  * Simple debugging utility for neo-related objects.
