@@ -13,6 +13,7 @@ import org.neo4j.api.core.Transaction;
  */
 public abstract class NodeWrapperImpl implements NodeWrapper
 {
+	private NeoService neo;
 	private Node node;
 	
 	/**
@@ -25,13 +26,13 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 	 * @return the new instance wrapping the node.
 	 */
 	public static <T extends NodeWrapper> T newInstance(
-		Class<T> instanceClass, Node node )
+		Class<T> instanceClass, NeoService neo, Node node )
 	{
 		try
 		{
 			Constructor<T> constructor =
-				instanceClass.getConstructor( Node.class );
-			T result = constructor.newInstance( node );
+				instanceClass.getConstructor( NeoService.class, Node.class );
+			T result = constructor.newInstance( neo, node );
 			return result;
 		}
 		catch ( RuntimeException e )
@@ -51,7 +52,7 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 		try
 		{
 			Node node = neo.getNodeById( nodeId );
-			T result = newInstance( instanceClass, node );
+			T result = newInstance( instanceClass, neo, node );
 			tx.success();
 			return result;
 		}
@@ -61,8 +62,9 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 		}
 	}
 
-	protected NodeWrapperImpl( Node node )
+	protected NodeWrapperImpl( NeoService neo, Node node )
 	{
+		this.neo = neo;
 		this.node = node;
 	}
 	
@@ -72,6 +74,11 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 	public Node getUnderlyingNode()
 	{
 		return node;
+	}
+	
+	protected NeoService getNeo()
+	{
+		return this.neo;
 	}
 	
 	@Override

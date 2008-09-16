@@ -85,7 +85,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 	
 	protected T instantiateItem( Node itemNode )
 	{
-		return NodeWrapperImpl.newInstance( instanceClass, itemNode );
+		return NodeWrapperImpl.newInstance( instanceClass, neo(), itemNode );
 	}
 	
 	public boolean add( T item )
@@ -210,8 +210,8 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 		{
 			// This is slow, I guess
 			return source.compare(
-				NodeWrapperImpl.newInstance( instanceClass, o1 ),
-				NodeWrapperImpl.newInstance( instanceClass, o2 ) );
+				NodeWrapperImpl.newInstance( instanceClass, neo(), o1 ),
+				NodeWrapperImpl.newInstance( instanceClass, neo(), o2 ) );
 		}
 	}
 }

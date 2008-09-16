@@ -1,6 +1,7 @@
 package org.neo4j.util;
 
 import org.neo4j.api.core.Direction;
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Transaction;
 
@@ -39,8 +40,10 @@ public class TestLink extends NeoTest
 			Node node1 = neo().createNode();
 			Node node2 = neo().createNode();
 			
-			Entity entity1 = NodeWrapperImpl.newInstance( Entity.class, node1 );
-			Entity entity2 = NodeWrapperImpl.newInstance( Entity.class, node2 );
+			Entity entity1 = NodeWrapperImpl.newInstance( Entity.class, neo(),
+				node1 );
+			Entity entity2 = NodeWrapperImpl.newInstance( Entity.class, neo(),
+				node2 );
 
 			Link<Entity> link = new LinkImpl<Entity>( neo(),
 				entity1.getUnderlyingNode(), Relationships.TESTREL, direction,
@@ -89,9 +92,9 @@ public class TestLink extends NeoTest
 		/**
 		 * @param node the underlying node.
 		 */
-		public Entity( Node node )
+		public Entity( NeoService neo, Node node )
 		{
-			super( node );
+			super( neo, node );
 		}
 	}
 }

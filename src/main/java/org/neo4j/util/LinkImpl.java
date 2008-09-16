@@ -75,7 +75,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	
 	protected T newObject( Node node )
 	{
-		return NodeWrapperImpl.newInstance( this.classType(), node );
+		return NodeWrapperImpl.newInstance( this.classType(), neo, node );
 	}
 	
 	public T get()

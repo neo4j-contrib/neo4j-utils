@@ -206,7 +206,7 @@ public class TestNeoRelationshipSet extends NeoTest
 	{
 		private SomeContainer( Node node )
 		{
-			super( node );
+			super( neo(), node );
 		}
 		
 		/**
@@ -249,7 +249,7 @@ public class TestNeoRelationshipSet extends NeoTest
 	{
 		private SomeOtherContainer( Node node )
 		{
-			super( node );
+			super( neo(), node );
 		}
 	}
 }

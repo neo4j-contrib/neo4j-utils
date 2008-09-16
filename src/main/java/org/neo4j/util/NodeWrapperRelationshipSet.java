@@ -52,7 +52,8 @@ public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	@Override
 	protected T newObject( Node node, Relationship relationship )
 	{
-		return NodeWrapperImpl.newInstance( this.getInstanceClass(), node );
+		return NodeWrapperImpl.newInstance( this.getInstanceClass(), neo(),
+			node );
 	}
 	
 	@Override

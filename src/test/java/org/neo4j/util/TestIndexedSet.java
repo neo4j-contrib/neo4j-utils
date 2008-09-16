@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 
 import test.TxNeoTest;
@@ -89,9 +90,9 @@ public class TestIndexedSet extends TxNeoTest
 	{
 		static Collection<Node> createdNodes = new ArrayList<Node>();
 		
-		public AnItem( Node node )
+		public AnItem( NeoService neo, Node node )
 		{
-			super( node );
+			super( neo, node );
 		}
 		
 		public AnItem( String name )
@@ -108,7 +109,7 @@ public class TestIndexedSet extends TxNeoTest
 		
 		public AnItem( Node node, String name )
 		{
-			this( node );
+			this( neo(), node );
 			node.setProperty( "name", name );
 		}
 		
