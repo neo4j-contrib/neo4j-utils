@@ -21,7 +21,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	private NeoService neo;
 	private Node node;
 	private RelationshipType type;
-	private Class<T> theClass;
+	private Class<? extends T> theClass;
 	private Direction direction = Direction.OUTGOING;
 	
 	/**
@@ -31,7 +31,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 	 * same class here to make instantiation work.
 	 */
 	public LinkImpl( NeoService neo, Node node, RelationshipType type,
-		Class<T> thisIsGenericsFault )
+		Class<? extends T> thisIsGenericsFault )
 	{
 		this.neo = neo;
 		this.node = node;
@@ -63,7 +63,7 @@ public class LinkImpl<T extends NodeWrapper> implements Link<T>
 		return this.type;
 	}
 	
-	protected Class<T> classType()
+	protected Class<? extends T> classType()
 	{
 		return this.theClass;
 	}
