@@ -14,6 +14,13 @@ import org.neo4j.api.core.RelationshipType;
  */
 public class NeoTest extends TestCase
 {
+	protected static enum TestRelTypes implements RelationshipType
+	{
+		TEST_TYPE,
+		TEST_OTHER_TYPE,
+		TEST_YET_ANOTHER_TYPE,
+	}
+	
 	private static NeoService neo;
 	
 	@Override

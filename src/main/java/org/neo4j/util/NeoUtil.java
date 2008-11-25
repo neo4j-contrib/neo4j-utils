@@ -691,4 +691,34 @@ public class NeoUtil
 			tx.finish();
 		}
 	}
+	
+	public String sumNodeContents( Node node )
+	{
+        StringBuffer result = new StringBuffer();
+        for ( Relationship rel : node.getRelationships() )
+        {
+            if ( rel.getStartNode().equals( node ) )
+            {
+                result.append( rel.getStartNode() + " ---[" +
+                    rel.getType().name() + "]--> " + rel.getEndNode() );
+            }
+            else
+            {
+                result.append( rel.getStartNode() + " <--[" +
+                    rel.getType().name() + "]--- " + rel.getEndNode() );
+            }
+            result.append( "\n" );
+        }
+        NeoUtil neoUtil = new NeoUtil( neo() );
+        for ( String key : node.getPropertyKeys() )
+        {
+            for ( Object value : neoUtil.neoPropertyAsArray(
+                node.getProperty( key ) ) )
+            {
+                result.append( "*" + key + "=[" + value + "]" );
+                result.append( "\n" );
+            }
+        }
+        return result.toString();
+	}
 }

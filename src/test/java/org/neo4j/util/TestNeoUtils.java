@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.neo4j.api.core.Node;
+import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.util.NeoPropertyArraySet;
 import org.neo4j.util.NeoUtil;
@@ -99,5 +100,47 @@ public class TestNeoUtils extends NeoTest
 		{
 			tx.finish();
 		}
+	}
+	
+	public void testSumContents() throws Exception
+	{
+	    Transaction tx = neo().beginTx();
+	    try
+	    {
+	        Node node1 = neo().createNode();
+	        Node node2 = neo().createNode();
+	        Node node3 = neo().createNode();
+	        Node node4 = neo().createNode();
+	        
+	        Relationship r1 = node1.createRelationshipTo(
+	            node2, TestRelTypes.TEST_TYPE );
+	        Relationship r2 = node2.createRelationshipTo(
+	            node1, TestRelTypes.TEST_OTHER_TYPE );
+	        Relationship r3 = node3.createRelationshipTo(
+	            node1, TestRelTypes.TEST_TYPE );
+	        Relationship r4 = node1.createRelationshipTo(
+	            node4, TestRelTypes.TEST_YET_ANOTHER_TYPE );
+	        
+	        node1.setProperty( "prop1", "Hejsan" );
+	        node1.setProperty( "prop2", 10 );
+	        
+	        System.out.println( new NeoUtil( neo() ).sumNodeContents( node1 ) );
+	        
+	        r1.delete();
+	        r2.delete();
+	        r3.delete();
+	        r4.delete();
+	        
+	        node1.delete();
+	        node2.delete();
+	        node3.delete();
+	        node4.delete();
+	        
+	        tx.success();
+	    }
+	    finally
+	    {
+	        tx.finish();
+	    }
 	}
 }
