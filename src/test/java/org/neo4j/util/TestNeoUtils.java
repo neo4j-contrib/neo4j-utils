@@ -124,7 +124,7 @@ public class TestNeoUtils extends NeoTest
 	        node1.setProperty( "prop1", "Hejsan" );
 	        node1.setProperty( "prop2", 10 );
 	        
-	        System.out.println( new NeoUtil( neo() ).sumNodeContents( node1 ) );
+	        new NeoUtil( neo() ).sumNodeContents( node1 );
 	        
 	        r1.delete();
 	        r2.delete();
