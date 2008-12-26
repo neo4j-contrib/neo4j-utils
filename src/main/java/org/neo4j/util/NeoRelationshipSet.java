@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.neo4j.api.core.Direction;
@@ -12,11 +11,7 @@ import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
-import org.neo4j.api.core.ReturnableEvaluator;
-import org.neo4j.api.core.StopEvaluator;
 import org.neo4j.api.core.Transaction;
-import org.neo4j.api.core.TraversalPosition;
-import org.neo4j.api.core.Traverser.Order;
 
 /**
  * A {@link Set} implemented with neo.
@@ -159,8 +154,15 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	
 	protected Iterator<Relationship> getAllRelationships()
 	{
-		return new RelationshipIterator(
-			node.getRelationships( type, getDirection() ).iterator() );
+		return new FilteringIterator<Relationship>(
+			node.getRelationships( type, getDirection() ).iterator() )
+		{
+            @Override
+            protected boolean passes( Relationship item )
+            {
+                return shouldIncludeRelationship( item );
+            }
+		};
 	}
 	
 	protected Relationship findRelationship( Object item )
@@ -170,6 +172,11 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		for ( Relationship rel : otherNode.getRelationships(
 			type, getInverseDirection() ) )
 		{
+		    if ( !shouldIncludeRelationship( rel ) )
+		    {
+		        continue;
+		    }
+		    
 			if ( rel.getOtherNode( otherNode ).equals( node ) )
 			{
 				result = rel;
@@ -197,7 +204,16 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		Transaction tx = neo().beginTx();
 		try
 		{
-			Iterator<T> result = new ItemIterator();
+			Iterator<T> result = new IteratorWrapper<T, Relationship>(
+			    getAllRelationships() )
+		    {
+                @Override
+                protected T underlyingObjectToObject( Relationship rel )
+                {
+                    return newObject( rel.getOtherNode(
+                        NeoRelationshipSet.this.node ), rel );
+                }
+		    };
 			tx.success();
 			return result;
 		}
@@ -337,130 +353,5 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	protected <R> Collection<R> newArrayCollection()
 	{
 		return new ArrayList<R>();
-	}
-	
-	protected class RelationshipIterator implements Iterator<Relationship>
-	{
-		private Iterator<Relationship> source;
-		private Relationship next;
-		
-		RelationshipIterator( Iterator<Relationship> source )
-		{
-			this.source = source;
-		}
-		
-		public boolean hasNext()
-		{
-			if ( next != null )
-			{
-				return true;
-			}
-			
-			while ( source.hasNext() && next == null )
-			{
-				Relationship test = source.next();
-				if ( shouldIncludeRelationship( test ) )
-				{
-					next = test;
-				}
-			}
-			return next != null;
-		}
-		
-		public Relationship next()
-		{
-			if ( !hasNext() )
-			{
-				throw new IllegalStateException();
-			}
-			Relationship result = next;
-			next = null;
-			return result;
-		}
-		
-		public void remove()
-		{
-			throw new UnsupportedOperationException();
-		}
-	}
-	
-	protected class ItemIterator implements Iterator<T>
-	{
-		private Iterator<Node> traverser;
-		private Relationship lastRelationship;
-		private Relationship nextRelationship;
-		private Node nextNode;
-		
-		ItemIterator()
-		{
-			StopEvaluator stopEvaluator = new DepthLimitStopEvaluator( 1 )
-			{
-				@Override
-				public boolean isStopNode( TraversalPosition position )
-				{
-					lastRelationship = position.lastRelationshipTraversed();
-					return super.isStopNode( position );
-				}
-			};
-			
-			traverser = node.traverse( Order.BREADTH_FIRST, stopEvaluator,
-				ReturnableEvaluator.ALL_BUT_START_NODE, type,
-				getDirection() ).iterator();
-		}
-		
-		public boolean hasNext()
-		{
-			if ( this.nextNode != null )
-			{
-				return true;
-			}
-			
-			Transaction tx = neo().beginTx();
-			try
-			{
-				// Find the next rel
-				while ( traverser.hasNext() )
-				{
-					Node node = traverser.next();
-					if ( shouldIncludeRelationship( this.lastRelationship ) )
-					{
-						this.nextNode = node;
-						this.nextRelationship = this.lastRelationship;
-						break;
-					}
-				}
-				return this.nextNode != null;
-			}
-			finally
-			{
-				tx.finish();
-			}
-		}
-
-		public T next()
-		{
-			Transaction tx = neo().beginTx();
-			try
-			{
-				if ( !this.hasNext() )
-				{
-					throw new NoSuchElementException();
-				}
-				T result = newObject( this.nextNode, this.nextRelationship );
-				this.nextNode = null;
-				this.nextRelationship = null;
-				tx.success();
-				return result;
-			}
-			finally
-			{
-				tx.finish();
-			}
-		}
-
-		public void remove()
-		{
-			throw new UnsupportedOperationException();
-		}
 	}
 }
