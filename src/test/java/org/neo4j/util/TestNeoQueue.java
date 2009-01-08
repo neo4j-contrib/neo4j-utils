@@ -66,4 +66,37 @@ public class TestNeoQueue extends NeoTest
 	        tx.finish();
         }
 	}
+	
+	public void testMany() throws Exception
+	{
+	    Transaction tx = neo().beginTx();
+	    
+	    Node rootNode = neo().createNode();
+	    NeoQueue q = new NeoQueue( neo(), rootNode, RelTypes.TEST_QUEUE );
+	    for ( int i = 0; i < 10; i++ )
+	    {
+	        Node node = q.add();
+	        node.setProperty( "p", i );
+	    }
+	    
+	    Node node = q.peek();
+	    assertEquals( 0, node.getProperty( "p" ) );
+	    Node[] nodes = q.peek( 4 );
+	    assertEquals( 4, nodes.length );
+	    for ( int i = 0; i < 4; i++ )
+	    {
+	        assertEquals( i, nodes[ i ].getProperty( "p" ) );
+	    }
+	    assertEquals( 10, q.peek( 20 ).length );
+	    
+	    q.remove( 3 );
+	    assertEquals( 3, q.peek().getProperty( "p" ) );
+	    assertEquals( 7, q.peek( 20 ).length );
+	    
+	    q.remove( 7 );
+	    rootNode.delete();
+	    
+	    tx.success();
+	    tx.finish();
+	}
 }

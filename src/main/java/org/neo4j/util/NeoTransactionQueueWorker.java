@@ -1,5 +1,6 @@
 package org.neo4j.util;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,14 +34,22 @@ public abstract class NeoTransactionQueueWorker extends Thread
 		new HashSet<Integer>() );
 	private boolean paused;
 	private boolean fallThrough;
+	private int batchSize;
 	
+    public NeoTransactionQueueWorker( NeoService neo, Node rootNode,
+        int maxConsumers )
+    {
+        this( neo, rootNode, maxConsumers, 1 );
+    }
+    
 	public NeoTransactionQueueWorker( NeoService neo, Node rootNode,
-		int maxConsumers )
+		int maxConsumers, int batchSize )
 	{
 		super( NeoTransactionQueueWorker.class.getSimpleName() );
 		this.neo = neo;
 		this.maxConsumers = maxConsumers;
 		this.workQueue = createQueue( rootNode );
+		this.batchSize = batchSize;
 	}
 	
 	public void add( Map<String, Object> values )
@@ -210,6 +219,14 @@ public abstract class NeoTransactionQueueWorker extends Thread
 		handleEntry( entry );
 	}
 	
+	protected void beforeBatch()
+	{
+	}
+	
+	protected void afterBatch()
+	{
+	}
+	
 	protected abstract void handleEntry( Map<String, Object> entry );
 	
 	protected long getWaitTimeoutBetweenBalancing()
@@ -258,31 +275,36 @@ public abstract class NeoTransactionQueueWorker extends Thread
 	{
 		private TxQueue updateQueue;
 		private int txId;
-		private EntryGetter entryGetter;
 		
 		Consumer( TxQueue updateQueue )
 		{
 			this.updateQueue = updateQueue;
 			this.txId = updateQueue.getTxId();
-			this.entryGetter = new EntryGetter( neo, updateQueue );
 		}
 		
 		public void run()
 		{
 			try
 			{
-				Map<String, Object> entry = updateQueue.peek();
-				while ( !halted && entry != null )
+				while ( !halted )
 				{
-					if ( isPaused() )
-					{
-						sleepSomeTime( 1000 );
-					}
-					else
-					{
-						doOne( entry );
-						entry = getNextEntry();
-					}
+                    if ( isPaused() )
+                    {
+                        sleepSomeTime( 1000 );
+                    }
+                    else
+                    {
+                        Collection<Map<String, Object>> entries =
+                            updateQueue.peek( batchSize );
+                        beforeBatch();
+    				    for ( Map<String, Object> entry : entries )
+    				    {
+       						doOne( entry );
+    				    }
+    				    afterBatch();
+                        new EntryRemover( neo, updateQueue,
+                            entries.size() ).run();
+                    }
 				}
 			}
 			catch ( Throwable e )
@@ -293,11 +315,6 @@ public abstract class NeoTransactionQueueWorker extends Thread
 			{
 				consumerDone( txId );
 			}
-		}
-		
-		private Map<String, Object> getNextEntry()
-		{
-			return entryGetter.run();
 		}
 		
 		private void sleepSomeTime( long millis )
@@ -353,29 +370,30 @@ public abstract class NeoTransactionQueueWorker extends Thread
 		}
 	}
 	
-	private static class EntryGetter
-		extends DeadlockCapsule<Map<String, Object>>
+	private static class EntryRemover
+		extends DeadlockCapsule<Object>
 	{
 		private NeoService neo;
 		private TxQueue queue;
+		private int size;
 		
-		EntryGetter( NeoService neo, TxQueue queue )
+		EntryRemover( NeoService neo, TxQueue queue, int size )
 		{
-			super( "EntryGetter" );
+			super( "EntryRemover" );
 			this.neo = neo;
 			this.queue = queue;
+			this.size = size;
 		}
 		
 		@Override
-		public Map<String, Object> tryOnce()
+		public Object tryOnce()
 		{
 			Transaction tx = neo.beginTx();
 			try
 			{
-				queue.remove();
-				Map<String, Object> result = queue.peek();
+				queue.remove( size );
 				tx.success();
-				return result;
+				return null;
 			}
 			finally
 			{

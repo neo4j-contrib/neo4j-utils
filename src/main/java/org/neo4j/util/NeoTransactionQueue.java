@@ -192,27 +192,34 @@ public class NeoTransactionQueue
 		
 		public Map<String, Object> peek()
 		{
-			if ( deleted )
-			{
-				return null;
-			}
-			
-			Transaction tx = neo.beginTx();
-			try
-			{
-				Node node = queue.peek();
-				Map<String, Object> result = null;
-				if ( node != null )
-				{
-					result = readEntry( node );
-				}
-				tx.success();
-				return result;
-			}
-			finally
-			{
-				tx.finish();
-			}
+		    Collection<Map<String, Object>> result = peek( 1 );
+		    return result.isEmpty() ? null : result.iterator().next();
+		}
+		
+		public Collection<Map<String, Object>> peek( int max )
+		{
+            if ( deleted )
+            {
+                return null;
+            }
+            
+            Transaction tx = neo.beginTx();
+            try
+            {
+                Collection<Map<String, Object>> result =
+                    new ArrayList<Map<String,Object>>( max );
+                Node[] nodes = queue.peek( max );
+                for ( Node node : nodes )
+                {
+                    result.add( readEntry( node ) );
+                }
+                tx.success();
+                return result;
+            }
+            finally
+            {
+                tx.finish();
+            }
 		}
 		
 		private Map<String, Object> readEntry( Node node )
@@ -227,6 +234,11 @@ public class NeoTransactionQueue
 		
 		public void remove()
 		{
+		    remove( 1 );
+		}
+		
+		public void remove( int max )
+		{
 			if ( deleted )
 			{
 				throw new IllegalStateException( "Deleted" );
@@ -235,7 +247,7 @@ public class NeoTransactionQueue
 			Transaction tx = neo.beginTx();
 			try
 			{
-				queue.remove();
+				queue.remove( max );
 				if ( queue.peek() == null )
 				{
 					NeoTransactionQueue.this.remove( this );

@@ -1,5 +1,8 @@
 package org.neo4j.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
@@ -67,34 +70,54 @@ public class NeoQueue
 	
 	public boolean remove()
 	{
-		Transaction tx = neo.beginTx();
-		neoUtil.getLockManager().getWriteLock( rootNode );
-		try
-		{
-			Relationship rel = getFirstRelationship();
-			Node result = null;
-			if ( rel != null )
-			{
-				result = rel.getEndNode();
-				rel.delete();
-				Relationship nextRel = result.getSingleRelationship( relType,
-					Direction.OUTGOING );
-				Node nextNode = nextRel.getEndNode();
-				nextRel.delete();
-				if ( !nextNode.equals( rootNode ) )
-				{
-					rootNode.createRelationshipTo( nextNode, relType );
-				}
-				result.delete();
-			}
-			tx.success();
-			return result != null;
-		}
-		finally
-		{
-			neoUtil.getLockManager().releaseWriteLock( rootNode );
-			tx.finish();
-		}
+	    return remove( 1 ) == 1;
+	}
+	
+	public int remove( int max )
+	{
+        Transaction tx = neo.beginTx();
+        neoUtil.getLockManager().getWriteLock( rootNode );
+        try
+        {
+            Relationship rel = getFirstRelationship();
+            int removed = 0;
+            if ( rel != null )
+            {
+                Node node = rel.getEndNode();
+                Node nextNode = null;
+                for ( int i = 0; i < max; i++ )
+                {
+                    Relationship relToNext = node.getSingleRelationship(
+                        relType, Direction.OUTGOING );
+                    nextNode = relToNext.getEndNode();
+                    for ( Relationship relToDel : node.getRelationships(
+                        relType ) )
+                    {
+                        relToDel.delete();
+                    }
+                    node.delete();
+                    removed++;
+                    if ( nextNode.equals( rootNode ) )
+                    {
+                        break;
+                    }
+                    node = nextNode;
+                }
+
+                if ( nextNode != null && !nextNode.equals( rootNode ) )
+                {
+                    rootNode.createRelationshipTo( nextNode, relType );
+                }
+            }
+            
+            tx.success();
+            return removed;
+        }
+        finally
+        {
+            neoUtil.getLockManager().releaseWriteLock( rootNode );
+            tx.finish();
+        }
 	}
 	
 	public Node peek()
@@ -115,5 +138,37 @@ public class NeoQueue
 		{
 			tx.finish();
 		}
+	}
+	
+	public Node[] peek( int max )
+	{
+	    Transaction tx = neo.beginTx();
+	    try
+	    {
+	        Collection<Node> result = new ArrayList<Node>( max );
+	        Node node = rootNode;
+	        for ( int i = 0; i < max; i++ )
+	        {
+	            Relationship rel = node.getSingleRelationship( relType,
+	                Direction.OUTGOING );
+	            if ( rel == null )
+	            {
+	                break;
+	            }
+	            Node otherNode = rel.getEndNode();
+	            if ( otherNode.equals( rootNode ) )
+	            {
+	                break;
+	            }
+	            result.add( otherNode );
+	            node = otherNode;
+	        }
+            tx.success();
+            return result.toArray( new Node[ 0 ] );
+	    }
+	    finally
+	    {
+	        tx.finish();
+	    }
 	}
 }
