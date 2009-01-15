@@ -52,4 +52,10 @@ public class LinkImpl<T extends NodeWrapper> extends AbstractLink<T>
 	{
 		return NodeWrapperImpl.newInstance( this.classType(), neo(), node );
 	}
+	
+	@Override
+	protected Node getNodeFromItem( T item )
+	{
+		return item.getUnderlyingNode();
+	}
 }

@@ -53,6 +53,8 @@ public abstract class AbstractLink<T> implements Link<T>
     
     protected abstract T newObject( Node node );
     
+    protected abstract Node getNodeFromItem( T item );
+    
     public T get()
     {
         Transaction tx = neo.beginTx();
@@ -120,7 +122,7 @@ public abstract class AbstractLink<T> implements Link<T>
                 remove();
             }
             
-            Node entityNode = ( ( NodeWrapper ) entity ).getUnderlyingNode();
+            Node entityNode = getNodeFromItem( entity );
             Node startNode = this.direction() == Direction.OUTGOING ?
                 this.node() : entityNode;
             Node endNode = this.direction() == Direction.OUTGOING ?
