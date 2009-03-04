@@ -26,8 +26,8 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 		this.neoUtil = new NeoUtil( neo );
 	}
 	
-	private ConcurrentMap<Thread, EventFilter> eventLists =
-		new ConcurrentHashMap<Thread, EventFilter>();
+	private ConcurrentMap<Transaction, EventFilter> eventLists =
+		new ConcurrentHashMap<Transaction, EventFilter>();
 	
 	protected abstract Event[] getEvents();
 	
@@ -84,6 +84,7 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 			if ( filter == null )
 			{
 			    filter = this.newFilter();
+			    this.eventLists.put( tx, filter );
 			    tx.registerSynchronization( new Synchronization()
 			    {
                     public void afterCompletion( int status )
