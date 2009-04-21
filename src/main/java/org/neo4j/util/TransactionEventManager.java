@@ -55,10 +55,17 @@ public class TransactionEventManager
 			return new TransactionHook( tx );
 		}
 	};
+	private boolean wrapEventsInTx;
 	
 	public TransactionEventManager( NeoService neo )
 	{
-		this.neoUtil = new NeoUtil( neo );
+	    this( neo, false );
+	}
+	
+	public TransactionEventManager( NeoService neo, boolean wrapEventsInTx )
+	{
+        this.neoUtil = new NeoUtil( neo );
+	    this.wrapEventsInTx = wrapEventsInTx;
 	}
 	
 	/**
@@ -405,7 +412,23 @@ public class TransactionEventManager
                 @Override
                 public void run()
                 {
-                    flushEvents();
+                    org.neo4j.api.core.Transaction tx = wrapEventsInTx ?
+                        neoUtil.neo().beginTx() : null;
+                    try
+                    {
+                        flushEvents();
+                        if ( wrapEventsInTx )
+                        {
+                            tx.success();
+                        }
+                    }
+                    finally
+                    {
+                        if ( wrapEventsInTx )
+                        {
+                            tx.finish();
+                        }
+                    }
                 }
             };
             thread.start();
