@@ -13,14 +13,15 @@ import org.neo4j.api.core.Transaction;
  */
 public abstract class NodeWrapperImpl implements NodeWrapper
 {
-	private NeoService neo;
-	private Node node;
+	private final NeoService neo;
+	private final Node node;
 	
 	/**
 	 * Utility method for instantiating a new node wrapper instance, using
 	 * the class' constructor which takes a {@link Node}.
 	 * @param <T> the resulting instance's class type.
 	 * @param instanceClass the resulting instance's class type.
+     * @param neo the {@link NeoService} used with the node.
 	 * @param node the node to wrap, the node returned from
 	 * {@link #getUnderlyingNode()}.
 	 * @return the new instance wrapping the node.
@@ -45,6 +46,16 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 		}
 	}
 	
+    /**
+     * Utility method for instantiating a new node wrapper instance, using
+     * the class' constructor which takes a {@link Node}.
+     * @param <T> the resulting instance's class type.
+     * @param instanceClass the resulting instance's class type.
+     * @param neo the {@link NeoService} used with the node.
+     * @param nodeId the id of the node to wrap, the node returned from
+     * {@link #getUnderlyingNode()}.
+     * @return the new instance wrapping the node (with the given id).
+     */
 	public static <T extends NodeWrapper> T newInstance(
 		Class<T> instanceClass, NeoService neo, long nodeId )
 	{
