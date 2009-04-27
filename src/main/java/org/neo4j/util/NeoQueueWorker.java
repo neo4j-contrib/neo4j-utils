@@ -14,11 +14,13 @@ public abstract class NeoQueueWorker extends Thread
     private final NeoService neo;
     private final NeoQueue queue;
     private boolean halted;
+    private boolean requestedToPause;
     private boolean paused;
     private int batchSize;
     
     public NeoQueueWorker( NeoService neo, NeoQueue queue, int batchSize )
     {
+        super( "NeoQueueWorker" );
         this.neo = neo;
         this.queue = queue;
         this.batchSize = batchSize;
@@ -29,11 +31,44 @@ public abstract class NeoQueueWorker extends Thread
         return this.queue;
     }
     
-    public void setPaused()
+    public void setPaused( boolean paused )
     {
-        this.paused = true;
+        if ( this.paused == paused )
+        {
+            return;
+        }
+        
+        if ( paused && this.requestedToPause )
+        {
+            waitUntilReallyPaused();
+            return;
+        }
+        
+        this.requestedToPause = paused;
+        if ( paused )
+        {
+            waitUntilReallyPaused();
+        }
+        else
+        {
+            this.paused = false;
+        }
     }
     
+    private void waitUntilReallyPaused()
+    {
+        while ( !this.paused )
+        {
+            try
+            {
+                Thread.sleep( 100 );
+            }
+            catch ( InterruptedException e )
+            { // OK
+            }
+        }
+    }
+
     public boolean isPaused()
     {
         return this.paused;
@@ -56,8 +91,10 @@ public abstract class NeoQueueWorker extends Thread
     {
         while ( !this.halted )
         {
-            if ( this.isPaused() )
+            if ( this.requestedToPause || this.paused )
             {
+                this.paused = true;
+                this.requestedToPause = false;
                 sleepQuiet( 1000 );
                 continue;
             }
