@@ -142,29 +142,37 @@ public abstract class NeoQueueWorker extends Thread
             {
                 entries.add( readNode( node ) );
             }
+
+            beforeBatch();
+            try
+            {
+                for ( Map<String, Object> entry : entries )
+                {
+                    doOne( entry );
+                }
+            }
+            finally
+            {
+                afterBatch();
+            }
+            
+            final int size = entrySize;
+            new DeadlockCapsule<Object>( "remover" )
+            {
+                @Override
+                public Object tryOnce()
+                {
+                    queue.remove( size );
+                    return null;
+                }
+            }.run();
+            
             tx.success();
         }
         finally
         {
             tx.finish();
         }
-        
-        beforeBatch();
-        for ( Map<String, Object> entry : entries )
-        {
-            doOne( entry );
-        }
-        afterBatch();
-        final int size = entrySize;
-        new DeadlockCapsule<Object>( "remover" )
-        {
-            @Override
-            public Object tryOnce()
-            {
-                queue.remove( size );
-                return null;
-            }
-        }.run();
         return true;
     }
     
