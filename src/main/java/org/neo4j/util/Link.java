@@ -8,26 +8,28 @@ package org.neo4j.util;
 public interface Link<T>
 {
 	/**
-	 * @return the object on the other side of this link. A runtime exception
-	 * will be thrown if this link doesn't point to another object.
+	 * @return the object on the other side of this link. If there's no
+	 * object connected null will be returned.
 	 */
 	T get();
 	
 	/**
 	 * Sets {@code entity} to be the object on the other side of this link.
 	 * If there's already a link to another object it will be removed first.
-	 * @param entity the object in the other side of this link.
+	 * @param object the object on the other side of this link.
+	 * @return the previously set object or null if there was no previous
+	 * object set.
 	 */
-	void set( T entity );
+	T set( T object );
 	
 	/**
-	 * Removes the link. A runtime exception will be thrown if this link
-	 * doesn't point to another object.
+	 * Removes the link if one is set.
+	 * @return the removed object or null if no object was set.
 	 */
-	void remove();
+	T remove();
 	
 	/**
-	 * @return {@code true} if this link points to an object.
+	 * @return {@code true} if there's a link to another object.
 	 */
 	boolean has();
 }

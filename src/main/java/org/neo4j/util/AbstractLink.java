@@ -53,22 +53,26 @@ public abstract class AbstractLink<T> implements Link<T>
     
     protected abstract T newObject( Node node );
     
+    private T newObject( Relationship relationship )
+    {
+        return newObject( relationship.getOtherNode( this.node ) );
+    }
+    
     protected abstract Node getNodeFromItem( T item );
+    
+    private Relationship getLinkRelationshipOrNull()
+    {
+        return this.node.getSingleRelationship( this.type(),
+            this.direction() );
+    }
     
     public T get()
     {
         Transaction tx = neo.beginTx();
         try
         {
-            Relationship rel = this.node().getSingleRelationship( this.type(),
-                this.direction() );
-            if ( rel == null )
-            {
-                throw new RuntimeException( "No link relationship found for " +
-                    this.node() + ":" + this.direction() + ":" + this.type() );
-            }
-            Node otherNode = rel.getOtherNode( this.node() );
-            T result = this.newObject( otherNode );
+            Relationship relationship = getLinkRelationshipOrNull();
+            T result = relationship == null ? null : newObject( relationship );
             tx.success();
             return result;
         }
@@ -83,8 +87,7 @@ public abstract class AbstractLink<T> implements Link<T>
         Transaction tx = neo.beginTx();
         try
         {
-            boolean result = this.node().getRelationships(
-                this.type(), this.direction() ).iterator().hasNext();
+            boolean result = getLinkRelationshipOrNull() != null;
             tx.success();
             return result;
         }
@@ -94,14 +97,21 @@ public abstract class AbstractLink<T> implements Link<T>
         }
     }
 
-    public void remove()
+    public T remove()
     {
         Transaction tx = neo.beginTx();
         try
         {
-            this.node().getSingleRelationship(
-                this.type(), this.direction() ).delete();
+            Relationship relationship = getLinkRelationshipOrNull();
+            T result = null;
+            if ( relationship != null )
+            {
+                result = newObject( relationship );
+                entityRemoved( result, relationship );
+                relationship.delete();
+            }
             tx.success();
+            return result;
         }
         finally
         {
@@ -109,7 +119,7 @@ public abstract class AbstractLink<T> implements Link<T>
         }
     }
 
-    public void set( T entity )
+    public T set( T object )
     {
         Transaction tx = neo.beginTx();
         LockManager lockManager =
@@ -117,20 +127,24 @@ public abstract class AbstractLink<T> implements Link<T>
         try
         {
             lockManager.getWriteLock( this.node() );
-            if ( has() )
+            Relationship existingRelationship = getLinkRelationshipOrNull();
+            T existingObject = null;
+            if ( existingRelationship != null )
             {
-                remove();
+                existingObject = newObject( existingRelationship );
+                existingRelationship.delete();
             }
             
-            Node entityNode = getNodeFromItem( entity );
+            Node entityNode = getNodeFromItem( object );
             Node startNode = this.direction() == Direction.OUTGOING ?
                 this.node() : entityNode;
             Node endNode = this.direction() == Direction.OUTGOING ?
                 entityNode : this.node();
-            Relationship rel =
+            Relationship createdRelationship =
                 startNode.createRelationshipTo( endNode, this.type() );
-            entitySet( entity, rel );
+            entitySet( object, createdRelationship );
             tx.success();
+            return existingObject;
         }
         catch ( IllegalResourceException e )
         {
@@ -151,6 +165,10 @@ public abstract class AbstractLink<T> implements Link<T>
     }
     
     protected void entitySet( T entity, Relationship createdRelationship )
+    {
+    }
+    
+    protected void entityRemoved( T entity, Relationship removedRelationship )
     {
     }
 }

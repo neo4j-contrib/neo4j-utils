@@ -8,7 +8,7 @@ import org.neo4j.api.core.Transaction;
 import test.NeoTest;
 
 /**
- * Tests the {@link Link} class and its implementation {@link LinkImpl}.
+ * Tests the {@link Link} class and its implementation {@link NodeWrapperLink}.
  * @author mattias
  *
  */
@@ -39,41 +39,33 @@ public class TestLink extends NeoTest
 		{
 			Node node1 = neo().createNode();
 			Node node2 = neo().createNode();
+            Node node3 = neo().createNode();
 			
 			Entity entity1 = NodeWrapperImpl.newInstance( Entity.class, neo(),
 				node1 );
 			Entity entity2 = NodeWrapperImpl.newInstance( Entity.class, neo(),
 				node2 );
+            Entity entity3 = NodeWrapperImpl.newInstance( Entity.class, neo(),
+                node3 );
 
-			Link<Entity> link = new LinkImpl<Entity>( neo(),
+			Link<Entity> link = new NodeWrapperLink<Entity>( neo(),
 				entity1.getUnderlyingNode(), Relationships.TESTREL, direction,
 				Entity.class );
 			assertTrue( !link.has() );
-			try
-			{
-				link.get();
-				fail( "ERROR, has got" );
-			}
-			catch ( Exception e )
-			{ // Good
-			}
-	
-			try
-			{
-				link.remove();
-				fail( "ERROR, has got remove" );
-			}
-			catch ( Exception e )
-			{ // Good
-			}
-	
-			link.set( entity2 );
+			assertNull( link.get() );
+			assertNull( link.remove() );
+			assertNull( link.set( entity2 ) );
 			assertTrue( link.has() );
-			link.get();
-			link.remove();
+			assertEquals( entity2, link.get() );
+			assertEquals( entity2, link.remove() );
 			assertTrue( !link.has() );
-			link.set( entity2 );
-			link.set( entity2 );
+			assertNull( link.set( entity2 ) );
+			assertEquals( entity2, link.set( entity3 ) );
+			link.remove();
+			
+			node1.delete();
+			node2.delete();
+			node3.delete();
 	
 			tx.success();
 		}

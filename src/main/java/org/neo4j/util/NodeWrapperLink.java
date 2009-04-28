@@ -6,12 +6,11 @@ import org.neo4j.api.core.Node;
 import org.neo4j.api.core.RelationshipType;
 
 /**
- * The default implementation of {@link Link}.
- * @author mattias
+ * An implementation of {@link Link} which uses {@link NodeWrapper}.
  *
  * @param <T> the type of objects used in this instance.
  */
-public class LinkImpl<T extends NodeWrapper> extends AbstractLink<T>
+public class NodeWrapperLink<T extends NodeWrapper> extends AbstractLink<T>
 {
 	private Class<? extends T> theClass;
 	
@@ -21,7 +20,7 @@ public class LinkImpl<T extends NodeWrapper> extends AbstractLink<T>
 	 * @param thisIsGenericsFault well, even if we have T we must send the
 	 * same class here to make instantiation work.
 	 */
-	public LinkImpl( NeoService neo, Node node, RelationshipType type,
+	public NodeWrapperLink( NeoService neo, Node node, RelationshipType type,
 		Class<? extends T> thisIsGenericsFault )
 	{
 	    super( neo, node, type );
@@ -35,7 +34,7 @@ public class LinkImpl<T extends NodeWrapper> extends AbstractLink<T>
 	 * same class here to make instantiation work.
 	 * @param direction the direction of the relationship.
 	 */
-	public LinkImpl( NeoService neo, Node node, RelationshipType type,
+	public NodeWrapperLink( NeoService neo, Node node, RelationshipType type,
 		Direction direction, Class<T> thisIsGenericsFault )
 	{
 	    super( neo, node, type, direction );
