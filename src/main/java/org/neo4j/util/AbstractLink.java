@@ -60,7 +60,7 @@ public abstract class AbstractLink<T> implements Link<T>
     
     protected abstract Node getNodeFromItem( T item );
     
-    private Relationship getLinkRelationshipOrNull()
+    protected Relationship getLinkRelationshipOrNull()
     {
         return this.node.getSingleRelationship( this.type(),
             this.direction() );
@@ -132,6 +132,7 @@ public abstract class AbstractLink<T> implements Link<T>
             if ( existingRelationship != null )
             {
                 existingObject = newObject( existingRelationship );
+                entityRemoved( existingObject, existingRelationship );
                 existingRelationship.delete();
             }
             
