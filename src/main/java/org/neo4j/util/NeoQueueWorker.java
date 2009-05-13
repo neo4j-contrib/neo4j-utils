@@ -150,22 +150,27 @@ public abstract class NeoQueueWorker extends Thread
                 {
                     doOne( entry );
                 }
+                
+                final int size = entrySize;
+                new DeadlockCapsule<Object>( "remover" )
+                {
+                    @Override
+                    public Object tryOnce()
+                    {
+                        queue.remove( size );
+                        return null;
+                    }
+                }.run();
+            }
+            catch ( Exception e )
+            {
+                // We got an exception, just do nothing and the tx will roll
+                // back so that we can try next time instead.
             }
             finally
             {
                 afterBatch();
             }
-            
-            final int size = entrySize;
-            new DeadlockCapsule<Object>( "remover" )
-            {
-                @Override
-                public Object tryOnce()
-                {
-                    queue.remove( size );
-                    return null;
-                }
-            }.run();
             
             tx.success();
         }
@@ -186,7 +191,7 @@ public abstract class NeoQueueWorker extends Thread
         return result;
     }
 
-    private void doOne( Map<String, Object> entry )
+    private void doOne( Map<String, Object> entry ) throws Exception
     {
         // Try a max of ten times if it fails.
         Exception exception = null;
@@ -206,20 +211,11 @@ public abstract class NeoQueueWorker extends Thread
         handleEntryError( entry, exception );
     }
     
-    private void handleEntryError( Map<String, Object> entry,
-        Exception exception )
+    protected void handleEntryError( Map<String, Object> entry,
+        Exception exception ) throws Exception
     {
         // Add it to the end of the queue
-        Transaction tx = neo.beginTx();
-        try
-        {
-            add( entry );
-            tx.success();
-        }
-        finally
-        {
-            tx.finish();
-        }
+        add( entry );
     }
     
     private void doHandleEntry( Map<String, Object> entry )
