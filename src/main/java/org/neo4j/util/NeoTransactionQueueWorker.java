@@ -78,7 +78,7 @@ public abstract class NeoTransactionQueueWorker extends Thread
 	
 	private int findTxId()
 	{
-		return UserTransactionImpl.getInstance().getEventIdentifier();
+	    return new UserTransactionImpl( neo ).getEventIdentifier();
 	}
 
 	protected NeoTransactionQueue getQueue()
