@@ -18,12 +18,18 @@ public abstract class NeoQueueWorker extends Thread
     private boolean paused;
     private int batchSize;
     
-    public NeoQueueWorker( NeoService neo, NeoQueue queue, int batchSize )
+    public NeoQueueWorker( NeoService neo, NeoQueue queue, int batchSize,
+        String name )
     {
-        super( "NeoQueueWorker" );
+        super( name );
         this.neo = neo;
         this.queue = queue;
         this.batchSize = batchSize;
+    }
+    
+    public NeoQueueWorker( NeoService neo, NeoQueue queue, int batchSize )
+    {
+        this( neo, queue, batchSize, "NeoQueueWorker" );
     }
     
     public NeoQueue getQueue()
