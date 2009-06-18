@@ -254,14 +254,27 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 		Transaction tx = neo().beginTx();
 		try
 		{
-			Collection<T> itemsToRemove = new HashSet<T>();
+		    Collection<Relationship> relationships =
+		        new HashSet<Relationship>();
+		    Iterator<Relationship> allRelationships = getAllRelationships();
+		    while ( allRelationships.hasNext() )
+		    {
+		        relationships.add( allRelationships.next() );
+		    }
+		    
 			for ( Object item : items )
 			{
 				Relationship rel = findRelationship( item );
 				if ( rel != null )
 				{
-					itemsToRemove.add( newObject( getOtherNode( rel ), rel ) );
+				    relationships.remove( rel );
 				}
+			}
+		    
+			Collection<T> itemsToRemove = new HashSet<T>();
+			for ( Relationship rel : relationships )
+			{
+			    itemsToRemove.add( newObject( getOtherNode( rel ), rel ) );
 			}
 			
 			boolean result = this.removeAll( itemsToRemove );

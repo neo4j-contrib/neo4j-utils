@@ -2,6 +2,7 @@ package org.neo4j.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import org.neo4j.api.core.Direction;
@@ -134,6 +135,61 @@ public class TestNeoRelationshipSet extends NeoTest
 		{
 			tx.finish();
 		}
+	}
+	
+	public void testRetain() throws Exception
+	{
+        Transaction tx = neo().beginTx();
+        try
+        {
+            Node node = neo().createNode();
+            Collection<Node> collection = new PureNodeRelationshipSet(
+                neo(), node, Relationships.TESTREL );
+            
+            Node node1 = neo().createNode();
+            Node node2 = neo().createNode();
+            Node node3 = neo().createNode();
+            Node node4 = neo().createNode();
+            Node node5 = neo().createNode();
+            Node node6 = neo().createNode();
+            
+            collection.add( node1 );
+            collection.add( node2 );
+            collection.add( node3 );
+            collection.add( node4 );
+            
+            Collection<Node> newCollection = new HashSet<Node>();
+            newCollection.add( node3 );
+            newCollection.add( node4 );
+            newCollection.add( node5 );
+            newCollection.add( node6 );
+            
+            collection.addAll( newCollection );
+            assertEquals( 6, collection.size() );
+            collection.retainAll( newCollection );
+            
+            assertEquals( newCollection.size(), collection.size() );
+            for ( Node shouldContain : newCollection )
+            {
+                assertTrue( collection.contains( shouldContain ) );
+            }
+            
+            collection.clear();
+            
+            node.delete();
+            node1.delete();
+            node2.delete();
+            node3.delete();
+            node4.delete();
+            node5.delete();
+            node6.delete();
+            
+            tx.success();
+        }
+        finally
+        {
+            tx.finish();
+        }
 	}
 	
 	/**
