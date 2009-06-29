@@ -5,6 +5,33 @@ Neo4j Utilities
 	the core neo API. The base package is <<org.neo4j.util>> and holds a
 	big variety of utilities, f.ex. utilities for easy handling of array
 	properties and a java Collection implementation of some neo concepts.
+	
+NeoServiceLifecycle
+
+	The <<org.neo4j.util.NeoServiceLifecycle>> class makes it easier to
+	manage your NeoService and additional components (such as an IndexService)
+	in one place without having to care about shutting down neo and its
+	components when the JVM exists.
+	
+---
+	// With the NeoServiceLifecycle class
+	NeoServiceLifecycle neo =
+		new NeoServiceLifecycle( new EmbeddedNeo( "neo" ) );
+	neo.addLuceneIndexService();
+	
+	// Without the NeoServiceLifecycle class
+	final NeoService neo = new EmbeddedNeo( "neo" );
+	final IndexService indexService = new LuceneIndexService( neo );
+	Runtime.getRuntime().addShutdownHook( new Thread()
+	{
+		@Override
+		public void run()
+		{
+			indexService.shutdown();
+			neo.shutdown();
+		}
+	} );
+---
 
 NeoUtil class
 
