@@ -13,13 +13,17 @@ NeoServiceLifecycle
 	in one place without having to care about shutting down neo and its
 	components when the JVM exists.
 	
+	So this code:
+	
 ---
-	// With the NeoServiceLifecycle class
 	NeoServiceLifecycle neo =
 		new NeoServiceLifecycle( new EmbeddedNeo( "neo" ) );
 	neo.addLuceneIndexService();
+---
+
+	Will replace code like:
 	
-	// Without the NeoServiceLifecycle class
+---	
 	final NeoService neo = new EmbeddedNeo( "neo" );
 	final IndexService indexService = new LuceneIndexService( neo );
 	Runtime.getRuntime().addShutdownHook( new Thread()
