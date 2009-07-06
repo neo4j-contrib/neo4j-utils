@@ -12,7 +12,11 @@ import org.neo4j.util.index.NeoIndexService;
  */
 public class NeoServiceLifecycle
 {
-    private final NeoService neoService;
+    /**
+     * Field not final since it's nulled in the shutdown process (to be able
+     * to support multiple calls to shutdown).
+     */
+    private NeoService neoService;
     private IndexService indexService;
     
     /**
@@ -34,20 +38,44 @@ public class NeoServiceLifecycle
             }
         } );
     }
-
+    
+    /**
+     * Runs the shutdown process manually instead of waiting for it to happen
+     * just before the JVM exists, see {@link #runJvmShutdownHook()}. Normally
+     * this method isn't necessary to call, but can be good to have for special
+     * cases.
+     */
+    public void manualShutdown()
+    {
+        runShutdown();
+    }
+    
+    /**
+     * Runs the shutdown process of all started services. Supports multiple
+     * calls to it (if such would accidentally be done).
+     */
+    protected void runShutdown()
+    {
+        if ( this.indexService != null )
+        {
+            this.indexService.shutdown();
+            this.indexService = null;
+        }
+        
+        if ( this.neoService != null )
+        {
+            this.neoService.shutdown();
+            this.neoService = null;
+        }
+    }
+    
     /**
      * Called right before the JVM exists. It's called from a thread registered
      * with {@link Runtime#addShutdownHook(Thread)}.
      */
     protected void runJvmShutdownHook()
     {
-        if ( this.indexService != null )
-        {
-            this.indexService.shutdown();
-            System.out.println( "index service shutdown" );
-        }
-        this.neoService.shutdown();
-        System.out.println( "neo shutdown" );
+        runShutdown();
     }
     
     /**
