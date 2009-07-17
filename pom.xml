@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.neo4j</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>4</version>
+    <version>5</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -12,11 +12,17 @@
   <groupId>org.neo4j</groupId>
   <artifactId>neo-utils</artifactId>
   <version>1.0-b9-SNAPSHOT</version>
-  <name>Neo utilities</name>
+  <name>Neo4j - utilities</name>
   <description>
 A set of convenience method and classes built on top of Neo.
     </description>
   <url>http://components.neo4j.org/${project.artifactId}/</url>
+
+  <properties>
+    <bundle.namespace>org.neo4j.util</bundle.namespace>
+  </properties>
+
+  <packaging>bundle</packaging>
 
   <scm>
     <connection>
@@ -61,7 +67,7 @@ A set of convenience method and classes built on top of Neo.
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo-component-commons</artifactId>
-      <version>0.1-SNAPSHOT</version>
+      <version>0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>

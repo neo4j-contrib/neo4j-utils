@@ -12,6 +12,7 @@ import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.Transaction;
 import org.neo4j.util.btree.BTree.RelTypes;
 import org.neo4j.util.sortedtree.SortedTree;
+import org.neo4j.commons.iterator.IterableWrapper;
 
 public class IndexedNeoCollection<T extends NodeWrapper>
 	extends AbstractNeoSet<T>

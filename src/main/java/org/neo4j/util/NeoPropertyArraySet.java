@@ -8,6 +8,7 @@ import java.util.ListIterator;
 import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.PropertyContainer;
 import org.neo4j.api.core.Transaction;
+import org.neo4j.commons.iterator.CollectionWrapper;
 
 /**
  * This class uses the fact that node property values can be arrays.

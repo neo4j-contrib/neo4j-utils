@@ -2,6 +2,7 @@ package org.neo4j.util;
 
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
+import org.neo4j.commons.iterator.IterableWrapper;
 
 public class RelationshipToNodeIterable
 	extends IterableWrapper<Node, Relationship>
