@@ -1,0 +1,5 @@
+#-----------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the bundle
+#-----------------------------------------------------------------
+
+Export-Package: !org.neo4j.util.internal.*,!org.neo4j.util.index,!org.neo4j.util.map,!org.neo4j.util.timeline,!org.neo4j.util.btree,!org.neo4j.util.sortedtree,org.neo4j.util.*;version="${pom.version}"
