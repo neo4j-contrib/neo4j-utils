@@ -124,7 +124,6 @@ public class NeoServiceLifecycle
     
     /**
      * @return the {@link NeoService} instance passed in to the constructor,
-     * {@link NeoServiceLifecycle( NeoService )}.
      */
     public NeoService neo()
     {

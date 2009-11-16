@@ -78,10 +78,6 @@ public class NeoTransactionQueue
 		}
 	}
 	
-	/**
-	 * @param object object to be updated, Ise or User f.ex.
-	 * @param operation the operation type
-	 */
 	public void add( int txId, Map<String, Object> values )
 	{
 		// We must be in a transaction, else the calling code isn't right
