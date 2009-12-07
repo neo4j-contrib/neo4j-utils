@@ -3,6 +3,7 @@ package org.neo4j.util;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.neo4j.api.core.DynamicRelationshipType;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.RelationshipType;
 import org.neo4j.api.core.Transaction;
@@ -95,6 +96,43 @@ public class TestNeoQueue extends NeoTest
 	    
 	    q.remove( 7 );
 	    rootNode.delete();
+	    
+	    tx.success();
+	    tx.finish();
+	}
+	
+	public void testFixedLengthList() throws Exception
+	{
+	    Transaction tx = neo().beginTx();
+	    
+	    Node rootNode = neo().createNode();
+	    FixedLengthNeoList list = new FixedLengthNeoList( neo(), rootNode,
+	        DynamicRelationshipType.withName( "LIST_TEST" ), 5 );
+	    assertNull( list.peek() );
+	    Node a = list.add();
+	    assertEquals( a, list.peek() );
+	    assertEquals( a, list.peek( 10 )[ 0 ] );
+	    Node b = list.add();
+	    assertEquals( b, list.peek() );
+	    assertEquals( b, list.peek( 10 )[ 0 ] );
+        assertEquals( a, list.peek( 10 )[ 1 ] );
+        Node c = list.add();
+        Node d = list.add();
+        Node e = list.add();
+        assertEquals( 5, list.peek( 10 ).length );
+        assertEquals( e, list.peek() );
+        assertEquals( a, list.peek( 10 )[ 4 ] );
+        Node f = list.add();
+        assertEquals( 5, list.peek( 10 ).length );
+        assertEquals( f, list.peek() );
+        assertEquals( b, list.peek( 10 )[ 4 ] );
+        Node g = list.add();
+        assertEquals( 5, list.peek( 10 ).length );
+        assertEquals( g, list.peek() );
+        assertEquals( c, list.peek( 10 )[ 4 ] );
+        
+        list.remove( 10 );
+        rootNode.delete();
 	    
 	    tx.success();
 	    tx.finish();
