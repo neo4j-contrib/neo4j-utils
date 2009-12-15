@@ -2,13 +2,19 @@ package org.neo4j.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.neo4j.api.core.Direction;
 import org.neo4j.api.core.NeoService;
 import org.neo4j.api.core.Node;
 import org.neo4j.api.core.Relationship;
 import org.neo4j.api.core.RelationshipType;
+import org.neo4j.api.core.ReturnableEvaluator;
+import org.neo4j.api.core.StopEvaluator;
 import org.neo4j.api.core.Transaction;
+import org.neo4j.api.core.TraversalPosition;
+import org.neo4j.api.core.Traverser;
+import org.neo4j.api.core.Traverser.Order;
 
 /**
  * Wraps a linked list of nodes in neo. It has a max length specified so that
@@ -22,16 +28,16 @@ public class FixedLengthNeoList
 	private Node rootNode;
 	private RelationshipType relType;
 	private NeoUtil neoUtil;
-	private int maxLength;
+	private Integer maxLength;
 	
 	public FixedLengthNeoList( NeoService neo, Node rootNode,
-	    RelationshipType relType, int maxLength )
+	    RelationshipType relType, Integer maxLengthOrNull )
 	{
 		this.neo = neo;
 		this.rootNode = rootNode;
 		this.relType = relType;
 		this.neoUtil = new NeoUtil( neo );
-		this.maxLength = maxLength;
+		this.maxLength = maxLengthOrNull;
 	}
 	
 	private Relationship getFirstRelationship()
@@ -67,7 +73,7 @@ public class FixedLengthNeoList
 			
 			int length = ( Integer ) rootNode.getProperty( KEY_LENGTH, 0 );
 			length++;
-			if ( length > maxLength )
+			if ( maxLength != null && length > maxLength )
 			{
 			    // Remove the last one
 			    Relationship lastRel = getLastRelationship();
@@ -202,5 +208,22 @@ public class FixedLengthNeoList
 	    {
 	        tx.finish();
 	    }
+	}
+	
+	public Iterator<Node> iterate()
+	{
+	    StopEvaluator stopEvaluator = new StopEvaluator()
+        {
+            public boolean isStopNode( TraversalPosition pos )
+            {
+                return pos.lastRelationshipTraversed() != null &&
+                    pos.currentNode().equals( rootNode );
+            }
+        };
+	    
+	    Traverser traverser = rootNode.traverse( Order.BREADTH_FIRST,
+	        stopEvaluator, ReturnableEvaluator.ALL_BUT_START_NODE, relType,
+	        Direction.OUTGOING );
+	    return traverser.iterator();
 	}
 }
