@@ -34,7 +34,7 @@ public class NeoTest extends TestCase
 	
 	private void init() throws Exception
 	{
-		String dbPath = "var/neo";
+		String dbPath = "target/var/neo";
 		File path = new File( dbPath );
 		if ( path.exists() )
 		{
