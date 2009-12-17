@@ -71,24 +71,27 @@ public class FixedLengthNeoList
 				node.createRelationshipTo( firstNode, relType );
 			}
 			
-			int length = ( Integer ) rootNode.getProperty( KEY_LENGTH, 0 );
-			length++;
-			if ( maxLength != null && length > maxLength )
+			if ( maxLength != null )
 			{
-			    // Remove the last one
-			    Relationship lastRel = getLastRelationship();
-			    Node lastNode = lastRel.getStartNode();
-			    Relationship previousRel = lastNode.getSingleRelationship(
-                    relType, Direction.INCOMING );
-			    Node previousNode = previousRel.getStartNode();
-			    lastRel.delete();
-			    previousRel.delete();
-			    nodeFellOut( lastNode );
-			    previousNode.createRelationshipTo( rootNode, relType );
-			}
-			else
-			{
-			    rootNode.setProperty( KEY_LENGTH, length );
+    			int length = ( Integer ) rootNode.getProperty( KEY_LENGTH, 0 );
+    			length++;
+    			if ( length > maxLength )
+    			{
+    			    // Remove the last one
+    			    Relationship lastRel = getLastRelationship();
+    			    Node lastNode = lastRel.getStartNode();
+    			    Relationship previousRel = lastNode.getSingleRelationship(
+                        relType, Direction.INCOMING );
+    			    Node previousNode = previousRel.getStartNode();
+    			    lastRel.delete();
+    			    previousRel.delete();
+    			    nodeFellOut( lastNode );
+    			    previousNode.createRelationshipTo( rootNode, relType );
+    			}
+    			else
+    			{
+    			    rootNode.setProperty( KEY_LENGTH, length );
+    			}
 			}
 			
 			tx.success();
