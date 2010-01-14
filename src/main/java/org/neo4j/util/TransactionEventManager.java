@@ -15,10 +15,10 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.impl.event.Event;
-import org.neo4j.impl.event.EventData;
-import org.neo4j.impl.event.ProActiveEventListener;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.impl.event.Event;
+import org.neo4j.kernel.impl.event.EventData;
+import org.neo4j.kernel.impl.event.ProActiveEventListener;
 
 /**
  * A layer on top of EventManager. EventManager delegates the events on to its
@@ -57,12 +57,12 @@ public class TransactionEventManager
 	};
 	private boolean wrapEventsInTx;
 	
-	public TransactionEventManager( NeoService neo )
+	public TransactionEventManager( GraphDatabaseService neo )
 	{
 	    this( neo, false );
 	}
 	
-	public TransactionEventManager( NeoService neo, boolean wrapEventsInTx )
+	public TransactionEventManager( GraphDatabaseService neo, boolean wrapEventsInTx )
 	{
         this.neoUtil = new NeoUtil( neo );
 	    this.wrapEventsInTx = wrapEventsInTx;
@@ -412,7 +412,7 @@ public class TransactionEventManager
                 @Override
                 public void run()
                 {
-                    org.neo4j.api.core.Transaction tx = wrapEventsInTx ?
+                    org.neo4j.graphdb.Transaction tx = wrapEventsInTx ?
                         neoUtil.neo().beginTx() : null;
                     try
                     {

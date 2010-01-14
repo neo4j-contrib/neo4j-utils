@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.PropertyContainer;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.commons.iterator.CollectionWrapper;
 
 /**
@@ -23,7 +23,7 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 	private String key;
 	private NeoUtil neoUtil;
 
-	public NeoPropertyArraySet( NeoService neo, PropertyContainer container,
+	public NeoPropertyArraySet( GraphDatabaseService neo, PropertyContainer container,
 	    String key )
 	{
 		super( neo );

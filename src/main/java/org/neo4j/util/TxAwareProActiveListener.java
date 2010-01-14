@@ -6,10 +6,10 @@ import java.util.concurrent.ConcurrentMap;
 import javax.transaction.Synchronization;
 import javax.transaction.Transaction;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.impl.event.Event;
-import org.neo4j.impl.event.EventData;
-import org.neo4j.impl.event.ProActiveEventListener;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.impl.event.Event;
+import org.neo4j.kernel.impl.event.EventData;
+import org.neo4j.kernel.impl.event.ProActiveEventListener;
 
 /**
  * This succer keeps some kind of track of transactions and may filter incoming
@@ -21,7 +21,7 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 {
 	private NeoUtil neoUtil;
 	
-	public TxAwareProActiveListener( NeoService neo )
+	public TxAwareProActiveListener( GraphDatabaseService neo )
 	{
 		this.neoUtil = new NeoUtil( neo );
 	}

@@ -1,8 +1,8 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.RelationshipType;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
 
 /**
  * Migration unit with a simple default implementation using reflection to
@@ -13,22 +13,22 @@ public abstract class SimpleMigration extends Migration
 	private String versionClassPrefix;
 	
 	/**
-	 * @param neo the {@link NeoService} instance to store migration info in.
+	 * @param neo the {@link GraphDatabaseService} instance to store migration info in.
 	 * @param subReferenceType the {@link RelationshipType} to use a sub
 	 * reference type.
 	 */
-	public SimpleMigration( NeoService neo, RelationshipType subReferenceType )
+	public SimpleMigration( GraphDatabaseService neo, RelationshipType subReferenceType )
 	{
 		super( neo, getConfigNodeFromType( neo, subReferenceType ) );
 		this.versionClassPrefix = this.getMigratorPrefix();
 	}
 	
-	public SimpleMigration( NeoService neo )
+	public SimpleMigration( GraphDatabaseService neo )
 	{
 		this( neo, MigrationRelationshipTypes.REF_MIGRATION );
 	}
 	
-	private static Node getConfigNodeFromType( NeoService neo,
+	private static Node getConfigNodeFromType( GraphDatabaseService neo,
 		RelationshipType type )
 	{
 		return new NeoUtil( neo ).getOrCreateSubReferenceNode( type );

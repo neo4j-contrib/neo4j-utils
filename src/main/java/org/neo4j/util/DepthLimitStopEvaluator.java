@@ -1,7 +1,7 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.StopEvaluator;
-import org.neo4j.api.core.TraversalPosition;
+import org.neo4j.graphdb.StopEvaluator;
+import org.neo4j.graphdb.TraversalPosition;
 
 /**
  * A {@link StopEvaluator} which stops after X levels.

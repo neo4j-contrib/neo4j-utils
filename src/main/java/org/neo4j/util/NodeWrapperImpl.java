@@ -2,9 +2,9 @@ package org.neo4j.util;
 
 import java.lang.reflect.Constructor;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Wraps a {@link Node}, also overriding {@link #equals(Object)} and
@@ -13,7 +13,7 @@ import org.neo4j.api.core.Transaction;
  */
 public abstract class NodeWrapperImpl implements NodeWrapper
 {
-	private final NeoService neo;
+	private final GraphDatabaseService neo;
 	private final Node node;
 	
 	/**
@@ -27,12 +27,12 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 	 * @return the new instance wrapping the node.
 	 */
 	public static <T extends NodeWrapper> T newInstance(
-		Class<T> instanceClass, NeoService neo, Node node )
+		Class<T> instanceClass, GraphDatabaseService neo, Node node )
 	{
 		try
 		{
 			Constructor<T> constructor =
-				instanceClass.getConstructor( NeoService.class, Node.class );
+				instanceClass.getConstructor( GraphDatabaseService.class, Node.class );
 			T result = constructor.newInstance( neo, node );
 			return result;
 		}
@@ -57,7 +57,7 @@ public abstract class NodeWrapperImpl implements NodeWrapper
      * @return the new instance wrapping the node (with the given id).
      */
 	public static <T extends NodeWrapper> T newInstance(
-		Class<T> instanceClass, NeoService neo, long nodeId )
+		Class<T> instanceClass, GraphDatabaseService neo, long nodeId )
 	{
 		Transaction tx = neo.beginTx();
 		try
@@ -73,7 +73,7 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 		}
 	}
 
-	protected NodeWrapperImpl( NeoService neo, Node node )
+	protected NodeWrapperImpl( GraphDatabaseService neo, Node node )
 	{
 		this.neo = neo;
 		this.node = node;
@@ -87,7 +87,7 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 		return node;
 	}
 	
-	protected NeoService getNeo()
+	protected GraphDatabaseService getNeo()
 	{
 		return this.neo;
 	}

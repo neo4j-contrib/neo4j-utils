@@ -2,8 +2,8 @@ package org.neo4j.util;
 
 import java.util.Collection;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Abstract super class for implementations of neo collections and sets.
@@ -13,14 +13,14 @@ import org.neo4j.api.core.Transaction;
  */
 public abstract class AbstractNeoSet<T> implements Collection<T>
 {
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	
-	public AbstractNeoSet( NeoService neo )
+	public AbstractNeoSet( GraphDatabaseService neo )
 	{
 		this.neo = neo;
 	}
 	
-	protected NeoService neo()
+	protected GraphDatabaseService neo()
 	{
 		return this.neo;
 	}

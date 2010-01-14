@@ -3,8 +3,8 @@ package org.neo4j.util;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 /**
  * Deletes an entire graph, i.e. all connected nodes (and their connected nodes)

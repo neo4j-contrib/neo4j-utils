@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.util.NeoPropertySet;
 
 import test.NeoTest;
@@ -129,7 +129,7 @@ public class TestNeoPropertySet extends NeoTest
 	
 	private static class TestSet extends NeoPropertySet<Integer>
 	{
-		TestSet( NeoService neo, Node node, String key )
+		TestSet( GraphDatabaseService neo, Node node, String key )
 		{
 			super( neo, node, key, "," );
 		}

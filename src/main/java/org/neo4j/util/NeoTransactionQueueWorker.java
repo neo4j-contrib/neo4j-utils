@@ -11,11 +11,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.transaction.DeadlockDetectedException;
-import org.neo4j.impl.transaction.UserTransactionImpl;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.impl.transaction.DeadlockDetectedException;
+import org.neo4j.kernel.impl.transaction.UserTransactionImpl;
 import org.neo4j.util.NeoTransactionQueue.TxQueue;
 
 /**
@@ -25,7 +25,7 @@ import org.neo4j.util.NeoTransactionQueue.TxQueue;
  */
 public abstract class NeoTransactionQueueWorker extends Thread
 {
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	private NeoTransactionQueue workQueue;
 	private boolean halted;
 	private int maxConsumers;
@@ -36,13 +36,13 @@ public abstract class NeoTransactionQueueWorker extends Thread
 	private boolean fallThrough;
 	private int batchSize;
 	
-    public NeoTransactionQueueWorker( NeoService neo, Node rootNode,
+    public NeoTransactionQueueWorker( GraphDatabaseService neo, Node rootNode,
         int maxConsumers )
     {
         this( neo, rootNode, maxConsumers, 1 );
     }
     
-	public NeoTransactionQueueWorker( NeoService neo, Node rootNode,
+	public NeoTransactionQueueWorker( GraphDatabaseService neo, Node rootNode,
 		int maxConsumers, int batchSize )
 	{
 		super( NeoTransactionQueueWorker.class.getSimpleName() );
@@ -373,11 +373,11 @@ public abstract class NeoTransactionQueueWorker extends Thread
 	private static class EntryRemover
 		extends DeadlockCapsule<Object>
 	{
-		private NeoService neo;
+		private GraphDatabaseService neo;
 		private TxQueue queue;
 		private int size;
 		
-		EntryRemover( NeoService neo, TxQueue queue, int size )
+		EntryRemover( GraphDatabaseService neo, TxQueue queue, int size )
 		{
 			super( "EntryRemover" );
 			this.neo = neo;

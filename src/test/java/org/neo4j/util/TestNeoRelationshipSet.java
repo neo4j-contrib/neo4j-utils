@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import test.NeoTest;
 
@@ -277,12 +277,12 @@ public class TestNeoRelationshipSet extends NeoTest
 	private class ContainerSet
 		extends NeoRelationshipSet<SomeOtherContainer>
 	{
-		private ContainerSet( NeoService neo, Node node )
+		private ContainerSet( GraphDatabaseService neo, Node node )
 		{
 			this( neo, node, Direction.OUTGOING );
 		}
 		
-		private ContainerSet( NeoService neo, Node node, Direction direction )
+		private ContainerSet( GraphDatabaseService neo, Node node, Direction direction )
 		{
 			super( neo, node, Relationships.TESTREL, direction );
 		}

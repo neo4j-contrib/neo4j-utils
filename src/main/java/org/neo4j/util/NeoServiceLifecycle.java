@@ -1,14 +1,14 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.util.index.IndexService;
-import org.neo4j.util.index.LuceneIndexService;
-import org.neo4j.util.index.NeoIndexService;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.index.IndexService;
+import org.neo4j.index.lucene.LuceneIndexService;
+import org.neo4j.index.impl.NeoIndexService;
 
 /**
- * Manages the life cycle of a {@link NeoService} as well as other components.
+ * Manages the life cycle of a {@link GraphDatabaseService} as well as other components.
  * Removes the tedious work of having to think about shutting down components
- * and the {@link NeoService} when the JVM exists, in the right order as well.
+ * and the {@link GraphDatabaseService} when the JVM exists, in the right order as well.
  */
 public class NeoServiceLifecycle
 {
@@ -16,19 +16,19 @@ public class NeoServiceLifecycle
      * Field not final since it's nulled in the shutdown process (to be able
      * to support multiple calls to shutdown).
      */
-    private NeoService neoService;
+    private GraphDatabaseService GraphDatabaseService;
     private IndexService indexService;
     
     /**
-     * Constructs a new {@link NeoServiceLifecycle} instance with {@code neo}
-     * as the {@link NeoService}. Other components can be instantiated using
+     * Constructs a new {@link GraphDatabaseServiceLifecycle} instance with {@code neo}
+     * as the {@link GraphDatabaseService}. Other components can be instantiated using
      * methods, f.ex. {@link #addIndexService(IndexService)}.
      * 
-     * @param neo the {@link NeoService} instance to manage.
+     * @param neo the {@link GraphDatabaseService} instance to manage.
      */
-    public NeoServiceLifecycle( NeoService neo )
+    public NeoServiceLifecycle( GraphDatabaseService neo )
     {
-        this.neoService = neo;
+        this.GraphDatabaseService = neo;
         Runtime.getRuntime().addShutdownHook( new Thread()
         {
             @Override
@@ -62,10 +62,10 @@ public class NeoServiceLifecycle
             this.indexService = null;
         }
         
-        if ( this.neoService != null )
+        if ( this.GraphDatabaseService != null )
         {
-            this.neoService.shutdown();
-            this.neoService = null;
+            this.GraphDatabaseService.shutdown();
+            this.GraphDatabaseService = null;
         }
     }
     
@@ -87,7 +87,7 @@ public class NeoServiceLifecycle
     public IndexService addLuceneIndexService()
     {
         assertIndexServiceNotInstantiated();
-        return addIndexService( new LuceneIndexService( this.neoService ) );
+        return addIndexService( new LuceneIndexService( this.GraphDatabaseService ) );
     }
     
     /**
@@ -99,7 +99,7 @@ public class NeoServiceLifecycle
     public IndexService addNeoIndexService()
     {
         assertIndexServiceNotInstantiated();
-        return addIndexService( new NeoIndexService( this.neoService ) );
+        return addIndexService( new NeoIndexService( this.GraphDatabaseService ) );
     }
     
     /**
@@ -123,11 +123,11 @@ public class NeoServiceLifecycle
     }
     
     /**
-     * @return the {@link NeoService} instance passed in to the constructor,
+     * @return the {@link GraphDatabaseService} instance passed in to the constructor,
      */
-    public NeoService neo()
+    public GraphDatabaseService neo()
     {
-        return this.neoService;
+        return this.GraphDatabaseService;
     }
     
     /**

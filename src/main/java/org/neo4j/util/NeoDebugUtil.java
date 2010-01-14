@@ -3,20 +3,20 @@ package org.neo4j.util;
 import java.io.PrintStream;
 import java.util.TreeSet;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.NotFoundException;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Simple debugging utility for neo-related objects.
  */
 public class NeoDebugUtil
 {
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	
-	public NeoDebugUtil( NeoService neo )
+	public NeoDebugUtil( GraphDatabaseService neo )
 	{
 		this.neo = neo;
 	}

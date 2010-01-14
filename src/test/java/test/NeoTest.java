@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.Collection;
 
 import junit.framework.TestCase;
-import org.neo4j.api.core.EmbeddedNeo;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.RelationshipType;
+import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.RelationshipType;
 
 /**
  * Super class of tests which handles neo-specific things.
@@ -21,7 +21,7 @@ public class NeoTest extends TestCase
 		TEST_YET_ANOTHER_TYPE,
 	}
 	
-	private static NeoService neo;
+	private static GraphDatabaseService neo;
 	
 	@Override
 	protected void setUp() throws Exception
@@ -44,7 +44,7 @@ public class NeoTest extends TestCase
 			}
 		}
 		
-		neo = new EmbeddedNeo( dbPath );
+		neo = new EmbeddedGraphDatabase( dbPath );
 		Runtime.getRuntime().addShutdownHook( new Thread()
 		{
 			@Override
@@ -55,7 +55,7 @@ public class NeoTest extends TestCase
 		} );
 	}
 	
-	protected static NeoService neo()
+	protected static GraphDatabaseService neo()
 	{
 		return neo;
 	}

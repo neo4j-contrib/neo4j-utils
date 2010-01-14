@@ -3,10 +3,10 @@ package org.neo4j.util;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.api.core.DynamicRelationshipType;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.RelationshipType;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
 
 import test.NeoTest;
 

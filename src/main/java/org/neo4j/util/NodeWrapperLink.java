@@ -1,9 +1,9 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.RelationshipType;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
 
 /**
  * An implementation of {@link Link} which uses {@link NodeWrapper}.
@@ -20,7 +20,7 @@ public class NodeWrapperLink<T extends NodeWrapper> extends AbstractLink<T>
 	 * @param thisIsGenericsFault well, even if we have T we must send the
 	 * same class here to make instantiation work.
 	 */
-	public NodeWrapperLink( NeoService neo, Node node, RelationshipType type,
+	public NodeWrapperLink( GraphDatabaseService neo, Node node, RelationshipType type,
 		Class<? extends T> thisIsGenericsFault )
 	{
 	    super( neo, node, type );
@@ -34,7 +34,7 @@ public class NodeWrapperLink<T extends NodeWrapper> extends AbstractLink<T>
 	 * same class here to make instantiation work.
 	 * @param direction the direction of the relationship.
 	 */
-	public NodeWrapperLink( NeoService neo, Node node, RelationshipType type,
+	public NodeWrapperLink( GraphDatabaseService neo, Node node, RelationshipType type,
 		Direction direction, Class<T> thisIsGenericsFault )
 	{
 	    super( neo, node, type, direction );

@@ -2,8 +2,8 @@ package org.neo4j.util;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.neo4j.impl.event.Event;
-import org.neo4j.impl.event.EventData;
+import org.neo4j.kernel.impl.event.Event;
+import org.neo4j.kernel.impl.event.EventData;
 import org.neo4j.util.CrudEventData.AlterationMode;
 
 /**

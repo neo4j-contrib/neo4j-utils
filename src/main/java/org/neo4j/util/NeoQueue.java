@@ -3,12 +3,12 @@ package org.neo4j.util;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.RelationshipType;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Wraps a linked list of nodes in neo.
@@ -16,12 +16,12 @@ import org.neo4j.api.core.Transaction;
  */
 public class NeoQueue
 {
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	private Node rootNode;
 	private RelationshipType relType;
 	private NeoUtil neoUtil;
 	
-	public NeoQueue( NeoService neo, Node rootNode, RelationshipType relType )
+	public NeoQueue( GraphDatabaseService neo, Node rootNode, RelationshipType relType )
 	{
 		this.neo = neo;
 		this.rootNode = rootNode;

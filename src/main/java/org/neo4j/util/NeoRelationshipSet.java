@@ -6,12 +6,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.RelationshipType;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.commons.iterator.FilteringIterator;
 import org.neo4j.commons.iterator.IteratorWrapper;
 
@@ -32,7 +32,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	 * @param node the {@link Node} to act as the collection.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public NeoRelationshipSet( NeoService neo, Node node,
+	public NeoRelationshipSet( GraphDatabaseService neo, Node node,
 		RelationshipType type )
 	{
 		this( neo, node, type, Direction.OUTGOING );
@@ -43,8 +43,8 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	 * @param direction the direction to use for the relationships.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public NeoRelationshipSet( NeoService neo, Node node, RelationshipType type,
-		Direction direction )
+	public NeoRelationshipSet( GraphDatabaseService neo, Node node, 
+	    RelationshipType type, Direction direction )
 	{
 		super( neo );
 		

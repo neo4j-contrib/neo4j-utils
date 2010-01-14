@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * A neo collection implemented with one property where the values are separated
@@ -35,7 +35,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	 * @param propertyKey the property key to use for the collection node to
 	 * store the values.
 	 */
-	public NeoPropertySet( NeoService neo, Node node, String propertyKey )
+	public NeoPropertySet( GraphDatabaseService neo, Node node, String propertyKey )
 	{
 		this( neo, node, propertyKey, DEFAULT_DELIMITER );
 	}
@@ -46,7 +46,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	 * store the values.
 	 * @param delimiter custom delimiter instead of {@link #DEFAULT_DELIMITER}.
 	 */
-	public NeoPropertySet( NeoService neo, Node node, String propertyKey,
+	public NeoPropertySet( GraphDatabaseService neo, Node node, String propertyKey,
 		String delimiter )
 	{
 		super( neo );

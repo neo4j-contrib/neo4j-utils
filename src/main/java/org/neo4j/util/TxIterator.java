@@ -2,15 +2,15 @@ package org.neo4j.util;
 
 import java.util.Iterator;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 public class TxIterator<T> implements Iterator<T>
 {
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	private Iterator<T> source;
 
-	public TxIterator( NeoService neo, Iterator<T> source )
+	public TxIterator( GraphDatabaseService neo, Iterator<T> source )
 	{
 		this.neo = neo;
 		this.source = source;

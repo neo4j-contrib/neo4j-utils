@@ -9,22 +9,22 @@ import java.util.List;
 
 import javax.transaction.TransactionManager;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.EmbeddedNeo;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.PropertyContainer;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.RelationshipType;
-import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.event.Event;
-import org.neo4j.impl.event.EventData;
-import org.neo4j.impl.event.EventListenerAlreadyRegisteredException;
-import org.neo4j.impl.event.EventListenerNotRegisteredException;
-import org.neo4j.impl.event.EventManager;
-import org.neo4j.impl.event.ProActiveEventListener;
-import org.neo4j.impl.event.ReActiveEventListener;
-import org.neo4j.impl.transaction.LockManager;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.kernel.impl.event.Event;
+import org.neo4j.kernel.impl.event.EventData;
+import org.neo4j.kernel.impl.event.EventListenerAlreadyRegisteredException;
+import org.neo4j.kernel.impl.event.EventListenerNotRegisteredException;
+import org.neo4j.kernel.impl.event.EventManager;
+import org.neo4j.kernel.impl.event.ProActiveEventListener;
+import org.neo4j.kernel.impl.event.ReActiveEventListener;
+import org.neo4j.kernel.impl.transaction.LockManager;
 
 /**
  * Contains some convenience methods for f.ex. set/get/remove one property
@@ -60,12 +60,12 @@ public class NeoUtil
 		RE_ACTIVE,
 	}
 	
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	
 	/**
 	 * @param neo the {@link NeoService} to use in methods which needs it.
 	 */
-	public NeoUtil( NeoService neo )
+	public NeoUtil( GraphDatabaseService neo )
 	{
 		this.neo = neo;
 	}
@@ -73,7 +73,7 @@ public class NeoUtil
 	/**
 	 * @return the {@link NeoService} from the constructor.
 	 */
-	public NeoService neo()
+	public GraphDatabaseService neo()
 	{
 		return this.neo;
 	}
@@ -450,18 +450,18 @@ public class NeoUtil
 	
 	public EventManager getEventManager()
 	{
-		return ( ( EmbeddedNeo )
+		return ( ( EmbeddedGraphDatabase )
 			neo() ).getConfig().getEventModule().getEventManager();
 	}
 	
 	public LockManager getLockManager()
 	{
-		return ( ( EmbeddedNeo ) neo() ).getConfig().getLockManager();
+		return ( ( EmbeddedGraphDatabase ) neo() ).getConfig().getLockManager();
 	}
 	
 	public TransactionManager getTransactionManager()
 	{
-		return ( ( EmbeddedNeo )
+		return ( ( EmbeddedGraphDatabase )
 			neo() ).getConfig().getTxModule().getTxManager();
 	}
 	

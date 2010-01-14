@@ -5,13 +5,13 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.Transaction;
-import org.neo4j.util.btree.BTree.RelTypes;
-import org.neo4j.util.sortedtree.SortedTree;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.index.impl.btree.BTree.RelTypes;
+import org.neo4j.index.impl.sortedtree.SortedTree;
 import org.neo4j.commons.iterator.IterableWrapper;
 
 public class IndexedNeoCollection<T extends NodeWrapper>
@@ -22,7 +22,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 	private Comparator<T> comparator;
 	private SortedTree index;
 	
-	public IndexedNeoCollection( NeoService neo, Node rootNode,
+	public IndexedNeoCollection( GraphDatabaseService neo, Node rootNode,
 		Comparator<T> comparator, Class<T> instanceClass )
 	{
 		super( neo );

@@ -1,23 +1,23 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.EmbeddedNeo;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.RelationshipType;
-import org.neo4j.api.core.Transaction;
-import org.neo4j.impl.transaction.IllegalResourceException;
-import org.neo4j.impl.transaction.LockManager;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.kernel.impl.transaction.IllegalResourceException;
+import org.neo4j.kernel.impl.transaction.LockManager;
 
 public abstract class AbstractLink<T> implements Link<T>
 {
-    private final NeoService neo;
+    private final GraphDatabaseService neo;
     private final Node node;
     private final RelationshipType type;
     private final Direction direction;
     
-    public AbstractLink( NeoService neo, Node node, RelationshipType type,
+    public AbstractLink( GraphDatabaseService neo, Node node, RelationshipType type,
         Direction direction )
     {
         this.neo = neo;
@@ -26,12 +26,12 @@ public abstract class AbstractLink<T> implements Link<T>
         this.direction = direction;
     }
     
-    public AbstractLink( NeoService neo, Node node, RelationshipType type )
+    public AbstractLink( GraphDatabaseService neo, Node node, RelationshipType type )
     {
         this( neo, node, type, Direction.OUTGOING );
     }
     
-    protected NeoService neo()
+    protected GraphDatabaseService neo()
     {
         return this.neo;
     }
@@ -123,7 +123,7 @@ public abstract class AbstractLink<T> implements Link<T>
     {
         Transaction tx = neo.beginTx();
         LockManager lockManager =
-            ( ( EmbeddedNeo ) neo ).getConfig().getLockManager();
+            ( ( EmbeddedGraphDatabase ) neo ).getConfig().getLockManager();
         try
         {
             lockManager.getWriteLock( this.node() );

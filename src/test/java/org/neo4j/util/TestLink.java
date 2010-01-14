@@ -1,9 +1,9 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import test.NeoTest;
 
@@ -84,7 +84,7 @@ public class TestLink extends NeoTest
 		/**
 		 * @param node the underlying node.
 		 */
-		public Entity( NeoService neo, Node node )
+		public Entity( GraphDatabaseService neo, Node node )
 		{
 			super( neo, node );
 		}

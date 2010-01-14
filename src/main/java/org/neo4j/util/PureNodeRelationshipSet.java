@@ -2,11 +2,11 @@ package org.neo4j.util;
 
 import java.util.Set;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.RelationshipType;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
 /**
  * Convenience {@link Set} for when dealing with basic nodes and relationships
@@ -15,13 +15,13 @@ import org.neo4j.api.core.RelationshipType;
  */
 public class PureNodeRelationshipSet extends NeoRelationshipSet<Node>
 {
-	public PureNodeRelationshipSet( NeoService neo, Node node,
+	public PureNodeRelationshipSet( GraphDatabaseService neo, Node node,
 		RelationshipType type )
 	{
 		super( neo, node, type );
 	}
 	
-	public PureNodeRelationshipSet( NeoService neo, Node node,
+	public PureNodeRelationshipSet( GraphDatabaseService neo, Node node,
 		RelationshipType type, Direction direction )
 	{
 		super( neo, node, type, direction );

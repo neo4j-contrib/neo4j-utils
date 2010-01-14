@@ -1,6 +1,6 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.Node;
+import org.neo4j.graphdb.Node;
 
 /**
  * All objects which uses neo in its implementation will benefit from neo-utils

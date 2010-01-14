@@ -1,6 +1,6 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.Node;
+import org.neo4j.graphdb.Node;
 
 /**
  * This interface allows for composite deletion patterns as well as hierarchial

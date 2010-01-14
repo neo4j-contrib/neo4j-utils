@@ -6,13 +6,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.NotFoundException;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.RelationshipType;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Wraps several {@link NeoQueue} instances (per transaction).
@@ -32,11 +32,11 @@ public class NeoTransactionQueue
 	private static Map<Integer, TxQueue> queueNodes =
 		Collections.synchronizedMap( new HashMap<Integer, TxQueue>() );
 	
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	private NeoUtil neoUtil;
 	private Node rootNode;
 	
-	public NeoTransactionQueue( NeoService neo, Node rootNode )
+	public NeoTransactionQueue( GraphDatabaseService neo, Node rootNode )
 	{
 		this.neo = neo;
 		this.neoUtil = new NeoUtil( neo );

@@ -5,20 +5,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 public abstract class NeoQueueWorker extends Thread
 {
-    private final NeoService neo;
+    private final GraphDatabaseService neo;
     private final NeoQueue queue;
     private boolean halted;
     private boolean requestedToPause;
     private boolean paused;
     private int batchSize;
     
-    public NeoQueueWorker( NeoService neo, NeoQueue queue, int batchSize,
+    public NeoQueueWorker( GraphDatabaseService neo, NeoQueue queue, int batchSize,
         String name )
     {
         super( name );
@@ -27,7 +27,7 @@ public abstract class NeoQueueWorker extends Thread
         this.batchSize = batchSize;
     }
     
-    public NeoQueueWorker( NeoService neo, NeoQueue queue, int batchSize )
+    public NeoQueueWorker( GraphDatabaseService neo, NeoQueue queue, int batchSize )
     {
         this( neo, queue, batchSize, "NeoQueueWorker" );
     }

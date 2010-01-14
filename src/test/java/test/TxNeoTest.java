@@ -1,6 +1,6 @@
 package test;
 
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.Transaction;
 
 public class TxNeoTest extends NeoTest
 {

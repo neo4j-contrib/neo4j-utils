@@ -1,7 +1,7 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 
 /**
  * A {@link NeoPropertySet} where the objects are strings.
@@ -13,7 +13,7 @@ public class NeoPropertyStringSet extends NeoPropertySet<String>
 	 * @param propertyKey the property key for storing values.
 	 * @param delimiter custom delimiter between values.
 	 */
-	public NeoPropertyStringSet( NeoService neo, Node node, String propertyKey,
+	public NeoPropertyStringSet( GraphDatabaseService neo, Node node, String propertyKey,
 		String delimiter )
 	{
 		super( neo, node, propertyKey, delimiter );
@@ -23,7 +23,7 @@ public class NeoPropertyStringSet extends NeoPropertySet<String>
 	 * @param node the collection node.
 	 * @param propertyKey the property key for storing values.
 	 */
-	public NeoPropertyStringSet( NeoService neo, Node node, String propertyKey )
+	public NeoPropertyStringSet( GraphDatabaseService neo, Node node, String propertyKey )
 	{
 		super( neo, node, propertyKey );
 	}

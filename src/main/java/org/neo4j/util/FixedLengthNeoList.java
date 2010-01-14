@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.RelationshipType;
-import org.neo4j.api.core.ReturnableEvaluator;
-import org.neo4j.api.core.StopEvaluator;
-import org.neo4j.api.core.Transaction;
-import org.neo4j.api.core.TraversalPosition;
-import org.neo4j.api.core.Traverser;
-import org.neo4j.api.core.Traverser.Order;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.ReturnableEvaluator;
+import org.neo4j.graphdb.StopEvaluator;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.TraversalPosition;
+import org.neo4j.graphdb.Traverser;
+import org.neo4j.graphdb.Traverser.Order;
 
 /**
  * Wraps a linked list of nodes in neo. It has a max length specified so that
@@ -24,13 +24,13 @@ public class FixedLengthNeoList
 {
     private static final String KEY_LENGTH = "list_length";
     
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	private Node rootNode;
 	private RelationshipType relType;
 	private NeoUtil neoUtil;
 	private Integer maxLength;
 	
-	public FixedLengthNeoList( NeoService neo, Node rootNode,
+	public FixedLengthNeoList( GraphDatabaseService neo, Node rootNode,
 	    RelationshipType relType, Integer maxLengthOrNull )
 	{
 		this.neo = neo;

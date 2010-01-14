@@ -2,7 +2,7 @@ package org.neo4j.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.neo4j.impl.event.EventData;
+import org.neo4j.kernel.impl.event.EventData;
 import org.neo4j.util.CrudEventBufferFilter;
 import org.neo4j.util.CrudEventData;
 import org.neo4j.util.CrudEventFilter;

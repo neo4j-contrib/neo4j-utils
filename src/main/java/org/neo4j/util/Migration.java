@@ -1,8 +1,8 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Transaction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Used for migrating data between one version of the code to a newer version.
@@ -17,7 +17,7 @@ import org.neo4j.api.core.Transaction;
  */
 public abstract class Migration
 {
-	private NeoService neo;
+	private GraphDatabaseService neo;
 	private Node configNode;
 	private boolean firstVersionIsAlwaysZero;
 	private boolean pretending;
@@ -28,7 +28,7 @@ public abstract class Migration
 	 * @param neo the {@link NeoService} to use.
 	 * This node should be the same every time in a code base.
 	 */
-	public Migration( NeoService neo, Node configNode )
+	public Migration( GraphDatabaseService neo, Node configNode )
 	{
 		this.neo = neo;
 		this.configNode = configNode;

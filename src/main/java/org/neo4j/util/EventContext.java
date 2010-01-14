@@ -1,7 +1,7 @@
 package org.neo4j.util;
 
-import org.neo4j.impl.event.Event;
-import org.neo4j.impl.event.EventData;
+import org.neo4j.kernel.impl.event.Event;
+import org.neo4j.kernel.impl.event.EventData;
 
 /**
  * A small class for coupling an {@link Event} with an {@link EventData}.

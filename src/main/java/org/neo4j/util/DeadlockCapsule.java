@@ -1,6 +1,6 @@
 package org.neo4j.util;
 
-import org.neo4j.impl.transaction.DeadlockDetectedException;
+import org.neo4j.kernel.impl.transaction.DeadlockDetectedException;
 
 /**
  * Encapsulates a block of code which is, sort of, expected to throw neo

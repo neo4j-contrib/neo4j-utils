@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 
 import test.TxNeoTest;
 
@@ -90,7 +90,7 @@ public class TestIndexedSet extends TxNeoTest
 	{
 		static Collection<Node> createdNodes = new ArrayList<Node>();
 		
-		public AnItem( NeoService neo, Node node )
+		public AnItem( GraphDatabaseService neo, Node node )
 		{
 			super( neo, node );
 		}

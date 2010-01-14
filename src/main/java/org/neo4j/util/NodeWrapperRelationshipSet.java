@@ -1,10 +1,10 @@
 package org.neo4j.util;
 
-import org.neo4j.api.core.Direction;
-import org.neo4j.api.core.NeoService;
-import org.neo4j.api.core.Node;
-import org.neo4j.api.core.Relationship;
-import org.neo4j.api.core.RelationshipType;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
 /**
  * A neo relationship set where each element wraps a neo {@link Node},
@@ -23,7 +23,7 @@ public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	 * @param type the type of relationships to read/write. 
 	 * @param instanceClass the exact class of instances in the collection.
 	 */
-	public NodeWrapperRelationshipSet( NeoService neo, Node node,
+	public NodeWrapperRelationshipSet( GraphDatabaseService neo, Node node,
 		RelationshipType type, Class<? extends T> instanceClass )
 	{
 		super( neo, node, type );
@@ -36,7 +36,7 @@ public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	 * @param direction the direction of relationships.
 	 * @param instanceClass the exact class of instances in the collection.
 	 */
-	public NodeWrapperRelationshipSet( NeoService neo, Node node,
+	public NodeWrapperRelationshipSet( GraphDatabaseService neo, Node node,
 		RelationshipType type, Direction direction,
 		Class<? extends T> instanceClass )
 	{

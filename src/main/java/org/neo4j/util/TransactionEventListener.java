@@ -1,8 +1,8 @@
 package org.neo4j.util;
 
-import org.neo4j.impl.event.Event;
-import org.neo4j.impl.event.EventData;
-import org.neo4j.impl.event.ProActiveEventListener;
+import org.neo4j.kernel.impl.event.Event;
+import org.neo4j.kernel.impl.event.EventData;
+import org.neo4j.kernel.impl.event.ProActiveEventListener;
 
 /**
  * Listens to events, receives events when a transaction is commited. Use with
