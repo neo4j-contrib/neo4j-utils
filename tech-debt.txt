@@ -1,0 +1,4 @@
+[2010-02-09] Package names are not descriptive
+    This component contains a lot of useful utilities. But catagorizing them
+    all as "utils" hides the usefulness, it would be better to divide this
+    into a number of components based on the purpose of each set of classes.
