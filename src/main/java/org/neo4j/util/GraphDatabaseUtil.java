@@ -40,7 +40,7 @@ import org.neo4j.kernel.impl.transaction.LockManager;
  * @author mathew
  *
  */
-public class NeoUtil
+public class GraphDatabaseUtil
 {
 	/**
 	 * The type of event, neo supports pro-active and re-active.
@@ -60,22 +60,23 @@ public class NeoUtil
 		RE_ACTIVE,
 	}
 	
-	private GraphDatabaseService neo;
+	private GraphDatabaseService graphDb;
 	
 	/**
-	 * @param neo the {@link NeoService} to use in methods which needs it.
+	 * @param graphDb the {@link GraphDatabaseService} to use in methods
+	 * which needs it.
 	 */
-	public NeoUtil( GraphDatabaseService neo )
+	public GraphDatabaseUtil( GraphDatabaseService graphDb )
 	{
-		this.neo = neo;
+		this.graphDb = graphDb;
 	}
 	
 	/**
 	 * @return the {@link NeoService} from the constructor.
 	 */
-	public GraphDatabaseService neo()
+	public GraphDatabaseService graphDb()
 	{
-		return this.neo;
+		return this.graphDb;
 	}
 	
 	private void assertPropertyKeyNotNull( String key )
@@ -96,7 +97,7 @@ public class NeoUtil
 	public boolean hasProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			boolean result = container.hasProperty( key );
@@ -119,7 +120,7 @@ public class NeoUtil
 	public Object getProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Object result = container.getProperty( key );
@@ -145,7 +146,7 @@ public class NeoUtil
 		String key, Object defaultValue )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Object result = container.getProperty( key, defaultValue );
@@ -175,7 +176,7 @@ public class NeoUtil
 				key + "' can't be null" );
 		}
 		
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			container.setProperty( key, value );
@@ -190,12 +191,12 @@ public class NeoUtil
 	public List<Object> getPropertyValues( PropertyContainer container,
 		String key )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			Object value = container.getProperty( key, null );
 			List<Object> result = value == null ?
-			    new ArrayList<Object>() : neoPropertyAsList( value );
+			    new ArrayList<Object>() : propertyValueAsList( value );
 			tx.success();
 			return result;
 		}
@@ -208,7 +209,7 @@ public class NeoUtil
 	public boolean addValueToArray( PropertyContainer container,
 		String key, Object value )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			Collection<Object> values = getPropertyValues( container, key );
@@ -216,7 +217,7 @@ public class NeoUtil
 			    values.add( value );
 			if ( changed )
 			{
-				container.setProperty( key, asNeoProperty( values ) );
+				container.setProperty( key, asPropertyValue( values ) );
 			}
 			tx.success();
 			return changed;
@@ -230,7 +231,7 @@ public class NeoUtil
 	public boolean removeValueFromArray( PropertyContainer container,
 		String key, Object value )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			Collection<Object> values = getPropertyValues( container, key );
@@ -243,7 +244,7 @@ public class NeoUtil
 				}
 				else
 				{
-					container.setProperty( key, asNeoProperty( values ) );
+					container.setProperty( key, asPropertyValue( values ) );
 				}
 			}
 			tx.success();
@@ -266,7 +267,7 @@ public class NeoUtil
 	public Object removeProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Object oldValue = container.removeProperty( key );
@@ -291,7 +292,7 @@ public class NeoUtil
 	public Relationship getSingleRelationship( Node node, RelationshipType type,
 		Direction direction )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Relationship singleRelationship =
@@ -308,7 +309,7 @@ public class NeoUtil
 	public Node getSingleOtherNode( Node node, RelationshipType type,
 		Direction direction )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Relationship rel = getSingleRelationship( node, type, direction );
@@ -325,7 +326,7 @@ public class NeoUtil
 	public Relationship getSingleRelationship( Node node,
 		RelationshipType type )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Iterator<Relationship> itr =
@@ -351,7 +352,7 @@ public class NeoUtil
 	
 	public Node getSingleOtherNode( Node node, RelationshipType type )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Relationship rel = getSingleRelationship( node, type );
@@ -366,15 +367,15 @@ public class NeoUtil
 	}
 
 	/**
-	 * Wraps a {@link NeoService#getReferenceNode()} in a transaction.
-	 * @return the result from {@link NeoService#getReferenceNode()}.
+	 * Wraps a {@link GraphDatabaseService#getReferenceNode()} in a transaction.
+	 * @return the result from {@link GraphDatabaseService#getReferenceNode()}.
 	 */
 	public Node getReferenceNode()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
-			Node referenceNode = neo().getReferenceNode();
+			Node referenceNode = graphDb().getReferenceNode();
 			tx.success();
 			return referenceNode;
 		}
@@ -408,7 +409,7 @@ public class NeoUtil
 	public Node getOrCreateSubReferenceNode( RelationshipType type,
 		Direction direction )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Node referenceNode = getReferenceNode();
@@ -421,7 +422,7 @@ public class NeoUtil
 			}
 			else
 			{
-				node = neo().createNode();
+				node = graphDb().createNode();
 				referenceNode.createRelationshipTo( node, type );
 			}
 			
@@ -444,25 +445,25 @@ public class NeoUtil
 	public <T extends NodeWrapper> Collection<T>
 		getSubReferenceNodeCollection( RelationshipType type, Class<T> clazz )
 	{
-		return new NodeWrapperRelationshipSet<T>( neo(),
+		return new NodeWrapperRelationshipSet<T>( graphDb(),
 			getOrCreateSubReferenceNode( type ), type, clazz );
 	}
 	
 	public EventManager getEventManager()
 	{
 		return ( ( EmbeddedGraphDatabase )
-			neo() ).getConfig().getEventModule().getEventManager();
+			graphDb() ).getConfig().getEventModule().getEventManager();
 	}
 	
 	public LockManager getLockManager()
 	{
-		return ( ( EmbeddedGraphDatabase ) neo() ).getConfig().getLockManager();
+		return ( ( EmbeddedGraphDatabase ) graphDb() ).getConfig().getLockManager();
 	}
 	
 	public TransactionManager getTransactionManager()
 	{
 		return ( ( EmbeddedGraphDatabase )
-			neo() ).getConfig().getTxModule().getTxManager();
+			graphDb() ).getConfig().getTxModule().getTxManager();
 	}
 	
 	/**
@@ -607,31 +608,31 @@ public class NeoUtil
 		return result;
 	}
 	
-	public Object[] neoPropertyAsArray( Object neoPropertyValue )
+	public Object[] propertyValueAsArray( Object propertyValue )
 	{
-		if ( neoPropertyValue.getClass().isArray() )
+		if ( propertyValue.getClass().isArray() )
 		{
-			int length = Array.getLength( neoPropertyValue );
+			int length = Array.getLength( propertyValue );
 			Object[] result = new Object[ length ];
 			for ( int i = 0; i < length; i++ )
 			{
-				result[ i ] = Array.get( neoPropertyValue, i );
+				result[ i ] = Array.get( propertyValue, i );
 			}
 			return result;
 		}
 		else
 		{
-			return new Object[] { neoPropertyValue };
+			return new Object[] { propertyValue };
 		}
 	}
 	
-	public List<Object> neoPropertyAsList( Object neoPropertyValue )
+	public List<Object> propertyValueAsList( Object propertyValue )
 	{
 		return new ArrayList<Object>(
-			Arrays.asList( neoPropertyAsArray( neoPropertyValue ) ) );
+			Arrays.asList( propertyValueAsArray( propertyValue ) ) );
 	}
 	
-	public Object asNeoProperty( Collection<?> values )
+	public Object asPropertyValue( Collection<?> values )
 	{
 		if ( values.isEmpty() )
 		{
@@ -654,7 +655,7 @@ public class NeoUtil
 	
 	public Integer incrementAndGetCounter( Node node, String propertyKey )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		getLockManager().getWriteLock( node );
 		try
 		{
@@ -674,7 +675,7 @@ public class NeoUtil
 	public Integer decrementAndGetCounter( Node node, String propertyKey,
 		int notLowerThan )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		getLockManager().getWriteLock( node );
 		try
 		{
@@ -709,10 +710,9 @@ public class NeoUtil
             }
             result.append( "\n" );
         }
-        NeoUtil neoUtil = new NeoUtil( neo() );
         for ( String key : node.getPropertyKeys() )
         {
-            for ( Object value : neoUtil.neoPropertyAsArray(
+            for ( Object value : propertyValueAsArray(
                 node.getProperty( key ) ) )
             {
                 result.append( "*" + key + "=[" + value + "]" );

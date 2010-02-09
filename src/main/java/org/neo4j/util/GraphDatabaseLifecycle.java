@@ -10,7 +10,7 @@ import org.neo4j.index.impl.NeoIndexService;
  * Removes the tedious work of having to think about shutting down components
  * and the {@link GraphDatabaseService} when the JVM exists, in the right order as well.
  */
-public class NeoServiceLifecycle
+public class GraphDatabaseLifecycle
 {
     /**
      * Field not final since it's nulled in the shutdown process (to be able
@@ -20,13 +20,13 @@ public class NeoServiceLifecycle
     private IndexService indexService;
     
     /**
-     * Constructs a new {@link GraphDatabaseServiceLifecycle} instance with {@code neo}
+     * Constructs a new {@link GraphDatabaseLifecycle} instance with {@code neo}
      * as the {@link GraphDatabaseService}. Other components can be instantiated using
      * methods, f.ex. {@link #addIndexService(IndexService)}.
      * 
      * @param neo the {@link GraphDatabaseService} instance to manage.
      */
-    public NeoServiceLifecycle( GraphDatabaseService neo )
+    public GraphDatabaseLifecycle( GraphDatabaseService neo )
     {
         this.GraphDatabaseService = neo;
         Runtime.getRuntime().addShutdownHook( new Thread()

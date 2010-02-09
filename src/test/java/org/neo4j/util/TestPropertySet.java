@@ -7,26 +7,25 @@ import java.util.Iterator;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.util.NeoPropertySet;
+import org.neo4j.util.PropertySet;
 
-import test.NeoTest;
 
 /**
- * Tests the {@link NeoPropertySet} class.
+ * Tests the {@link PropertySet} class.
  * @author mattias
  */
-public class TestNeoPropertySet extends NeoTest
+public class TestPropertySet extends Neo4jTest
 {
 	/**
-	 * Tests some general use of the {@link NeoPropertySet} class.
+	 * Tests some general use of the {@link PropertySet} class.
 	 */
 	public void testSome()
 	{
 		Node node = null;
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
-			node = neo().createNode();
+			node = graphDb().createNode();
 			tx.success();
 		}
 		finally
@@ -34,7 +33,7 @@ public class TestNeoPropertySet extends NeoTest
 			tx.finish();
 		}
 		
-		Collection<Integer> set = new TestSet( neo(), node, "ids" );
+		Collection<Integer> set = new TestSet( graphDb(), node, "ids" );
 		Integer item = 10;
 		Integer item2 = 21211;
 		
@@ -115,7 +114,7 @@ public class TestNeoPropertySet extends NeoTest
 		assertEquals( 1, set.toArray().length );
 		assertEquals( item2, set.toArray( new Integer[ 1 ] )[ 0 ] );
 		
-		tx = neo().beginTx();
+		tx = graphDb().beginTx();
 		try
 		{
 			node.delete();
@@ -127,11 +126,11 @@ public class TestNeoPropertySet extends NeoTest
 		}
 	}
 	
-	private static class TestSet extends NeoPropertySet<Integer>
+	private static class TestSet extends PropertySet<Integer>
 	{
-		TestSet( GraphDatabaseService neo, Node node, String key )
+		TestSet( GraphDatabaseService graphDb, Node node, String key )
 		{
-			super( neo, node, key, "," );
+			super( graphDb, node, key, "," );
 		}
 
 		@Override

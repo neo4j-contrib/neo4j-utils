@@ -6,49 +6,47 @@ import java.util.Collection;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.util.NeoPropertyArraySet;
-import org.neo4j.util.NeoUtil;
+import org.neo4j.util.PropertyArraySet;
+import org.neo4j.util.GraphDatabaseUtil;
 
-import test.NeoTest;
-
-public class TestNeoUtils extends NeoTest
+public class TestGraphDbUtils extends Neo4jTest
 {
-	private NeoUtil neoUtil;
+	private GraphDatabaseUtil graphDbUtil;
 	
 	@Override
 	public void setUp() throws Exception
 	{
 		super.setUp();
-		this.neoUtil = new NeoUtil( neo() );
+		this.graphDbUtil = new GraphDatabaseUtil( graphDb() );
 	}
 	
 	public void testArrays()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			String key = "key_with_array_values";
-			Node node = neo().createNode();
+			Node node = graphDb().createNode();
 			int v1 = 10;
 			int v2 = 101;
 			int v3 = 2002;
-			assertTrue( neoUtil.addValueToArray( node, key, v1 ) );
-			assertCollection( neoUtil.neoPropertyAsList(
+			assertTrue( graphDbUtil.addValueToArray( node, key, v1 ) );
+			assertCollection( graphDbUtil.propertyValueAsList(
 				node.getProperty( key ) ), v1 );
-			assertFalse( neoUtil.addValueToArray( node, key, v1 ) );
-			assertCollection( neoUtil.neoPropertyAsList(
+			assertFalse( graphDbUtil.addValueToArray( node, key, v1 ) );
+			assertCollection( graphDbUtil.propertyValueAsList(
 				node.getProperty( key ) ), v1 );
-			assertTrue( neoUtil.addValueToArray( node, key, v2 ) );
-			assertCollection( neoUtil.neoPropertyAsList(
+			assertTrue( graphDbUtil.addValueToArray( node, key, v2 ) );
+			assertCollection( graphDbUtil.propertyValueAsList(
 				node.getProperty( key ) ), v1, v2 );
-			assertTrue( neoUtil.addValueToArray( node, key, v3 ) );
-			assertCollection( neoUtil.neoPropertyAsList(
+			assertTrue( graphDbUtil.addValueToArray( node, key, v3 ) );
+			assertCollection( graphDbUtil.propertyValueAsList(
 				node.getProperty( key ) ), v1, v2, v3 );
-			assertTrue( neoUtil.removeValueFromArray( node, key, v2 ) );
-			assertCollection( neoUtil.neoPropertyAsList(
+			assertTrue( graphDbUtil.removeValueFromArray( node, key, v2 ) );
+			assertCollection( graphDbUtil.propertyValueAsList(
 				node.getProperty( key ) ), v1, v3 );
-			assertFalse( neoUtil.removeValueFromArray( node, key, v2 ) );
-			assertCollection( neoUtil.neoPropertyAsList(
+			assertFalse( graphDbUtil.removeValueFromArray( node, key, v2 ) );
+			assertCollection( graphDbUtil.propertyValueAsList(
 				node.getProperty( key ) ), v1, v3 );
 			node.delete();
 			tx.success();
@@ -61,16 +59,16 @@ public class TestNeoUtils extends NeoTest
 	
 	public void testArraySet()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			String key = "key_with_array_values";
-			Node node = neo().createNode();
+			Node node = graphDb().createNode();
 			int v1 = 10;
 			int v2 = 101;
 			int v3 = 2002;
-			Collection<Integer> values = new NeoPropertyArraySet<Integer>(
-				neo(), node, key );
+			Collection<Integer> values = new PropertyArraySet<Integer>(
+				graphDb(), node, key );
 			assertTrue( values.add( v1 ) );
 			assertCollection( values, v1 );
 			assertFalse( values.add( v1 ) );
@@ -79,7 +77,7 @@ public class TestNeoUtils extends NeoTest
 			assertCollection( values, v1, v2 );
 			assertTrue( values.add( v3 ) );
 			assertCollection( values, v1, v2, v3 );
-			assertCollection( neoUtil.neoPropertyAsList(
+			assertCollection( graphDbUtil.propertyValueAsList(
 				node.getProperty( key ) ), v1, v2, v3 );
 			assertTrue( values.remove( v2 ) );
 			assertCollection( values, v1, v3 );
@@ -104,13 +102,13 @@ public class TestNeoUtils extends NeoTest
 	
 	public void testSumContents() throws Exception
 	{
-	    Transaction tx = neo().beginTx();
+	    Transaction tx = graphDb().beginTx();
 	    try
 	    {
-	        Node node1 = neo().createNode();
-	        Node node2 = neo().createNode();
-	        Node node3 = neo().createNode();
-	        Node node4 = neo().createNode();
+	        Node node1 = graphDb().createNode();
+	        Node node2 = graphDb().createNode();
+	        Node node3 = graphDb().createNode();
+	        Node node4 = graphDb().createNode();
 	        
 	        Relationship r1 = node1.createRelationshipTo(
 	            node2, TestRelTypes.TEST_TYPE );
@@ -124,7 +122,7 @@ public class TestNeoUtils extends NeoTest
 	        node1.setProperty( "prop1", "Hejsan" );
 	        node1.setProperty( "prop2", 10 );
 	        
-	        new NeoUtil( neo() ).sumNodeContents( node1 );
+	        new GraphDatabaseUtil( graphDb() ).sumNodeContents( node1 );
 	        
 	        r1.delete();
 	        r2.delete();

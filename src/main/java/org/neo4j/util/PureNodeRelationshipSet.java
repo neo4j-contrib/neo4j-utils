@@ -13,18 +13,18 @@ import org.neo4j.graphdb.RelationshipType;
  * in contrast to {@link NodeWrapperRelationshipSet} where you're dealing with
  * wrappers around nodes.
  */
-public class PureNodeRelationshipSet extends NeoRelationshipSet<Node>
+public class PureNodeRelationshipSet extends RelationshipSet<Node>
 {
-	public PureNodeRelationshipSet( GraphDatabaseService neo, Node node,
+	public PureNodeRelationshipSet( GraphDatabaseService graphDB, Node node,
 		RelationshipType type )
 	{
-		super( neo, node, type );
+		super( graphDB, node, type );
 	}
 	
-	public PureNodeRelationshipSet( GraphDatabaseService neo, Node node,
+	public PureNodeRelationshipSet( GraphDatabaseService graphDB, Node node,
 		RelationshipType type, Direction direction )
 	{
-		super( neo, node, type, direction );
+		super( graphDB, node, type, direction );
 	}
 	
 	@Override

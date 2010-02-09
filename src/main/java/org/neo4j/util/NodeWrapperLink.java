@@ -49,7 +49,7 @@ public class NodeWrapperLink<T extends NodeWrapper> extends AbstractLink<T>
 	@Override
 	protected T newObject( Node node )
 	{
-		return NodeWrapperImpl.newInstance( this.classType(), neo(), node );
+		return NodeWrapperImpl.newInstance( this.classType(), graphDb(), node );
 	}
 	
 	@Override

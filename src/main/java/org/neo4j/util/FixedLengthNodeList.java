@@ -20,23 +20,23 @@ import org.neo4j.graphdb.Traverser.Order;
  * Wraps a linked list of nodes in neo. It has a max length specified so that
  * only the latest N are stored (latest added is first in list).
  */
-public class FixedLengthNeoList
+public class FixedLengthNodeList
 {
     private static final String KEY_LENGTH = "list_length";
     
-	private GraphDatabaseService neo;
+	private GraphDatabaseService graphDB;
 	private Node rootNode;
 	private RelationshipType relType;
-	private NeoUtil neoUtil;
+	private GraphDatabaseUtil graphDbUtil;
 	private Integer maxLength;
 	
-	public FixedLengthNeoList( GraphDatabaseService neo, Node rootNode,
+	public FixedLengthNodeList( GraphDatabaseService graphDB, Node rootNode,
 	    RelationshipType relType, Integer maxLengthOrNull )
 	{
-		this.neo = neo;
+		this.graphDB = graphDB;
 		this.rootNode = rootNode;
 		this.relType = relType;
-		this.neoUtil = new NeoUtil( neo );
+		this.graphDbUtil = new GraphDatabaseUtil( graphDB );
 		this.maxLength = maxLengthOrNull;
 	}
 	
@@ -52,11 +52,11 @@ public class FixedLengthNeoList
 	
 	public Node add()
 	{
-		Transaction tx = neo.beginTx();
-		neoUtil.getLockManager().getWriteLock( rootNode );
+		Transaction tx = graphDB.beginTx();
+		graphDbUtil.getLockManager().getWriteLock( rootNode );
 		try
 		{
-			Node node = neo.createNode();
+			Node node = graphDB.createNode();
 			Relationship rel = getFirstRelationship();
 			if ( rel == null )
 			{
@@ -99,7 +99,7 @@ public class FixedLengthNeoList
 		}
 		finally
 		{
-			neoUtil.getLockManager().releaseWriteLock( rootNode );
+			graphDbUtil.getLockManager().releaseWriteLock( rootNode );
 			tx.finish();
 		}
 	}
@@ -116,8 +116,8 @@ public class FixedLengthNeoList
 	
 	public int remove( int max )
 	{
-        Transaction tx = neo.beginTx();
-        neoUtil.getLockManager().getWriteLock( rootNode );
+        Transaction tx = graphDB.beginTx();
+        graphDbUtil.getLockManager().getWriteLock( rootNode );
         try
         {
             Relationship rel = getFirstRelationship();
@@ -156,14 +156,14 @@ public class FixedLengthNeoList
         }
         finally
         {
-            neoUtil.getLockManager().releaseWriteLock( rootNode );
+            graphDbUtil.getLockManager().releaseWriteLock( rootNode );
             tx.finish();
         }
 	}
 	
 	public Node peek()
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDB.beginTx();
 		try
 		{
 			Relationship rel = getFirstRelationship();
@@ -183,7 +183,7 @@ public class FixedLengthNeoList
 	
 	public Node[] peek( int max )
 	{
-	    Transaction tx = neo.beginTx();
+	    Transaction tx = graphDB.beginTx();
 	    try
 	    {
 	        Collection<Node> result = new ArrayList<Node>( max );

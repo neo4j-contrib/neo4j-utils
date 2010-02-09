@@ -4,28 +4,28 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 /**
- * A {@link NeoPropertySet} where the objects are strings.
+ * A {@link PropertySet} where the objects are strings.
  */
-public class NeoPropertyStringSet extends NeoPropertySet<String>
+public class StringPropertySet extends PropertySet<String>
 {
 	/**
 	 * @param node the collection node.
 	 * @param propertyKey the property key for storing values.
 	 * @param delimiter custom delimiter between values.
 	 */
-	public NeoPropertyStringSet( GraphDatabaseService neo, Node node, String propertyKey,
+	public StringPropertySet( GraphDatabaseService graphDb, Node node, String propertyKey,
 		String delimiter )
 	{
-		super( neo, node, propertyKey, delimiter );
+		super( graphDb, node, propertyKey, delimiter );
 	}
 
 	/**
 	 * @param node the collection node.
 	 * @param propertyKey the property key for storing values.
 	 */
-	public NeoPropertyStringSet( GraphDatabaseService neo, Node node, String propertyKey )
+	public StringPropertySet( GraphDatabaseService graphDb, Node node, String propertyKey )
 	{
-		super( neo, node, propertyKey );
+		super( graphDb, node, propertyKey );
 	}
 
 	@Override

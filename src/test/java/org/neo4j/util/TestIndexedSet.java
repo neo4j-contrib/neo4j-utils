@@ -10,14 +10,12 @@ import java.util.List;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
-import test.TxNeoTest;
-
-public class TestIndexedSet extends TxNeoTest
+public class TestIndexedSet extends TxNeo4jTest
 {
 	public void testIndexedSet() throws Exception
 	{
-		Node rootNode = neo().createNode();
-		Collection<AnItem> collection = new IndexedNeoCollection<AnItem>( neo(),
+		Node rootNode = graphDb().createNode();
+		Collection<AnItem> collection = new IndexedNodeCollection<AnItem>( graphDb(),
 			rootNode, new AnItemComparator(), AnItem.class );
 		
 		List<String> strings = new ArrayList<String>( Arrays.asList(
@@ -41,7 +39,7 @@ public class TestIndexedSet extends TxNeoTest
 			assertTrue( collection.add( new AnItem( string ) ) );
 		}
 		
-		// Compare the indexed neo collection against a natural sorting order
+		// Compare the indexed node collection against a natural sorting order
 		Collections.sort( strings );
 		assertCollectionSame( strings, collection );
 		
@@ -52,7 +50,7 @@ public class TestIndexedSet extends TxNeoTest
 		assertCollectionSame( strings, collection );
 		
 		collection.clear();
-		( ( IndexedNeoCollection<AnItem> ) collection ).delete();
+		( ( IndexedNodeCollection<AnItem> ) collection ).delete();
 		rootNode.delete();
 		for ( Node node : AnItem.createdNodes )
 		{
@@ -81,8 +79,8 @@ public class TestIndexedSet extends TxNeoTest
 		for ( AnItem item : collection ) 
 		{
 			String naturalOrder = strings.get( i++ );
-			String neoIndexed = item.getName();
-			assertEquals( naturalOrder, neoIndexed );
+			String indexed = item.getName();
+			assertEquals( naturalOrder, indexed );
 		}
 	}
 	
@@ -90,9 +88,9 @@ public class TestIndexedSet extends TxNeoTest
 	{
 		static Collection<Node> createdNodes = new ArrayList<Node>();
 		
-		public AnItem( GraphDatabaseService neo, Node node )
+		public AnItem( GraphDatabaseService graphDb, Node node )
 		{
-			super( neo, node );
+			super( graphDb, node );
 		}
 		
 		public AnItem( String name )
@@ -102,14 +100,14 @@ public class TestIndexedSet extends TxNeoTest
 		
 		private static Node newNode()
 		{
-			Node node = neo().createNode();
+			Node node = graphDb().createNode();
 			createdNodes.add( node );
 			return node;
 		}
 		
 		public AnItem( Node node, String name )
 		{
-			this( neo(), node );
+			this( graphDb(), node );
 			node.setProperty( "name", name );
 		}
 		

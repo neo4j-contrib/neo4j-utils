@@ -6,7 +6,7 @@ import org.neo4j.graphdb.Node;
  * This interface allows for composite deletion patterns as well as hierarchial
  * delete functionality by implementations
  */
-public interface NeoDeletor
+public interface GraphDeletor
 {
 	/**
 	 * Deletes from the node space, starting at <code>startNode</code>

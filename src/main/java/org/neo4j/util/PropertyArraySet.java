@@ -16,25 +16,25 @@ import org.neo4j.commons.iterator.CollectionWrapper;
  *
  * @param <T> the type of values.
  */
-public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
+public class PropertyArraySet<T> extends AbstractSet<T>
     implements List<T>
 {
 	private PropertyContainer container;
 	private String key;
-	private NeoUtil neoUtil;
+	private GraphDatabaseUtil graphDBUtil;
 
-	public NeoPropertyArraySet( GraphDatabaseService neo, PropertyContainer container,
+	public PropertyArraySet( GraphDatabaseService graphDb, PropertyContainer container,
 	    String key )
 	{
-		super( neo );
-		this.neoUtil = new NeoUtil( neo );
+		super( graphDb );
+		this.graphDBUtil = new GraphDatabaseUtil( graphDb );
 		this.container = container;
 		this.key = key;
 	}
 
-	protected NeoUtil neoUtil()
+	protected GraphDatabaseUtil graphDbUtil()
 	{
-		return this.neoUtil;
+		return this.graphDBUtil;
 	}
 
 	protected PropertyContainer container()
@@ -49,23 +49,23 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 
 	public boolean add( T o )
 	{
-		return neoUtil().addValueToArray( container(), key(), o );
+		return graphDbUtil().addValueToArray( container(), key(), o );
 	}
 
 	public void clear()
 	{
-		neoUtil().removeProperty( container(), key() );
+		graphDbUtil().removeProperty( container(), key() );
 	}
 
 	private List<Object> values()
 	{
-	    return neoUtil().getPropertyValues( container(), key() );
+	    return graphDbUtil().getPropertyValues( container(), key() );
 	}
 
 	private void setValues( Collection<?> collection )
 	{
-		neoUtil().setProperty( container(), key(),
-			neoUtil().asNeoProperty( collection ) );
+		graphDbUtil().setProperty( container(), key(),
+			graphDbUtil().asPropertyValue( collection ) );
 	}
 
 	public boolean contains( Object o )
@@ -81,7 +81,7 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 	public Iterator<T> iterator()
 	{
 		return new CollectionWrapper<T, Object>(
-			neoUtil().getPropertyValues( container(), key() ) )
+			graphDbUtil().getPropertyValues( container(), key() ) )
 		{
 			@Override
 			protected Object objectToUnderlyingObject( T object )
@@ -99,12 +99,12 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 
 	public boolean remove( Object o )
 	{
-		return neoUtil().removeValueFromArray( container(), key(), o );
+		return graphDbUtil().removeValueFromArray( container(), key(), o );
 	}
 
 	public boolean retainAll( Collection<?> c )
 	{
-		Transaction tx = neoUtil().neo().beginTx();
+		Transaction tx = graphDbUtil().graphDb().beginTx();
 		try
 		{
 			Collection<Object> values = values();
@@ -118,7 +118,7 @@ public class NeoPropertyArraySet<T> extends AbstractNeoSet<T>
 				else
 				{
 					container().setProperty( key(),
-						neoUtil().asNeoProperty( values ) );
+						graphDbUtil().asPropertyValue( values ) );
 				}
 			}
 			tx.success();

@@ -9,13 +9,11 @@ import org.neo4j.util.CrudEventFilter;
 import org.neo4j.util.EventContext;
 import org.neo4j.util.CrudEventData.AlterationMode;
 
-import test.NeoTest;
-
 /**
  * Tests THE CRUD event filters.
  * @author mattias
  */
-public class TestEventFilters extends NeoTest
+public class TestEventFilters extends Neo4jTest
 {
 	/**
 	 * Tests the {@link CrudEventFilter} class.

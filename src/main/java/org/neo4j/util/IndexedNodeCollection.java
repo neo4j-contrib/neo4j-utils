@@ -14,18 +14,18 @@ import org.neo4j.index.impl.btree.BTree.RelTypes;
 import org.neo4j.index.impl.sortedtree.SortedTree;
 import org.neo4j.commons.iterator.IterableWrapper;
 
-public class IndexedNeoCollection<T extends NodeWrapper>
-	extends AbstractNeoSet<T>
+public class IndexedNodeCollection<T extends NodeWrapper>
+	extends AbstractSet<T>
 {
 	private Node rootNode;
 	private Class<T> instanceClass;
 	private Comparator<T> comparator;
 	private SortedTree index;
 	
-	public IndexedNeoCollection( GraphDatabaseService neo, Node rootNode,
+	public IndexedNodeCollection( GraphDatabaseService graphDb, Node rootNode,
 		Comparator<T> comparator, Class<T> instanceClass )
 	{
-		super( neo );
+		super( graphDb );
 		this.rootNode = rootNode;
 		this.instanceClass = instanceClass;
 		this.comparator = comparator;
@@ -34,7 +34,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 	
 	private Node ensureTheresARoot()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Node result = null;
@@ -46,7 +46,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 			}
 			else
 			{
-				result = neo().createNode();
+				result = graphDb().createNode();
 				rootNode.createRelationshipTo( result, RelTypes.TREE_ROOT );
 			}
 			tx.success();
@@ -60,11 +60,11 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 	
 	private void instantiateIndex()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Node treeRootNode = ensureTheresARoot();
-			this.index = new SortedTree( neo(), treeRootNode,
+			this.index = new SortedTree( graphDb(), treeRootNode,
 				new ComparatorWrapper( this.comparator ) );
 			tx.success();
 		}
@@ -86,7 +86,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 	
 	protected T instantiateItem( Node itemNode )
 	{
-		return NodeWrapperImpl.newInstance( instanceClass, neo(), itemNode );
+		return NodeWrapperImpl.newInstance( instanceClass, graphDb(), itemNode );
 	}
 	
 	public boolean add( T item )
@@ -96,7 +96,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 
 	public void clear()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			index().delete();
@@ -131,7 +131,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 				return instantiateItem( node );
 			}
 		}.iterator();
-		return new TxIterator<T>( neo(), iterator );
+		return new TxIterator<T>( graphDb(), iterator );
 	}
 
 	public boolean remove( Object item )
@@ -152,7 +152,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 	
 	private <R> Collection<R> toCollection()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Collection<R> result = new ArrayList<R>();
@@ -186,7 +186,7 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 	 */
 	public void delete()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			index().delete();
@@ -211,8 +211,8 @@ public class IndexedNeoCollection<T extends NodeWrapper>
 		{
 			// This is slow, I guess
 			return source.compare(
-				NodeWrapperImpl.newInstance( instanceClass, neo(), o1 ),
-				NodeWrapperImpl.newInstance( instanceClass, neo(), o2 ) );
+				NodeWrapperImpl.newInstance( instanceClass, graphDb(), o1 ),
+				NodeWrapperImpl.newInstance( instanceClass, graphDb(), o2 ) );
 		}
 	}
 }

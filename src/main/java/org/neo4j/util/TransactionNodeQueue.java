@@ -15,11 +15,11 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * Wraps several {@link NeoQueue} instances (per transaction).
- * See {@link NeoTransactionQueueWorker} for usage.
+ * Wraps several {@link NodeQueue} instances (per transaction).
+ * See {@link TransactionNodeQueueWorker} for usage.
  * @author mattias
  */
-public class NeoTransactionQueue
+public class TransactionNodeQueue
 {
 	public static enum QueueRelTypes implements RelationshipType
 	{
@@ -33,13 +33,13 @@ public class NeoTransactionQueue
 		Collections.synchronizedMap( new HashMap<Integer, TxQueue>() );
 	
 	private GraphDatabaseService neo;
-	private NeoUtil neoUtil;
+	private GraphDatabaseUtil neoUtil;
 	private Node rootNode;
 	
-	public NeoTransactionQueue( GraphDatabaseService neo, Node rootNode )
+	public TransactionNodeQueue( GraphDatabaseService neo, Node rootNode )
 	{
 		this.neo = neo;
-		this.neoUtil = new NeoUtil( neo );
+		this.neoUtil = new GraphDatabaseUtil( neo );
 		this.rootNode = rootNode;
 		initialize();
 	}
@@ -157,13 +157,13 @@ public class NeoTransactionQueue
 	
 	public class TxQueue
 	{
-		private NeoQueue queue;
+		private NodeQueue queue;
 		private Node node;
 		private boolean deleted;
 		
 		public TxQueue( Node rootNode )
 		{
-			queue = new NeoQueue( neo, rootNode, QueueRelTypes.INTERNAL_QUEUE );
+			queue = new NodeQueue( neo, rootNode, QueueRelTypes.INTERNAL_QUEUE );
 			this.node = rootNode;
 		}
 		
@@ -246,7 +246,7 @@ public class NeoTransactionQueue
 				queue.remove( max );
 				if ( queue.peek() == null )
 				{
-					NeoTransactionQueue.this.remove( this );
+					TransactionNodeQueue.this.remove( this );
 					deleted = true;
 				}
 				tx.success();

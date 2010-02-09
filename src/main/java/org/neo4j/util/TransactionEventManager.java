@@ -47,7 +47,7 @@ public class TransactionEventManager
 	private Map<Event, Set<ProActiveEventListener>> listeners =
 		new HashMap<Event, Set<ProActiveEventListener>>();
 	private Set<Event> registeredEvents = new HashSet<Event>();
-	private NeoUtil neoUtil;
+	private GraphDatabaseUtil graphDbUtil;
 	private TransactionHookFactory hookFactory = new TransactionHookFactory()
 	{
 		public TransactionHook newHook( Transaction tx )
@@ -57,14 +57,14 @@ public class TransactionEventManager
 	};
 	private boolean wrapEventsInTx;
 	
-	public TransactionEventManager( GraphDatabaseService neo )
+	public TransactionEventManager( GraphDatabaseService graphDb )
 	{
-	    this( neo, false );
+	    this( graphDb, false );
 	}
 	
-	public TransactionEventManager( GraphDatabaseService neo, boolean wrapEventsInTx )
+	public TransactionEventManager( GraphDatabaseService graphDb, boolean wrapEventsInTx )
 	{
-        this.neoUtil = new NeoUtil( neo );
+        this.graphDbUtil = new GraphDatabaseUtil( graphDb );
 	    this.wrapEventsInTx = wrapEventsInTx;
 	}
 	
@@ -167,7 +167,7 @@ public class TransactionEventManager
 		{
 			if ( !registeredEvents.contains( event ) )
 			{
-				neoUtil.registerProActiveEventListener(
+				graphDbUtil.registerProActiveEventListener(
 					internalListener, event );
 				registeredEvents.add( event );
 			}
@@ -204,7 +204,7 @@ public class TransactionEventManager
 		{
 			if ( registeredEvents.contains( event ) )
 			{
-				neoUtil.unregisterProActiveEventListener(
+				graphDbUtil.unregisterProActiveEventListener(
 					internalListener, event );
 				registeredEvents.remove( event );
 			}
@@ -266,7 +266,7 @@ public class TransactionEventManager
 		try
         {
             TransactionHook hook = getTransactionHook(
-                neoUtil.getTransactionManager().getTransaction() );
+                graphDbUtil.getTransactionManager().getTransaction() );
             if ( hook == null )
             {
             	return;
@@ -413,7 +413,7 @@ public class TransactionEventManager
                 public void run()
                 {
                     org.neo4j.graphdb.Transaction tx = wrapEventsInTx ?
-                        neoUtil.neo().beginTx() : null;
+                        graphDbUtil.graphDb().beginTx() : null;
                     try
                     {
                         flushEvents();
@@ -455,7 +455,7 @@ public class TransactionEventManager
             try
             {
                 Transaction tx =
-                    neoUtil.getTransactionManager().getTransaction();
+                    graphDbUtil.getTransactionManager().getTransaction();
                 TransactionHook hook = getTransactionHook( tx );
                 if ( hook == null )
                 {

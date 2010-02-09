@@ -11,23 +11,23 @@ import org.neo4j.graphdb.Transaction;
  *
  * @param <T> The type of objects in this collection.
  */
-public abstract class AbstractNeoSet<T> implements Collection<T>
+public abstract class AbstractSet<T> implements Collection<T>
 {
-	private GraphDatabaseService neo;
+	private GraphDatabaseService graphDB;
 	
-	public AbstractNeoSet( GraphDatabaseService neo )
+	public AbstractSet( GraphDatabaseService graphDb )
 	{
-		this.neo = neo;
+		this.graphDB = graphDb;
 	}
 	
-	protected GraphDatabaseService neo()
+	protected GraphDatabaseService graphDb()
 	{
-		return this.neo;
+		return this.graphDB;
 	}
 	
 	public boolean addAll( Collection<? extends T> items )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			boolean changed = false;
@@ -49,7 +49,7 @@ public abstract class AbstractNeoSet<T> implements Collection<T>
 
 	public boolean containsAll( Collection<?> items )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			boolean ok = true;
@@ -72,7 +72,7 @@ public abstract class AbstractNeoSet<T> implements Collection<T>
 
 	public boolean removeAll( Collection<?> items )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			boolean changed = false;

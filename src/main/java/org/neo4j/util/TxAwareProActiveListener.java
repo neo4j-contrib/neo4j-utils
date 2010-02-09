@@ -19,11 +19,11 @@ import org.neo4j.kernel.impl.event.ProActiveEventListener;
  */
 public abstract class TxAwareProActiveListener implements ProActiveEventListener
 {
-	private NeoUtil neoUtil;
+	private GraphDatabaseUtil graphDbUtil;
 	
-	public TxAwareProActiveListener( GraphDatabaseService neo )
+	public TxAwareProActiveListener( GraphDatabaseService graphDb )
 	{
-		this.neoUtil = new NeoUtil( neo );
+		this.graphDbUtil = new GraphDatabaseUtil( graphDb );
 	}
 	
 	private ConcurrentMap<Transaction, EventFilter> eventLists =
@@ -47,7 +47,7 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 	{
 		for ( Event event : getEvents() )
 		{
-			neoUtil.registerProActiveEventListener( this, event );
+			graphDbUtil.registerProActiveEventListener( this, event );
 		}
 	}
 	
@@ -58,7 +58,7 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 	{
 		for ( Event event : getEvents() )
 		{
-			neoUtil.unregisterProActiveEventListener( this, event );
+			graphDbUtil.unregisterProActiveEventListener( this, event );
 		}
 	}
 	
@@ -78,7 +78,7 @@ public abstract class TxAwareProActiveListener implements ProActiveEventListener
 		try
 		{
 		    final Transaction tx =
-		        neoUtil.getTransactionManager().getTransaction();
+		        graphDbUtil.getTransactionManager().getTransaction();
 			EventContext context = new EventContext( event, data );
 			EventFilter filter = this.eventLists.get( tx );
 			if ( filter == null )

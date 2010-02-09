@@ -1,8 +1,8 @@
-package test;
+package org.neo4j.util;
 
 import org.neo4j.graphdb.Transaction;
 
-public class TxNeoTest extends NeoTest
+public abstract class TxNeo4jTest extends Neo4jTest
 {
 	private Transaction tx;
 	
@@ -10,14 +10,14 @@ public class TxNeoTest extends NeoTest
 	public void setUp() throws Exception
 	{
 		super.setUp();
-		tx = neo().beginTx();
+		tx = graphDb().beginTx();
 	}
 	
 	protected void newTransaction()
 	{
 		tx.success();
 		tx.finish();
-		tx = neo().beginTx();
+		tx = graphDb().beginTx();
 	}
 
 	@Override

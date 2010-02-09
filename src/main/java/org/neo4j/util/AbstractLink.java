@@ -12,28 +12,28 @@ import org.neo4j.kernel.impl.transaction.LockManager;
 
 public abstract class AbstractLink<T> implements Link<T>
 {
-    private final GraphDatabaseService neo;
+    private final GraphDatabaseService graphDb;
     private final Node node;
     private final RelationshipType type;
     private final Direction direction;
     
-    public AbstractLink( GraphDatabaseService neo, Node node, RelationshipType type,
+    public AbstractLink( GraphDatabaseService graphDb, Node node, RelationshipType type,
         Direction direction )
     {
-        this.neo = neo;
+        this.graphDb = graphDb;
         this.node = node;
         this.type = type;
         this.direction = direction;
     }
     
-    public AbstractLink( GraphDatabaseService neo, Node node, RelationshipType type )
+    public AbstractLink( GraphDatabaseService graphDb, Node node, RelationshipType type )
     {
-        this( neo, node, type, Direction.OUTGOING );
+        this( graphDb, node, type, Direction.OUTGOING );
     }
     
-    protected GraphDatabaseService neo()
+    protected GraphDatabaseService graphDb()
     {
-        return this.neo;
+        return this.graphDb;
     }
     
     protected Node node()
@@ -68,7 +68,7 @@ public abstract class AbstractLink<T> implements Link<T>
     
     public T get()
     {
-        Transaction tx = neo.beginTx();
+        Transaction tx = graphDb.beginTx();
         try
         {
             Relationship relationship = getLinkRelationshipOrNull();
@@ -84,7 +84,7 @@ public abstract class AbstractLink<T> implements Link<T>
 
     public boolean has()
     {
-        Transaction tx = neo.beginTx();
+        Transaction tx = graphDb.beginTx();
         try
         {
             boolean result = getLinkRelationshipOrNull() != null;
@@ -99,7 +99,7 @@ public abstract class AbstractLink<T> implements Link<T>
 
     public T remove()
     {
-        Transaction tx = neo.beginTx();
+        Transaction tx = graphDb.beginTx();
         try
         {
             Relationship relationship = getLinkRelationshipOrNull();
@@ -121,9 +121,9 @@ public abstract class AbstractLink<T> implements Link<T>
 
     public T set( T object )
     {
-        Transaction tx = neo.beginTx();
+        Transaction tx = graphDb.beginTx();
         LockManager lockManager =
-            ( ( EmbeddedGraphDatabase ) neo ).getConfig().getLockManager();
+            ( ( EmbeddedGraphDatabase ) graphDb ).getConfig().getLockManager();
         try
         {
             lockManager.getWriteLock( this.node() );

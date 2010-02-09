@@ -11,7 +11,7 @@ import org.neo4j.graphdb.Transaction;
 /**
  * A String collection, persistent in neo.
  */
-public class NeoStringSet extends NeoRelationshipSet<String>
+public class GraphDbStringSet extends RelationshipSet<String>
 {
 	private static final String VALUE_KEY = "value";
 	
@@ -20,7 +20,7 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 	 * @param node the {@link Node} which is the collection node.
 	 * @param type the relationship type to use internally for each element.
 	 */
-	public NeoStringSet( GraphDatabaseService neo, Node node, RelationshipType type )
+	public GraphDbStringSet( GraphDatabaseService neo, Node node, RelationshipType type )
 	{
 		super( neo, node, type );
 	}
@@ -29,10 +29,10 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 	protected Node getNodeFromItem( Object item )
 	{
 		String value = ( String ) item;
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
-			Node node = neo().createNode();
+			Node node = graphDb().createNode();
 			node.setProperty( VALUE_KEY, value );
 			tx.success();
 			return node;
@@ -46,7 +46,7 @@ public class NeoStringSet extends NeoRelationshipSet<String>
 	@Override
 	protected String newObject( Node node, Relationship relationship )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			return ( String ) node.getProperty( VALUE_KEY );

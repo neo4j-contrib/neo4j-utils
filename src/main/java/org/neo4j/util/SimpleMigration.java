@@ -13,25 +13,26 @@ public abstract class SimpleMigration extends Migration
 	private String versionClassPrefix;
 	
 	/**
-	 * @param neo the {@link GraphDatabaseService} instance to store migration info in.
+	 * @param graphDB the {@link GraphDatabaseService} instance to store migration info in.
 	 * @param subReferenceType the {@link RelationshipType} to use a sub
 	 * reference type.
 	 */
-	public SimpleMigration( GraphDatabaseService neo, RelationshipType subReferenceType )
+	public SimpleMigration( GraphDatabaseService graphDB,
+	        RelationshipType subReferenceType )
 	{
-		super( neo, getConfigNodeFromType( neo, subReferenceType ) );
+		super( graphDB, getConfigNodeFromType( graphDB, subReferenceType ) );
 		this.versionClassPrefix = this.getMigratorPrefix();
 	}
 	
-	public SimpleMigration( GraphDatabaseService neo )
+	public SimpleMigration( GraphDatabaseService graphDB )
 	{
-		this( neo, MigrationRelationshipTypes.REF_MIGRATION );
+		this( graphDB, MigrationRelationshipTypes.REF_MIGRATION );
 	}
 	
-	private static Node getConfigNodeFromType( GraphDatabaseService neo,
+	private static Node getConfigNodeFromType( GraphDatabaseService graphDb,
 		RelationshipType type )
 	{
-		return new NeoUtil( neo ).getOrCreateSubReferenceNode( type );
+		return new GraphDatabaseUtil( graphDb ).getOrCreateSubReferenceNode( type );
 	}
 	
 	protected String getMigratorPrefix()

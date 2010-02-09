@@ -17,7 +17,7 @@ import org.neo4j.graphdb.Transaction;
  */
 public abstract class Migration
 {
-	private GraphDatabaseService neo;
+	private GraphDatabaseService graphDb;
 	private Node configNode;
 	private boolean firstVersionIsAlwaysZero;
 	private boolean pretending;
@@ -25,12 +25,12 @@ public abstract class Migration
 	/**
 	 * Creates a new migration object with a reference to a configuration node.
 	 * @param configNode the node to hold configuration data for migration.
-	 * @param neo the {@link NeoService} to use.
+	 * @param graphDb the {@link NeoService} to use.
 	 * This node should be the same every time in a code base.
 	 */
-	public Migration( GraphDatabaseService neo, Node configNode )
+	public Migration( GraphDatabaseService graphDb, Node configNode )
 	{
-		this.neo = neo;
+		this.graphDb = graphDb;
 		this.configNode = configNode;
 	}
 	
@@ -68,7 +68,7 @@ public abstract class Migration
 	 */
 	public int getDataVersion()
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			int result = 0;
@@ -128,7 +128,7 @@ public abstract class Migration
 	 */
 	public void setDataVersion( int version )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			this.getConfigNode().setProperty( getCurrentVersionPropertyKey(),
@@ -203,11 +203,11 @@ public abstract class Migration
 	
 	private void migrateOne( int version )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			System.out.println( "Migrating ==> version " + version );
-			findMigrator( version ).performMigration( this.neo );
+			findMigrator( version ).performMigration( this.graphDb );
 			setDataVersion( version );
 			if ( !this.pretending )
 			{

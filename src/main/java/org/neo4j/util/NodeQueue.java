@@ -11,22 +11,23 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * Wraps a linked list of nodes in neo.
+ * Wraps a linked list of nodes in Neo4j.
  * @author mattias
  */
-public class NeoQueue
+public class NodeQueue
 {
-	private GraphDatabaseService neo;
+	private GraphDatabaseService graphDB;
 	private Node rootNode;
 	private RelationshipType relType;
-	private NeoUtil neoUtil;
+	private GraphDatabaseUtil graphDbUtil;
 	
-	public NeoQueue( GraphDatabaseService neo, Node rootNode, RelationshipType relType )
+	public NodeQueue( GraphDatabaseService graphDb, Node rootNode,
+	        RelationshipType relType )
 	{
-		this.neo = neo;
+		this.graphDB = graphDb;
 		this.rootNode = rootNode;
 		this.relType = relType;
-		this.neoUtil = new NeoUtil( neo );
+		this.graphDbUtil = new GraphDatabaseUtil( graphDb );
 	}
 	
 	private Relationship getFirstRelationship()
@@ -41,11 +42,11 @@ public class NeoQueue
 	
 	public Node add()
 	{
-		Transaction tx = neo.beginTx();
-		neoUtil.getLockManager().getWriteLock( rootNode );
+		Transaction tx = graphDB.beginTx();
+		graphDbUtil.getLockManager().getWriteLock( rootNode );
 		try
 		{
-			Node node = neo.createNode();
+			Node node = graphDB.createNode();
 			Relationship rel = getLastRelationship();
 			if ( rel == null )
 			{
@@ -63,7 +64,7 @@ public class NeoQueue
 		}
 		finally
 		{
-			neoUtil.getLockManager().releaseWriteLock( rootNode );
+			graphDbUtil.getLockManager().releaseWriteLock( rootNode );
 			tx.finish();
 		}
 	}
@@ -75,8 +76,8 @@ public class NeoQueue
 	
 	public int remove( int max )
 	{
-        Transaction tx = neo.beginTx();
-        neoUtil.getLockManager().getWriteLock( rootNode );
+        Transaction tx = graphDB.beginTx();
+        graphDbUtil.getLockManager().getWriteLock( rootNode );
         try
         {
             Relationship rel = getFirstRelationship();
@@ -115,14 +116,14 @@ public class NeoQueue
         }
         finally
         {
-            neoUtil.getLockManager().releaseWriteLock( rootNode );
+            graphDbUtil.getLockManager().releaseWriteLock( rootNode );
             tx.finish();
         }
 	}
 	
 	public Node peek()
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDB.beginTx();
 		try
 		{
 			Relationship rel = getFirstRelationship();
@@ -142,7 +143,7 @@ public class NeoQueue
 	
 	public Node[] peek( int max )
 	{
-	    Transaction tx = neo.beginTx();
+	    Transaction tx = graphDB.beginTx();
 	    try
 	    {
 	        Collection<Node> result = new ArrayList<Node>( max );

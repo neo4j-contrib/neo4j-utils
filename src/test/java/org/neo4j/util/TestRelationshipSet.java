@@ -11,29 +11,25 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
-import test.NeoTest;
-
 /**
  * Tests the neo relationship sets.
- * @author mattias
- *
  */
-public class TestNeoRelationshipSet extends NeoTest
+public class TestRelationshipSet extends Neo4jTest
 {
 	/**
 	 * Tests passing of illegal direction arguments.
 	 */
 	public void testIllegalDirection()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
-			Node node = neo().createNode();
+			Node node = graphDb().createNode();
 			try
 			{
-				new ContainerSet( neo(), node, Direction.BOTH );
-				new ContainerSet( neo(), node, null );
-				fail( "Shouldn't be able to create a neo relationship set " +
+				new ContainerSet( graphDb(), node, Direction.BOTH );
+				new ContainerSet( graphDb(), node, null );
+				fail( "Shouldn't be able to create a relationship set " +
 					"with Direction.BOTH or null as direction" );
 			}
 			catch ( IllegalArgumentException e )
@@ -52,14 +48,14 @@ public class TestNeoRelationshipSet extends NeoTest
 	 */
 	public void testSome()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
-			Node node = neo().createNode();
+			Node node = graphDb().createNode();
 			SomeContainer container = new SomeContainer( node );
 			Collection<SomeOtherContainer> set = container.otherContainers();
-			Node itemNode = neo().createNode();
-			Node itemNode2 = neo().createNode();
+			Node itemNode = graphDb().createNode();
+			Node itemNode2 = graphDb().createNode();
 			SomeOtherContainer item = new SomeOtherContainer( itemNode );
 			SomeOtherContainer item2 = new SomeOtherContainer( itemNode2 );
 			
@@ -139,19 +135,19 @@ public class TestNeoRelationshipSet extends NeoTest
 	
 	public void testRetain() throws Exception
 	{
-        Transaction tx = neo().beginTx();
+        Transaction tx = graphDb().beginTx();
         try
         {
-            Node node = neo().createNode();
+            Node node = graphDb().createNode();
             Collection<Node> collection = new PureNodeRelationshipSet(
-                neo(), node, Relationships.TESTREL );
+                graphDb(), node, Relationships.TESTREL );
             
-            Node node1 = neo().createNode();
-            Node node2 = neo().createNode();
-            Node node3 = neo().createNode();
-            Node node4 = neo().createNode();
-            Node node5 = neo().createNode();
-            Node node6 = neo().createNode();
+            Node node1 = graphDb().createNode();
+            Node node2 = graphDb().createNode();
+            Node node3 = graphDb().createNode();
+            Node node4 = graphDb().createNode();
+            Node node5 = graphDb().createNode();
+            Node node6 = graphDb().createNode();
             
             collection.add( node1 );
             collection.add( node2 );
@@ -202,11 +198,11 @@ public class TestNeoRelationshipSet extends NeoTest
 		Node node = null;
 		SomeOtherContainer entity1 = null;
 		
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
-			node = neo().createNode();
-			entity1 = new SomeOtherContainer( neo().createNode() );
+			node = graphDb().createNode();
+			entity1 = new SomeOtherContainer( graphDb().createNode() );
 			tx.success();
 		}
 		finally
@@ -215,8 +211,8 @@ public class TestNeoRelationshipSet extends NeoTest
 		}
 		
 		
-		NeoRelationshipSet<SomeOtherContainer> set =
-			new ContainerSet( neo(), node );
+		RelationshipSet<SomeOtherContainer> set =
+			new ContainerSet( graphDb(), node );
 		Collection<SomeOtherContainer> collection =
 			Arrays.asList( new SomeOtherContainer[] { entity1 } );
 		assertTrue( set.isEmpty() );
@@ -245,7 +241,7 @@ public class TestNeoRelationshipSet extends NeoTest
 		set.toString();
 		set.clear();
 		
-		tx = neo().beginTx();
+		tx = graphDb().beginTx();
 		try
 		{
 			node.delete();
@@ -262,7 +258,7 @@ public class TestNeoRelationshipSet extends NeoTest
 	{
 		private SomeContainer( Node node )
 		{
-			super( neo(), node );
+			super( graphDb(), node );
 		}
 		
 		/**
@@ -270,21 +266,21 @@ public class TestNeoRelationshipSet extends NeoTest
 		 */
 		public Collection<SomeOtherContainer> otherContainers()
 		{
-			return new ContainerSet( neo(), getUnderlyingNode() );
+			return new ContainerSet( graphDb(), getUnderlyingNode() );
 		}
 	}
 	
 	private class ContainerSet
-		extends NeoRelationshipSet<SomeOtherContainer>
+		extends RelationshipSet<SomeOtherContainer>
 	{
-		private ContainerSet( GraphDatabaseService neo, Node node )
+		private ContainerSet( GraphDatabaseService graphDb, Node node )
 		{
-			this( neo, node, Direction.OUTGOING );
+			this( graphDb, node, Direction.OUTGOING );
 		}
 		
-		private ContainerSet( GraphDatabaseService neo, Node node, Direction direction )
+		private ContainerSet( GraphDatabaseService graphDB, Node node, Direction direction )
 		{
-			super( neo, node, Relationships.TESTREL, direction );
+			super( graphDB, node, Relationships.TESTREL, direction );
 		}
 
 		@Override
@@ -305,7 +301,7 @@ public class TestNeoRelationshipSet extends NeoTest
 	{
 		private SomeOtherContainer( Node node )
 		{
-			super( neo(), node );
+			super( graphDb(), node );
 		}
 	}
 }

@@ -16,17 +16,17 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.impl.transaction.DeadlockDetectedException;
 import org.neo4j.kernel.impl.transaction.UserTransactionImpl;
-import org.neo4j.util.NeoTransactionQueue.TxQueue;
+import org.neo4j.util.TransactionNodeQueue.TxQueue;
 
 /**
- * Handles entries from a {@link NeoTransactionQueue} using one or more
+ * Handles entries from a {@link TransactionNodeQueue} using one or more
  * working threads to "eat" the queue items.
  * @author mattias
  */
-public abstract class NeoTransactionQueueWorker extends Thread
+public abstract class TransactionNodeQueueWorker extends Thread
 {
 	private GraphDatabaseService neo;
-	private NeoTransactionQueue workQueue;
+	private TransactionNodeQueue workQueue;
 	private boolean halted;
 	private int maxConsumers;
 	private ExecutorService consumers;
@@ -36,16 +36,16 @@ public abstract class NeoTransactionQueueWorker extends Thread
 	private boolean fallThrough;
 	private int batchSize;
 	
-    public NeoTransactionQueueWorker( GraphDatabaseService neo, Node rootNode,
+    public TransactionNodeQueueWorker( GraphDatabaseService neo, Node rootNode,
         int maxConsumers )
     {
         this( neo, rootNode, maxConsumers, 1 );
     }
     
-	public NeoTransactionQueueWorker( GraphDatabaseService neo, Node rootNode,
+	public TransactionNodeQueueWorker( GraphDatabaseService neo, Node rootNode,
 		int maxConsumers, int batchSize )
 	{
-		super( NeoTransactionQueueWorker.class.getSimpleName() );
+		super( TransactionNodeQueueWorker.class.getSimpleName() );
 		this.neo = neo;
 		this.maxConsumers = maxConsumers;
 		this.workQueue = createQueue( rootNode );
@@ -81,14 +81,14 @@ public abstract class NeoTransactionQueueWorker extends Thread
 	    return new UserTransactionImpl( neo ).getEventIdentifier();
 	}
 
-	protected NeoTransactionQueue getQueue()
+	protected TransactionNodeQueue getQueue()
 	{
 		return this.workQueue;
 	}
 	
-	protected NeoTransactionQueue createQueue( Node rootNode )
+	protected TransactionNodeQueue createQueue( Node rootNode )
 	{
-		return new NeoTransactionQueue( neo, rootNode );
+		return new TransactionNodeQueue( neo, rootNode );
 	}
 	
 	public void setPaused( boolean paused )

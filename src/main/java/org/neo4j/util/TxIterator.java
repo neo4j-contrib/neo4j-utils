@@ -7,18 +7,18 @@ import org.neo4j.graphdb.Transaction;
 
 public class TxIterator<T> implements Iterator<T>
 {
-	private GraphDatabaseService neo;
+	private GraphDatabaseService graphDb;
 	private Iterator<T> source;
 
-	public TxIterator( GraphDatabaseService neo, Iterator<T> source )
+	public TxIterator( GraphDatabaseService graphDb, Iterator<T> source )
 	{
-		this.neo = neo;
+		this.graphDb = graphDb;
 		this.source = source;
 	}
 
 	public boolean hasNext()
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			boolean result = source.hasNext();
@@ -33,7 +33,7 @@ public class TxIterator<T> implements Iterator<T>
 
 	public T next()
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			T result = source.next();
@@ -48,7 +48,7 @@ public class TxIterator<T> implements Iterator<T>
 
 	public void remove()
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			source.remove();

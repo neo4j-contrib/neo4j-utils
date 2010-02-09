@@ -3,7 +3,7 @@ package org.neo4j.util;
 import org.neo4j.kernel.impl.transaction.DeadlockDetectedException;
 
 /**
- * Encapsulates a block of code which is, sort of, expected to throw neo
+ * Encapsulates a block of code which is, sort of, expected to throw Neo4j
  * {@link DeadlockDetectedException} and provides a means of performing that
  * code block a number of times in order to succeed.
  * @author mattias

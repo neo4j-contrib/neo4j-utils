@@ -5,14 +5,12 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
-import test.NeoTest;
-
 /**
  * Tests the {@link Link} class and its implementation {@link NodeWrapperLink}.
  * @author mattias
  *
  */
-public class TestLink extends NeoTest
+public class TestLink extends Neo4jTest
 {
 	/**
 	 * Tests link functionality with normal outgoing direction.
@@ -34,21 +32,21 @@ public class TestLink extends NeoTest
 
 	private void doSomeTesting( Direction direction ) throws Exception
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
-			Node node1 = neo().createNode();
-			Node node2 = neo().createNode();
-            Node node3 = neo().createNode();
+			Node node1 = graphDb().createNode();
+			Node node2 = graphDb().createNode();
+            Node node3 = graphDb().createNode();
 			
-			Entity entity1 = NodeWrapperImpl.newInstance( Entity.class, neo(),
+			Entity entity1 = NodeWrapperImpl.newInstance( Entity.class, graphDb(),
 				node1 );
-			Entity entity2 = NodeWrapperImpl.newInstance( Entity.class, neo(),
+			Entity entity2 = NodeWrapperImpl.newInstance( Entity.class, graphDb(),
 				node2 );
-            Entity entity3 = NodeWrapperImpl.newInstance( Entity.class, neo(),
+            Entity entity3 = NodeWrapperImpl.newInstance( Entity.class, graphDb(),
                 node3 );
 
-			Link<Entity> link = new NodeWrapperLink<Entity>( neo(),
+			Link<Entity> link = new NodeWrapperLink<Entity>( graphDb(),
 				entity1.getUnderlyingNode(), Relationships.TESTREL, direction,
 				Entity.class );
 			assertTrue( !link.has() );
@@ -84,9 +82,9 @@ public class TestLink extends NeoTest
 		/**
 		 * @param node the underlying node.
 		 */
-		public Entity( GraphDatabaseService neo, Node node )
+		public Entity( GraphDatabaseService graphDb, Node node )
 		{
-			super( neo, node );
+			super( graphDb, node );
 		}
 	}
 }

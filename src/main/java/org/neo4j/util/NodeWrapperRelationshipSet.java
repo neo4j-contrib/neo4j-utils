@@ -14,7 +14,7 @@ import org.neo4j.graphdb.RelationshipType;
  * @param <T> the class type of each object in the collection.
  */
 public class NodeWrapperRelationshipSet<T extends NodeWrapper>
-	extends NeoRelationshipSet<T>
+	extends RelationshipSet<T>
 {
 	private Class<? extends T> instanceClass;
 	
@@ -52,7 +52,7 @@ public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	@Override
 	protected T newObject( Node node, Relationship relationship )
 	{
-		return NodeWrapperImpl.newInstance( this.getInstanceClass(), neo(),
+		return NodeWrapperImpl.newInstance( this.getInstanceClass(), graphDb(),
 			node );
 	}
 	

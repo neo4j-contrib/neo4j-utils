@@ -8,9 +8,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 
-import test.NeoTest;
-
-public class TestNeoQueue extends NeoTest
+public class TestNodeQueue extends Neo4jTest
 {
 	private static enum RelTypes implements RelationshipType
 	{
@@ -28,12 +26,12 @@ public class TestNeoQueue extends NeoTest
 		Collection<Node> rootNodes = new ArrayList<Node>();
 		for ( int i = 0; i < 10; i++ )
 		{
-			Transaction tx = neo().beginTx();
+			Transaction tx = graphDb().beginTx();
 	        try
 	        {
-	        	Node rootNode = neo().createNode();
+	        	Node rootNode = graphDb().createNode();
 	        	rootNodes.add( rootNode );
-		        NeoQueue q = new NeoQueue( neo(),
+		        NodeQueue q = new NodeQueue( graphDb(),
 		        	rootNode, RelTypes.TEST_QUEUE );
 		        for ( int ii = 0; ii < 10000; ii++ )
 		        {
@@ -47,12 +45,12 @@ public class TestNeoQueue extends NeoTest
 	        }
 		}
 		
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
         try
         {
 	        for ( Node node : rootNodes )
 	        {
-	        	NeoQueue q = new NeoQueue( neo(), node,
+	        	NodeQueue q = new NodeQueue( graphDb(), node,
 	        		RelTypes.TEST_QUEUE );
 	        	while ( q.peek() != null )
 	        	{
@@ -70,10 +68,10 @@ public class TestNeoQueue extends NeoTest
 	
 	public void testMany() throws Exception
 	{
-	    Transaction tx = neo().beginTx();
+	    Transaction tx = graphDb().beginTx();
 	    
-	    Node rootNode = neo().createNode();
-	    NeoQueue q = new NeoQueue( neo(), rootNode, RelTypes.TEST_QUEUE );
+	    Node rootNode = graphDb().createNode();
+	    NodeQueue q = new NodeQueue( graphDb(), rootNode, RelTypes.TEST_QUEUE );
 	    for ( int i = 0; i < 10; i++ )
 	    {
 	        Node node = q.add();
@@ -103,10 +101,10 @@ public class TestNeoQueue extends NeoTest
 	
 	public void testFixedLengthList() throws Exception
 	{
-	    Transaction tx = neo().beginTx();
+	    Transaction tx = graphDb().beginTx();
 	    
-	    Node rootNode = neo().createNode();
-	    FixedLengthNeoList list = new FixedLengthNeoList( neo(), rootNode,
+	    Node rootNode = graphDb().createNode();
+	    FixedLengthNodeList list = new FixedLengthNodeList( graphDb(), rootNode,
 	        DynamicRelationshipType.withName( "LIST_TEST" ), 5 );
 	    assertNull( list.peek() );
 	    Node a = list.add();

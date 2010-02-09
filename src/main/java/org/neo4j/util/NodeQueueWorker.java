@@ -9,16 +9,16 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
-public abstract class NeoQueueWorker extends Thread
+public abstract class NodeQueueWorker extends Thread
 {
     private final GraphDatabaseService neo;
-    private final NeoQueue queue;
+    private final NodeQueue queue;
     private boolean halted;
     private boolean requestedToPause;
     private boolean paused;
     private int batchSize;
     
-    public NeoQueueWorker( GraphDatabaseService neo, NeoQueue queue, int batchSize,
+    public NodeQueueWorker( GraphDatabaseService neo, NodeQueue queue, int batchSize,
         String name )
     {
         super( name );
@@ -27,12 +27,12 @@ public abstract class NeoQueueWorker extends Thread
         this.batchSize = batchSize;
     }
     
-    public NeoQueueWorker( GraphDatabaseService neo, NeoQueue queue, int batchSize )
+    public NodeQueueWorker( GraphDatabaseService neo, NodeQueue queue, int batchSize )
     {
         this( neo, queue, batchSize, "NeoQueueWorker" );
     }
     
-    public NeoQueue getQueue()
+    public NodeQueue getQueue()
     {
         return this.queue;
     }

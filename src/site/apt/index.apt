@@ -1,30 +1,30 @@
 Neo4j Utilities
 
-	Neo-utils is a collection of useful utilities on top of Neo which you
+	This is a collection of useful utilities on top of Neo4j which you
 	very often find yourself needing, but you can't (as of yet) find in
 	the core neo API. The base package is <<org.neo4j.util>> and holds a
 	big variety of utilities, f.ex. utilities for easy handling of array
 	properties and a java Collection implementation of some neo concepts.
 	
-NeoServiceLifecycle
+GraphDatabaseServiceLifecycle
 
-	The <<org.neo4j.util.NeoServiceLifecycle>> class makes it easier to
-	manage your NeoService and additional components (such as an IndexService)
-	in one place without having to care about shutting down neo and its
+	The <<org.neo4j.util.GraphDatabaseServiceLifecycle>> class makes it easier to
+	manage your GraphDatabaseService and additional components (such as an IndexService)
+	in one place without having to care about shutting down Neo4j and its
 	components when the JVM exists.
 	
 	So this code:
 	
 ---
-	NeoServiceLifecycle neo =
-		new NeoServiceLifecycle( new EmbeddedNeo( "neo" ) );
+	GraphDatabaseLifecycle neo =
+		new GraphDatabaseLifecycle( new EmbeddedGraphDatabase( "path/to/db" ) );
 	neo.addLuceneIndexService();
 ---
 
 	Will replace code like:
 	
 ---	
-	final NeoService neo = new EmbeddedNeo( "neo" );
+	final GraphDatabaseService neo = new EmbeddedGraphDatabase( "neo" );
 	final IndexService indexService = new LuceneIndexService( neo );
 	Runtime.getRuntime().addShutdownHook( new Thread()
 	{
@@ -37,40 +37,40 @@ NeoServiceLifecycle
 	} );
 ---
 
-NeoUtil class
+GraphDatabaseUtil class
 
-	The <<org.neo4j.util.NeoUtil>> class is a blob class with many very useful
+	The <<org.neo4j.util.GraphDatabaseUtil>> class is a blob class with many very useful
 	methods, f.ex: methods for single has/get/set/remove property on
 	Node/Relationship which does that single call within a transaction.
 	
 ---
-	NeoService neo = ...;
-	NeoUtil neoUtil = new NeoUtil( neo );
+	GraphDatabaseService graphDb = ...;
+	GraphDatabaseUtil graphDbUtil = new GraphDatabaseUtil( graphDb );
 	Node node = ...;
 	
 	// One transaction.
-	neoUtil.setProperty( node, "name", "Some name" );
+	graphDbUtil.setProperty( node, "name", "Some name" );
 	
 	// Another transaction.
-	String name = ( String ) neoUtil.getProperty( node, "name" );
+	String name = ( String ) graphDbUtil.getProperty( node, "name" );
 ---
 	
-	Since neo can handle property values which are arrays the NeoUtil class
+	Since neo can handle property values which are arrays the GraphDatabaseUtil class
 	provides some useful array handling methods.
 	
 ---
-	neoUtil.setProperty( node, "numbers", 5 );
-	List<Object> oneNumber = neoUtil.getPropertyValues( node, "numbers" );
+	graphDbUtil.setProperty( node, "numbers", 5 );
+	List<Object> oneNumber = graphDbUtil.getPropertyValues( node, "numbers" );
 	// Will contain one item (5).
 
-	neoUtil.setProperty( node, "numbers", new int[] { 5, 10, 15 } );
-	List<Object> numbers = neoUtil.getPropertyValues( node, "numbers" );
+	graphDbUtil.setProperty( node, "numbers", new int[] { 5, 10, 15 } );
+	List<Object> numbers = graphDbUtil.getPropertyValues( node, "numbers" );
 	// Will contain three items (5, 10, 15).
 	
 	// There's also methods for adding/removing values to/from a property.
-	neoUtil.removeValueFromArray( node, "numbers", 10 );
-	neoUtil.addValueToArray( node, "numbers", 20 );
-	List<Object> newNumbers = neoUtil.getPropertyValues( node, "numbers" );
+	graphDbUtil.removeValueFromArray( node, "numbers", 10 );
+	graphDbUtil.addValueToArray( node, "numbers", 20 );
+	List<Object> newNumbers = graphDbUtil.getPropertyValues( node, "numbers" );
 	// Will contain three items (5, 15, 20).
 ---
 	
@@ -80,19 +80,19 @@ NeoUtil class
 ---
 	node.setProperty( "numbers", new int[] { 5, 10, 15 } );
 	Object numbers = node.getProperty( "numbers" );
-	List<Object> numbersAsList = neoUtil.neoPropertyAsList( numbers );
+	List<Object> numbersAsList = graphDbUtil.propertyValueAsList( numbers );
 	numbersAsList.add( 20 );
-	Object newNumbers = neoUtil.asNeoProperty( numbersAsList );
+	Object newNumbers = graphDbUtil.asPropertyValue( numbersAsList );
 	node.setProperty( "numbers", newNumbers );
 ---
 
 	Often in a neo node space you have some sort of sub-reference nodes
-	connected to the neo reference node (f.ex. one which all users are
+	connected to the reference node (f.ex. one which all users are
 	connected to), there's one method to get or create those sub-reference
 	nodes.
 	
 ---
-	NeoUtil neoUtil = new NeoUtil( neo );
+	GraphDatabaseUtil graphDbUtil = new GraphDatabaseUtil( graphDb );
 	RelationshipType usersReferenceRelationshipType = ...;
 	Node usersReferenceNode =
 		neoUtil.getOrCreateSubReferenceNode( usersReferenceRelationshipType );
@@ -121,7 +121,7 @@ Collection implementations
 	constructor and the current implementation assumes the NodeWrapper class
 	to have a public constructor which takes a neo <<Node>>.
 
-* NeoPropertyArraySet
+* PropertyArraySet
 
 	Ability to see a property on a Node/Relationship as a collection of
 	values, using neos array abilities.
@@ -150,9 +150,9 @@ Migration
 	// The migration class.
 	class MyMigrator extends SimpleMigration
 	{
-		public MyMigration( NeoService neo )
+		public MyMigration( GraphDatabaseService graphDb )
 		{
-			super( neo );
+			super( graphDb );
 		}
 	
 		@Override
@@ -168,7 +168,7 @@ Migration
 	// package as itself named "Migrator" + <version>.
 	class Migrator1 implements Migrator
 	{
-		public void performMigration( NeoService neo )
+		public void performMigration( GraphDatabaseService graphDb )
 		{
 			// Go ahead, do your thing... transactions are managed by the
 			// Migration instance.
@@ -177,11 +177,11 @@ Migration
 ---
 
 	To use the migration framework, just have it sync the versions after a
-	NeoService has been started.
+	GraphDatabaseService has been started.
 
 ---
-	NeoService neo = new EmbeddedNeo( "path/to/neo/" );
-	new MyMigration( neo ).syncVersion();
+	GraphDatabaseService graphDb = new EmbeddedGraphDatabase( "path/to/db" );
+	new MyMigration( graphDb ).syncVersion();
 ---
 
 	Remember that the first time a <syncVersion> is performed on a neo store

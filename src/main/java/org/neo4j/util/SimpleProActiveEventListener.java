@@ -7,16 +7,16 @@ import org.neo4j.kernel.impl.event.ProActiveEventListener;
 public abstract class SimpleProActiveEventListener
 	implements ProActiveEventListener
 {
-	private NeoUtil neoUtil;
+	private GraphDatabaseUtil graphDBUtil;
 	
 	protected abstract Event[] getEventsToListenFor();
 	
-	public SimpleProActiveEventListener( GraphDatabaseService neo )
+	public SimpleProActiveEventListener( GraphDatabaseService graphDb )
 	{
-		this.neoUtil = new NeoUtil( neo );
+		this.graphDBUtil = new GraphDatabaseUtil( graphDb );
 		for ( Event event : getEventsToListenFor() )
 		{
-			neoUtil.registerProActiveEventListener( this, event );
+			graphDBUtil.registerProActiveEventListener( this, event );
 		}
 	}
 	
@@ -24,7 +24,7 @@ public abstract class SimpleProActiveEventListener
 	{
 		for ( Event event : getEventsToListenFor() )
 		{
-			neoUtil.unregisterProActiveEventListener( this, event );
+			graphDBUtil.unregisterProActiveEventListener( this, event );
 		}
 	}
 }

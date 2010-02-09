@@ -11,7 +11,7 @@ import org.neo4j.graphdb.Relationship;
  * from a start node (any start node in that graph). It is mostly used in
  * some test cases.
  */
-public class EntireGraphDeletor implements NeoDeletor
+public class EntireGraphDeletor implements GraphDeletor
 {
 	public void delete( Node startNode )
 	{

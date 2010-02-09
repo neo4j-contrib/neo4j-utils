@@ -1,4 +1,4 @@
-package test;
+package org.neo4j.util;
 
 import java.io.File;
 import java.util.Collection;
@@ -9,10 +9,10 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.RelationshipType;
 
 /**
- * Super class of tests which handles neo-specific things.
+ * Super class of tests which handles Neo4j-specific things.
  * @author mattias
  */
-public class NeoTest extends TestCase
+public abstract class Neo4jTest extends TestCase
 {
 	protected static enum TestRelTypes implements RelationshipType
 	{
@@ -21,12 +21,12 @@ public class NeoTest extends TestCase
 		TEST_YET_ANOTHER_TYPE,
 	}
 	
-	private static GraphDatabaseService neo;
+	private static GraphDatabaseService graphDb;
 	
 	@Override
 	protected void setUp() throws Exception
 	{
-		if ( neo() == null )
+		if ( graphDb() == null )
 		{
 			init();
 		}
@@ -34,7 +34,7 @@ public class NeoTest extends TestCase
 	
 	private void init() throws Exception
 	{
-		String dbPath = "target/var/neo";
+		String dbPath = "target/var/neo4j";
 		File path = new File( dbPath );
 		if ( path.exists() )
 		{
@@ -44,29 +44,22 @@ public class NeoTest extends TestCase
 			}
 		}
 		
-		neo = new EmbeddedGraphDatabase( dbPath );
+		graphDb = new EmbeddedGraphDatabase( dbPath );
 		Runtime.getRuntime().addShutdownHook( new Thread()
 		{
 			@Override
 			public void run()
 			{
-				neo.shutdown();
+				graphDb.shutdown();
 			}
 		} );
 	}
 	
-	protected static GraphDatabaseService neo()
+	protected static GraphDatabaseService graphDb()
 	{
-		return neo;
+		return graphDb;
 	}
 	
-	/**
-	 * To avoid a warning about (there's no tests in this class).
-	 */
-	public void testNothing()
-	{
-	}
-
 	/**
 	 * Relationships used in this test suite.
 	 * @author mattias

@@ -12,13 +12,13 @@ import org.neo4j.graphdb.Transaction;
 /**
  * Simple debugging utility for neo-related objects.
  */
-public class NeoDebugUtil
+public class GraphDbDebugUtil
 {
-	private GraphDatabaseService neo;
+	private GraphDatabaseService graphDb;
 	
-	public NeoDebugUtil( GraphDatabaseService neo )
+	public GraphDbDebugUtil( GraphDatabaseService graphDB )
 	{
-		this.neo = neo;
+		this.graphDb = graphDB;
 	}
 	
 	/**
@@ -28,11 +28,11 @@ public class NeoDebugUtil
 	 */
 	public void printNodeInfo( int nodeId, PrintStream writer )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			writer.println( "--- Printing Node info for " + nodeId + " ---" );
-			Node node = neo.getNodeById( nodeId );
+			Node node = graphDb.getNodeById( nodeId );
 			writer.println( "Relationships: " );
 			for ( Relationship rel : node.getRelationships() )
 			{
@@ -74,7 +74,7 @@ public class NeoDebugUtil
 	 */
 	public void printRelationshipInfo( Relationship rel, PrintStream writer )
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			writer.println( "--- Printing Relationship info for " +

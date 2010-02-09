@@ -21,7 +21,7 @@ import org.neo4j.commons.iterator.IteratorWrapper;
  *
  * @param <T> the type of objects in the set.
  */
-public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
+public abstract class RelationshipSet<T> extends AbstractSet<T>
 	implements Set<T>
 {
 	private Node node;
@@ -32,7 +32,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	 * @param node the {@link Node} to act as the collection.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public NeoRelationshipSet( GraphDatabaseService neo, Node node,
+	public RelationshipSet( GraphDatabaseService neo, Node node,
 		RelationshipType type )
 	{
 		this( neo, node, type, Direction.OUTGOING );
@@ -43,7 +43,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	 * @param direction the direction to use for the relationships.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public NeoRelationshipSet( GraphDatabaseService neo, Node node, 
+	public RelationshipSet( GraphDatabaseService neo, Node node, 
 	    RelationshipType type, Direction direction )
 	{
 		super( neo );
@@ -87,7 +87,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 	
 	public boolean add( T item )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			if ( contains( item ) )
@@ -118,7 +118,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public void clear()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Iterator<Relationship> itr = getAllRelationships();
@@ -136,7 +136,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public boolean contains( Object item )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			boolean result = findRelationship( item ) != null;
@@ -190,7 +190,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public boolean isEmpty()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			return !getAllRelationships().hasNext();
@@ -203,7 +203,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public Iterator<T> iterator()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Iterator<T> result = new IteratorWrapper<T, Relationship>(
@@ -213,7 +213,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
                 protected T underlyingObjectToObject( Relationship rel )
                 {
                     return newObject( rel.getOtherNode(
-                        NeoRelationshipSet.this.node ), rel );
+                        RelationshipSet.this.node ), rel );
                 }
 		    };
 			tx.success();
@@ -232,7 +232,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public boolean remove( Object item )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Relationship rel = findRelationship( item );
@@ -253,7 +253,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public boolean retainAll( Collection<?> items )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 		    Collection<Relationship> relationships =
@@ -291,7 +291,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public int size()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			int counter = 0;
@@ -319,7 +319,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public Object[] toArray()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Iterator<Relationship> itr = getAllRelationships();
@@ -340,7 +340,7 @@ public abstract class NeoRelationshipSet<T> extends AbstractNeoSet<T>
 
 	public <R> R[] toArray( R[] array )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Iterator<Relationship> itr = getAllRelationships();

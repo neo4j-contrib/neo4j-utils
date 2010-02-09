@@ -18,7 +18,7 @@ import org.neo4j.graphdb.Transaction;
  *
  * @param <T> the type of objects in the collection.
  */
-public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
+public abstract class PropertySet<T> extends AbstractSet<T>
 	implements Set<T>
 {
 	/**
@@ -35,9 +35,9 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	 * @param propertyKey the property key to use for the collection node to
 	 * store the values.
 	 */
-	public NeoPropertySet( GraphDatabaseService neo, Node node, String propertyKey )
+	public PropertySet( GraphDatabaseService graphDb, Node node, String propertyKey )
 	{
-		this( neo, node, propertyKey, DEFAULT_DELIMITER );
+		this( graphDb, node, propertyKey, DEFAULT_DELIMITER );
 	}
 	
 	/**
@@ -46,10 +46,10 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	 * store the values.
 	 * @param delimiter custom delimiter instead of {@link #DEFAULT_DELIMITER}.
 	 */
-	public NeoPropertySet( GraphDatabaseService neo, Node node, String propertyKey,
+	public PropertySet( GraphDatabaseService graphDB, Node node, String propertyKey,
 		String delimiter )
 	{
-		super( neo );
+		super( graphDB );
 		this.node = node;
 		this.key = propertyKey;
 		this.delimiter = delimiter;
@@ -61,7 +61,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	
 	private Set<String> tokenize()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Set<String> set = new HashSet<String>();
@@ -107,7 +107,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 			return;
 		}
 		
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			this.node.setProperty( this.key, value );
@@ -121,7 +121,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 	
 	public boolean add( T item )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Set<String> set = tokenize();
@@ -138,7 +138,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 
 	public void clear()
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			if ( this.node.hasProperty( this.key ) )
@@ -170,7 +170,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 
 	public boolean remove( Object item )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Set<String> set = tokenize();
@@ -187,7 +187,7 @@ public abstract class NeoPropertySet<T> extends AbstractNeoSet<T>
 
 	public boolean retainAll( Collection<?> realItems )
 	{
-		Transaction tx = neo().beginTx();
+		Transaction tx = graphDb().beginTx();
 		try
 		{
 			Collection<String> items = new ArrayList<String>();
