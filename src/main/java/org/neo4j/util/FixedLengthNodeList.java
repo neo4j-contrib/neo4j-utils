@@ -17,7 +17,7 @@ import org.neo4j.graphdb.Traverser;
 import org.neo4j.graphdb.Traverser.Order;
 
 /**
- * Wraps a linked list of nodes in neo. It has a max length specified so that
+ * Wraps a linked list of nodes. It has a max length specified so that
  * only the latest N are stored (latest added is first in list).
  */
 public class FixedLengthNodeList

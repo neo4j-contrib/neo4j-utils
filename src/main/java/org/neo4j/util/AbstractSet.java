@@ -6,7 +6,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * Abstract super class for implementations of neo collections and sets.
+ * Abstract super class for implementations of Neo4j collections and sets.
  * @author mattias
  *
  * @param <T> The type of objects in this collection.

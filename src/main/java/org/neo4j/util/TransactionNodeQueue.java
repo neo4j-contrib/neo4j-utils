@@ -32,21 +32,21 @@ public class TransactionNodeQueue
 	private static Map<Integer, TxQueue> queueNodes =
 		Collections.synchronizedMap( new HashMap<Integer, TxQueue>() );
 	
-	private GraphDatabaseService neo;
-	private GraphDatabaseUtil neoUtil;
+	private GraphDatabaseService graphDb;
+	private GraphDatabaseUtil graphDbUtil;
 	private Node rootNode;
 	
-	public TransactionNodeQueue( GraphDatabaseService neo, Node rootNode )
+	public TransactionNodeQueue( GraphDatabaseService graphDb, Node rootNode )
 	{
-		this.neo = neo;
-		this.neoUtil = new GraphDatabaseUtil( neo );
+		this.graphDb = graphDb;
+		this.graphDbUtil = new GraphDatabaseUtil( graphDb );
 		this.rootNode = rootNode;
 		initialize();
 	}
 	
 	private void initialize()
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			Collection<Relationship> toDelete = new ArrayList<Relationship>();
@@ -106,7 +106,7 @@ public class TransactionNodeQueue
 		
 		if ( allowCreate )
 		{
-			Node queueNode = neo.createNode();
+			Node queueNode = graphDb.createNode();
 			queueNode.setProperty( INDEX_TX_ID, txId );
 			getRefNode().createRelationshipTo( queueNode,
 				QueueRelTypes.UPDATE_QUEUE );
@@ -119,7 +119,7 @@ public class TransactionNodeQueue
 	
 	public Map<Integer, TxQueue> getQueues()
 	{
-		Transaction tx = neo.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			Map<Integer, TxQueue> map = new HashMap<Integer, TxQueue>();
@@ -163,7 +163,7 @@ public class TransactionNodeQueue
 		
 		public TxQueue( Node rootNode )
 		{
-			queue = new NodeQueue( neo, rootNode, QueueRelTypes.INTERNAL_QUEUE );
+			queue = new NodeQueue( graphDb, rootNode, QueueRelTypes.INTERNAL_QUEUE );
 			this.node = rootNode;
 		}
 		
@@ -174,7 +174,7 @@ public class TransactionNodeQueue
 		
 		public int getTxId()
 		{
-			return ( Integer ) neoUtil.getProperty( node, INDEX_TX_ID );
+			return ( Integer ) graphDbUtil.getProperty( node, INDEX_TX_ID );
 		}
 		
 		private void add( Map<String, Object> values )
@@ -199,7 +199,7 @@ public class TransactionNodeQueue
                 return null;
             }
             
-            Transaction tx = neo.beginTx();
+            Transaction tx = graphDb.beginTx();
             try
             {
                 Collection<Map<String, Object>> result =
@@ -240,7 +240,7 @@ public class TransactionNodeQueue
 				throw new IllegalStateException( "Deleted" );
 			}
 			
-			Transaction tx = neo.beginTx();
+			Transaction tx = graphDb.beginTx();
 			try
 			{
 				queue.remove( max );

@@ -80,6 +80,7 @@ public class TestLink extends Neo4jTest
 	public static class Entity extends NodeWrapperImpl
 	{
 		/**
+		 * @param graphDb the {@link GraphDatabaseService}.
 		 * @param node the underlying node.
 		 */
 		public Entity( GraphDatabaseService graphDb, Node node )

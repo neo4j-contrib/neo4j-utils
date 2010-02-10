@@ -9,6 +9,7 @@ import org.neo4j.graphdb.Node;
 public class StringPropertySet extends PropertySet<String>
 {
 	/**
+     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the collection node.
 	 * @param propertyKey the property key for storing values.
 	 * @param delimiter custom delimiter between values.
@@ -20,6 +21,7 @@ public class StringPropertySet extends PropertySet<String>
 	}
 
 	/**
+     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the collection node.
 	 * @param propertyKey the property key for storing values.
 	 */

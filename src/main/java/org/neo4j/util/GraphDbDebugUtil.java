@@ -10,7 +10,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * Simple debugging utility for neo-related objects.
+ * Simple debugging utility for Neo4j-related objects.
  */
 public class GraphDbDebugUtil
 {

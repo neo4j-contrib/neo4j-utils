@@ -43,7 +43,7 @@ import org.neo4j.kernel.impl.transaction.LockManager;
 public class GraphDatabaseUtil
 {
 	/**
-	 * The type of event, neo supports pro-active and re-active.
+	 * The type of event, Neo4j supports pro-active and re-active.
 	 */
 	public static enum EventType
 	{
@@ -55,7 +55,7 @@ public class GraphDatabaseUtil
 		
 		/**
 		 * A re-active event, which means that the event may reach its targets
-		 * at a later time (a separate thread in neo).
+		 * at a later time (a separate thread).
 		 */
 		RE_ACTIVE,
 	}
@@ -72,7 +72,7 @@ public class GraphDatabaseUtil
 	}
 	
 	/**
-	 * @return the {@link NeoService} from the constructor.
+	 * @return the {@link GraphDatabaseService} from the constructor.
 	 */
 	public GraphDatabaseService graphDb()
 	{

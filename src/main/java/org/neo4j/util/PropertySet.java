@@ -12,7 +12,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * A neo collection implemented with one property where the values are separated
+ * A collection implemented with one property where the values are separated
  * with a delimiter.
  * @author mattias
  *
@@ -31,6 +31,7 @@ public abstract class PropertySet<T> extends AbstractSet<T>
 	private String delimiter;
 	
 	/**
+     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node to act as the collection.
 	 * @param propertyKey the property key to use for the collection node to
 	 * store the values.
@@ -41,15 +42,16 @@ public abstract class PropertySet<T> extends AbstractSet<T>
 	}
 	
 	/**
+     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node to act as the collection.
 	 * @param propertyKey the property key to use for the collection node to
 	 * store the values.
 	 * @param delimiter custom delimiter instead of {@link #DEFAULT_DELIMITER}.
 	 */
-	public PropertySet( GraphDatabaseService graphDB, Node node, String propertyKey,
+	public PropertySet( GraphDatabaseService graphDb, Node node, String propertyKey,
 		String delimiter )
 	{
-		super( graphDB );
+		super( graphDb );
 		this.node = node;
 		this.key = propertyKey;
 		this.delimiter = delimiter;

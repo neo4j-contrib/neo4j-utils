@@ -9,20 +9,20 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * A String collection, persistent in neo.
+ * A String collection, persistent in Neo4j.
  */
 public class GraphDbStringSet extends RelationshipSet<String>
 {
 	private static final String VALUE_KEY = "value";
 	
 	/**
-	 * @param neo the {@link GraphDatabaseService} to use.
+	 * @param graphDb the {@link GraphDatabaseService} to use.
 	 * @param node the {@link Node} which is the collection node.
 	 * @param type the relationship type to use internally for each element.
 	 */
-	public GraphDbStringSet( GraphDatabaseService neo, Node node, RelationshipType type )
+	public GraphDbStringSet( GraphDatabaseService graphDb, Node node, RelationshipType type )
 	{
-		super( neo, node, type );
+		super( graphDb, node, type );
 	}
 	
 	@Override

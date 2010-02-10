@@ -25,7 +25,7 @@ public abstract class Migration
 	/**
 	 * Creates a new migration object with a reference to a configuration node.
 	 * @param configNode the node to hold configuration data for migration.
-	 * @param graphDb the {@link NeoService} to use.
+	 * @param graphDb the {@link GraphDatabaseService} to use.
 	 * This node should be the same every time in a code base.
 	 */
 	public Migration( GraphDatabaseService graphDb, Node configNode )

@@ -16,7 +16,7 @@ import org.neo4j.commons.iterator.FilteringIterator;
 import org.neo4j.commons.iterator.IteratorWrapper;
 
 /**
- * A {@link Set} implemented with neo.
+ * A {@link Set} implemented on top of Neo4j primitives.
  * @author mattias
  *
  * @param <T> the type of objects in the set.
@@ -29,24 +29,26 @@ public abstract class RelationshipSet<T> extends AbstractSet<T>
 	private Direction direction;
 	
 	/**
+     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the {@link Node} to act as the collection.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public RelationshipSet( GraphDatabaseService neo, Node node,
+	public RelationshipSet( GraphDatabaseService graphDb, Node node,
 		RelationshipType type )
 	{
-		this( neo, node, type, Direction.OUTGOING );
+		this( graphDb, node, type, Direction.OUTGOING );
 	}
 	
 	/**
+     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the {@link Node} to act as the collection.
 	 * @param direction the direction to use for the relationships.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public RelationshipSet( GraphDatabaseService neo, Node node, 
+	public RelationshipSet( GraphDatabaseService graphDb, Node node, 
 	    RelationshipType type, Direction direction )
 	{
-		super( neo );
+		super( graphDb );
 		
 		if ( direction == null || direction == Direction.BOTH )
 		{

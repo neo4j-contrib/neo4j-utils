@@ -11,25 +11,25 @@ import org.neo4j.graphdb.Transaction;
 
 public abstract class NodeQueueWorker extends Thread
 {
-    private final GraphDatabaseService neo;
+    private final GraphDatabaseService graphDb;
     private final NodeQueue queue;
     private boolean halted;
     private boolean requestedToPause;
     private boolean paused;
     private int batchSize;
     
-    public NodeQueueWorker( GraphDatabaseService neo, NodeQueue queue, int batchSize,
+    public NodeQueueWorker( GraphDatabaseService graphDb, NodeQueue queue, int batchSize,
         String name )
     {
         super( name );
-        this.neo = neo;
+        this.graphDb = graphDb;
         this.queue = queue;
         this.batchSize = batchSize;
     }
     
-    public NodeQueueWorker( GraphDatabaseService neo, NodeQueue queue, int batchSize )
+    public NodeQueueWorker( GraphDatabaseService graphDb, NodeQueue queue, int batchSize )
     {
-        this( neo, queue, batchSize, "NeoQueueWorker" );
+        this( graphDb, queue, batchSize, "NodeQueueWorker" );
     }
     
     public NodeQueue getQueue()
@@ -133,7 +133,7 @@ public abstract class NodeQueueWorker extends Thread
     {
         int entrySize = 0;
         Collection<Map<String, Object>> entries = null;
-        Transaction tx = neo.beginTx();
+        Transaction tx = graphDb.beginTx();
         try
         {
             Node[] nodes = this.queue.peek( batchSize );

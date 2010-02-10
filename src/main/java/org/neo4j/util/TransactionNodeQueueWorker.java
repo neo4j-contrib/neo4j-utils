@@ -25,7 +25,7 @@ import org.neo4j.util.TransactionNodeQueue.TxQueue;
  */
 public abstract class TransactionNodeQueueWorker extends Thread
 {
-	private GraphDatabaseService neo;
+	private GraphDatabaseService graphDb;
 	private TransactionNodeQueue workQueue;
 	private boolean halted;
 	private int maxConsumers;
@@ -36,17 +36,17 @@ public abstract class TransactionNodeQueueWorker extends Thread
 	private boolean fallThrough;
 	private int batchSize;
 	
-    public TransactionNodeQueueWorker( GraphDatabaseService neo, Node rootNode,
+    public TransactionNodeQueueWorker( GraphDatabaseService graphDb, Node rootNode,
         int maxConsumers )
     {
-        this( neo, rootNode, maxConsumers, 1 );
+        this( graphDb, rootNode, maxConsumers, 1 );
     }
     
-	public TransactionNodeQueueWorker( GraphDatabaseService neo, Node rootNode,
+	public TransactionNodeQueueWorker( GraphDatabaseService graphDb, Node rootNode,
 		int maxConsumers, int batchSize )
 	{
 		super( TransactionNodeQueueWorker.class.getSimpleName() );
-		this.neo = neo;
+		this.graphDb = graphDb;
 		this.maxConsumers = maxConsumers;
 		this.workQueue = createQueue( rootNode );
 		this.batchSize = batchSize;
@@ -78,7 +78,7 @@ public abstract class TransactionNodeQueueWorker extends Thread
 	
 	private int findTxId()
 	{
-	    return new UserTransactionImpl( neo ).getEventIdentifier();
+	    return new UserTransactionImpl( graphDb ).getEventIdentifier();
 	}
 
 	protected TransactionNodeQueue getQueue()
@@ -88,7 +88,7 @@ public abstract class TransactionNodeQueueWorker extends Thread
 	
 	protected TransactionNodeQueue createQueue( Node rootNode )
 	{
-		return new TransactionNodeQueue( neo, rootNode );
+		return new TransactionNodeQueue( graphDb, rootNode );
 	}
 	
 	public void setPaused( boolean paused )
@@ -302,7 +302,7 @@ public abstract class TransactionNodeQueueWorker extends Thread
        						doOne( entry );
     				    }
     				    afterBatch();
-                        new EntryRemover( neo, updateQueue,
+                        new EntryRemover( graphDb, updateQueue,
                             entries.size() ).run();
                     }
 				}
@@ -357,7 +357,7 @@ public abstract class TransactionNodeQueueWorker extends Thread
 //				( exception == null ? "" : exception.toString() ) );
 			
 			// Add it to the end of the queue
-			Transaction tx = neo.beginTx();
+			Transaction tx = graphDb.beginTx();
 			try
 			{
 				add( entry );
@@ -373,14 +373,14 @@ public abstract class TransactionNodeQueueWorker extends Thread
 	private static class EntryRemover
 		extends DeadlockCapsule<Object>
 	{
-		private GraphDatabaseService neo;
+		private GraphDatabaseService graphDb;
 		private TxQueue queue;
 		private int size;
 		
-		EntryRemover( GraphDatabaseService neo, TxQueue queue, int size )
+		EntryRemover( GraphDatabaseService graphDb, TxQueue queue, int size )
 		{
 			super( "EntryRemover" );
-			this.neo = neo;
+			this.graphDb = graphDb;
 			this.queue = queue;
 			this.size = size;
 		}
@@ -388,7 +388,7 @@ public abstract class TransactionNodeQueueWorker extends Thread
 		@Override
 		public Object tryOnce()
 		{
-			Transaction tx = neo.beginTx();
+			Transaction tx = graphDb.beginTx();
 			try
 			{
 				queue.remove( size );

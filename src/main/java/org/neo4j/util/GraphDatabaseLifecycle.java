@@ -3,7 +3,6 @@ package org.neo4j.util;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.index.IndexService;
 import org.neo4j.index.lucene.LuceneIndexService;
-import org.neo4j.index.impl.NeoIndexService;
 
 /**
  * Manages the life cycle of a {@link GraphDatabaseService} as well as other components.
@@ -16,19 +15,19 @@ public class GraphDatabaseLifecycle
      * Field not final since it's nulled in the shutdown process (to be able
      * to support multiple calls to shutdown).
      */
-    private GraphDatabaseService GraphDatabaseService;
+    private GraphDatabaseService graphDb;
     private IndexService indexService;
     
     /**
-     * Constructs a new {@link GraphDatabaseLifecycle} instance with {@code neo}
+     * Constructs a new {@link GraphDatabaseLifecycle} instance with {@code graphDb}
      * as the {@link GraphDatabaseService}. Other components can be instantiated using
      * methods, f.ex. {@link #addIndexService(IndexService)}.
      * 
-     * @param neo the {@link GraphDatabaseService} instance to manage.
+     * @param graphDb the {@link GraphDatabaseService} instance to manage.
      */
-    public GraphDatabaseLifecycle( GraphDatabaseService neo )
+    public GraphDatabaseLifecycle( GraphDatabaseService graphDb )
     {
-        this.GraphDatabaseService = neo;
+        this.graphDb = graphDb;
         Runtime.getRuntime().addShutdownHook( new Thread()
         {
             @Override
@@ -62,10 +61,10 @@ public class GraphDatabaseLifecycle
             this.indexService = null;
         }
         
-        if ( this.GraphDatabaseService != null )
+        if ( this.graphDb != null )
         {
-            this.GraphDatabaseService.shutdown();
-            this.GraphDatabaseService = null;
+            this.graphDb.shutdown();
+            this.graphDb = null;
         }
     }
     
@@ -87,19 +86,7 @@ public class GraphDatabaseLifecycle
     public IndexService addLuceneIndexService()
     {
         assertIndexServiceNotInstantiated();
-        return addIndexService( new LuceneIndexService( this.GraphDatabaseService ) );
-    }
-    
-    /**
-     * Convenience method for adding a {@link NeoIndexService} as the
-     * {@link IndexService}. See {@link #addIndexService(IndexService)}.
-     * 
-     * @return the created {@link NeoIndexService} instance.
-     */
-    public IndexService addNeoIndexService()
-    {
-        assertIndexServiceNotInstantiated();
-        return addIndexService( new NeoIndexService( this.GraphDatabaseService ) );
+        return addIndexService( new LuceneIndexService( this.graphDb ) );
     }
     
     /**
@@ -109,7 +96,7 @@ public class GraphDatabaseLifecycle
      * you try to instantiate more than one instance a
      * {@link UnsupportedOperationException} will be thrown. There are
      * convenience methods for creating common index services,
-     * {@link #addLuceneIndexService()}, {@link #addNeoIndexService()}.
+     * {@link #addLuceneIndexService()}.
      * 
      * @param indexService the {@link IndexService} to add to the list if
      * managed components by this life cycle object.
@@ -125,9 +112,9 @@ public class GraphDatabaseLifecycle
     /**
      * @return the {@link GraphDatabaseService} instance passed in to the constructor,
      */
-    public GraphDatabaseService neo()
+    public GraphDatabaseService graphDb()
     {
-        return this.GraphDatabaseService;
+        return this.graphDb;
     }
     
     /**

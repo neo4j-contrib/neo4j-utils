@@ -51,7 +51,7 @@ public abstract class NodeWrapperImpl implements NodeWrapper
      * the class' constructor which takes a {@link Node}.
      * @param <T> the resulting instance's class type.
      * @param instanceClass the resulting instance's class type.
-     * @param graphDb the {@link NeoService} used with the node.
+     * @param graphDb the {@link GraphDatabaseService} used with the node.
      * @param nodeId the id of the node to wrap, the node returned from
      * {@link #getUnderlyingNode()}.
      * @return the new instance wrapping the node (with the given id).

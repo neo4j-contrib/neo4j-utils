@@ -15,29 +15,31 @@ public class NodeWrapperLink<T extends NodeWrapper> extends AbstractLink<T>
 	private Class<? extends T> theClass;
 	
 	/**
+	 * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node to act as the link.
 	 * @param type the relationship type to be the link relationship.
 	 * @param thisIsGenericsFault well, even if we have T we must send the
 	 * same class here to make instantiation work.
 	 */
-	public NodeWrapperLink( GraphDatabaseService neo, Node node, RelationshipType type,
+	public NodeWrapperLink( GraphDatabaseService graphDb, Node node, RelationshipType type,
 		Class<? extends T> thisIsGenericsFault )
 	{
-	    super( neo, node, type );
+	    super( graphDb, node, type );
 		this.theClass = thisIsGenericsFault;
 	}
 	
 	/**
+     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node to act as the link.
 	 * @param type the relationship type to be the link relationship.
 	 * @param thisIsGenericsFault well, even if we have T we must send the
 	 * same class here to make instantiation work.
 	 * @param direction the direction of the relationship.
 	 */
-	public NodeWrapperLink( GraphDatabaseService neo, Node node, RelationshipType type,
+	public NodeWrapperLink( GraphDatabaseService graphDb, Node node, RelationshipType type,
 		Direction direction, Class<T> thisIsGenericsFault )
 	{
-	    super( neo, node, type, direction );
+	    super( graphDb, node, type, direction );
 	    this.theClass = thisIsGenericsFault;
 	}
 	
