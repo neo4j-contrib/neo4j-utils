@@ -2,3 +2,10 @@
     This component contains a lot of useful utilities. But catagorizing them
     all as "utils" hides the usefulness, it would be better to divide this
     into a number of components based on the purpose of each set of classes.
+
+[2010-02-10] Tests doesn't cover all the code
+    The tests in this component doesn't cover all, only most of the code.
+    Some examples of these:
+    * org.neo4j.util.Migration/Migrator
+    * org.neo4j.util.NodeQueueWorker
+    * org.neo4j.util.TransactionNodeQueue/+Worker
