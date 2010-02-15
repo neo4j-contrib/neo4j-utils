@@ -10,8 +10,8 @@ GraphDatabaseServiceLifecycle
 
 	The <<org.neo4j.util.GraphDatabaseServiceLifecycle>> class makes it easier to
 	manage your GraphDatabaseService and additional components (such as an IndexService)
-	in one place without having to care about shutting down Neo4j and its
-	components when the JVM exists.
+	in one place without having to care about shutting down the Neo4j graph database
+	and its when the JVM exits.
 	
 	So this code:
 	
