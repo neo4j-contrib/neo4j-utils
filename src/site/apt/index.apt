@@ -16,7 +16,7 @@ GraphDatabaseServiceLifecycle
 	So this code:
 	
 ---
-	GraphDatabaseLifecycle neo =
+	GraphDatabaseLifecycle graphDb =
 		new GraphDatabaseLifecycle( new EmbeddedGraphDatabase( "path/to/db" ) );
 	neo.addLuceneIndexService();
 ---
@@ -24,15 +24,15 @@ GraphDatabaseServiceLifecycle
 	Will replace code like:
 	
 ---	
-	final GraphDatabaseService neo = new EmbeddedGraphDatabase( "neo" );
-	final IndexService indexService = new LuceneIndexService( neo );
+	final GraphDatabaseService graphDb = new EmbeddedGraphDatabase( "path/to/db" );
+	final IndexService indexService = new LuceneIndexService( graphDb );
 	Runtime.getRuntime().addShutdownHook( new Thread()
 	{
 		@Override
 		public void run()
 		{
 			indexService.shutdown();
-			neo.shutdown();
+			graphDb.shutdown();
 		}
 	} );
 ---
@@ -55,7 +55,7 @@ GraphDatabaseUtil class
 	String name = ( String ) graphDbUtil.getProperty( node, "name" );
 ---
 	
-	Since neo can handle property values which are arrays the GraphDatabaseUtil class
+	Since Neo4j can handle property values which are arrays the GraphDatabaseUtil class
 	provides some useful array handling methods.
 	
 ---
@@ -74,7 +74,7 @@ GraphDatabaseUtil class
 	// Will contain three items (5, 15, 20).
 ---
 	
-	Furthermore some methods to deal directly with values returned from neo
+	Furthermore some methods to deal directly with values returned from Neo4j
 	which may or may not be arrays.
 	
 ---
@@ -86,7 +86,7 @@ GraphDatabaseUtil class
 	node.setProperty( "numbers", newNumbers );
 ---
 
-	Often in a neo node space you have some sort of sub-reference nodes
+	Often in a Neo4j graph you have some sort of sub-reference nodes
 	connected to the reference node (f.ex. one which all users are
 	connected to), there's one method to get or create those sub-reference
 	nodes.
@@ -95,7 +95,7 @@ GraphDatabaseUtil class
 	GraphDatabaseUtil graphDbUtil = new GraphDatabaseUtil( graphDb );
 	RelationshipType usersReferenceRelationshipType = ...;
 	Node usersReferenceNode =
-		neoUtil.getOrCreateSubReferenceNode( usersReferenceRelationshipType );
+		graphDbUtil.getOrCreateSubReferenceNode( usersReferenceRelationshipType );
 	
 ---
 
@@ -111,7 +111,7 @@ Collection implementations
 	
 * PureNodeRelationshipSet
 
-	See the collection itself as a neo node and its items relationships
+	See the collection itself as a Neo4j node and its items relationships
 	(of the same type) to other nodes.
 
 * NodeWrapperRelationshipSet
@@ -119,7 +119,7 @@ Collection implementations
 	Same as the <<PureNodeRelationshipSet>>, but the items are NodeWrapper
 	instances. The collection is given a Class\<? extends NodeWrapper\> in the
 	constructor and the current implementation assumes the NodeWrapper class
-	to have a public constructor which takes a neo <<Node>>.
+	to have a public constructor which takes a <<Node>>.
 
 * PropertyArraySet
 
@@ -134,15 +134,15 @@ Link
 Migration
 
 	When code is under development and node/relationship layout is altered over
-	time and there's a neo store which is undesired to be rebuilt from scratch
+	time and there's a Neo4j store which is undesired to be rebuilt from scratch
 	each time such a structural modification occurs, the migration framework may
 	be used. There's a notion of two versions, one version for the code and one
-	for the data in the neo store. For each version there is a migrator which
-	iterates over the neo store and alters what needs to be altered for the
-	neo store to be able to call itself a certain version. So if a structural
+	for the data in the Neo4j store. For each version there is a migrator which
+	iterates over the Neo4j store and alters what needs to be altered for the
+	Neo4j store to be able to call itself a certain version. So if a structural
 	modification occurs in the code, an integer (in a subclass of
 	<<org.neo4j.util.Migration>>) is incremented and a new class implementing
-	<<org.neo4j.util.Migrator>> is written. The next time neo is started the
+	<<org.neo4j.util.Migrator>> is written. The next time Neo4j is started the
 	migration framework will notice the differentiating versions and run the
 	appropriate migrators.
 	
@@ -184,7 +184,7 @@ Migration
 	new MyMigration( graphDb ).syncVersion();
 ---
 
-	Remember that the first time a <syncVersion> is performed on a neo store
+	Remember that the first time a <syncVersion> is performed on a Neo4j store
 	the version is set to that of returned from <getCodeVersion>, unless
 	a call to <setFirstVersionIsAlwaysZero( true )> is made before a call to
 	<syncVersion> is made.
