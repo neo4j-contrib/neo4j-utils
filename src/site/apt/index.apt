@@ -124,7 +124,7 @@ Collection implementations
 * PropertyArraySet
 
 	Ability to see a property on a Node/Relationship as a collection of
-	values, using neos array abilities.
+	values, using Neo4j's array abilities.
 
 Link
 
