@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.neo4j</groupId>
   <artifactId>neo4j-${short-name}</artifactId>
-  <version>1.0-b11-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <name>Neo4j - utilities</name>
   <description>
 A set of convenience method and classes built on top of Neo4j.
@@ -62,17 +62,17 @@ A set of convenience method and classes built on top of Neo4j.
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-kernel</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-commons</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-index</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
