@@ -26,7 +26,7 @@ public class TestIndexedSet extends TxNeo4jTest
 			"Implemented",
 			"An",
 			"Indexed",
-			"Neo",
+			"GraphDb",
 			"Set",
 			"And",
 			"How",

@@ -12,7 +12,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * Tests the neo relationship sets.
+ * Tests the relationship sets.
  */
 public class TestRelationshipSet extends Neo4jTest
 {
