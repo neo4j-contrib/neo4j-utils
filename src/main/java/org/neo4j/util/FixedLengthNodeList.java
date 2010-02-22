@@ -24,7 +24,7 @@ public class FixedLengthNodeList
 {
     private static final String KEY_LENGTH = "list_length";
     
-	private GraphDatabaseService graphDB;
+	private GraphDatabaseService graphDb;
 	private Node rootNode;
 	private RelationshipType relType;
 	private GraphDatabaseUtil graphDbUtil;
@@ -33,7 +33,7 @@ public class FixedLengthNodeList
 	public FixedLengthNodeList( GraphDatabaseService graphDB, Node rootNode,
 	    RelationshipType relType, Integer maxLengthOrNull )
 	{
-		this.graphDB = graphDB;
+		this.graphDb = graphDB;
 		this.rootNode = rootNode;
 		this.relType = relType;
 		this.graphDbUtil = new GraphDatabaseUtil( graphDB );
@@ -52,11 +52,11 @@ public class FixedLengthNodeList
 	
 	public Node add()
 	{
-		Transaction tx = graphDB.beginTx();
+		Transaction tx = graphDb.beginTx();
 		graphDbUtil.getLockManager().getWriteLock( rootNode );
 		try
 		{
-			Node node = graphDB.createNode();
+			Node node = graphDb.createNode();
 			Relationship rel = getFirstRelationship();
 			if ( rel == null )
 			{
@@ -116,7 +116,7 @@ public class FixedLengthNodeList
 	
 	public int remove( int max )
 	{
-        Transaction tx = graphDB.beginTx();
+        Transaction tx = graphDb.beginTx();
         graphDbUtil.getLockManager().getWriteLock( rootNode );
         try
         {
@@ -163,7 +163,7 @@ public class FixedLengthNodeList
 	
 	public Node peek()
 	{
-		Transaction tx = graphDB.beginTx();
+		Transaction tx = graphDb.beginTx();
 		try
 		{
 			Relationship rel = getFirstRelationship();
@@ -183,7 +183,7 @@ public class FixedLengthNodeList
 	
 	public Node[] peek( int max )
 	{
-	    Transaction tx = graphDB.beginTx();
+	    Transaction tx = graphDb.beginTx();
 	    try
 	    {
 	        Collection<Node> result = new ArrayList<Node>( max );
