@@ -30,13 +30,13 @@ public class FixedLengthNodeList
 	private GraphDatabaseUtil graphDbUtil;
 	private Integer maxLength;
 	
-	public FixedLengthNodeList( GraphDatabaseService graphDB, Node rootNode,
+	public FixedLengthNodeList( GraphDatabaseService graphDb, Node rootNode,
 	    RelationshipType relType, Integer maxLengthOrNull )
 	{
-		this.graphDb = graphDB;
+		this.graphDb = graphDb;
 		this.rootNode = rootNode;
 		this.relType = relType;
-		this.graphDbUtil = new GraphDatabaseUtil( graphDB );
+		this.graphDbUtil = new GraphDatabaseUtil( graphDb );
 		this.maxLength = maxLengthOrNull;
 	}
 	
