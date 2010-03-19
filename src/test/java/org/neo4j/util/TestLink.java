@@ -1,5 +1,10 @@
 package org.neo4j.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -16,7 +21,8 @@ public class TestLink extends Neo4jTest
 	 * Tests link functionality with normal outgoing direction.
 	 * @throws Exception if something goes wrong.
 	 */
-	public void testOne() throws Exception
+    @Test
+    public void testOne() throws Exception
 	{
 		this.doSomeTesting( Direction.OUTGOING );
 	}
@@ -25,12 +31,13 @@ public class TestLink extends Neo4jTest
 	 * Tests link functionality with incoming direction.
 	 * @throws Exception if something goes wrong.
 	 */
-	public void testOther() throws Exception
+    @Test
+    public void testOther() throws Exception
 	{
 		this.doSomeTesting( Direction.INCOMING );
 	}
 
-	private void doSomeTesting( Direction direction ) throws Exception
+    private void doSomeTesting( Direction direction ) throws Exception
 	{
 		Transaction tx = graphDb().beginTx();
 		try
@@ -47,7 +54,7 @@ public class TestLink extends Neo4jTest
                 node3 );
 
 			Link<Entity> link = new NodeWrapperLink<Entity>( graphDb(),
-				entity1.getUnderlyingNode(), Relationships.TESTREL, direction,
+				entity1.getUnderlyingNode(), TestRelTypes.TEST_TYPE, direction,
 				Entity.class );
 			assertTrue( !link.has() );
 			assertNull( link.get() );

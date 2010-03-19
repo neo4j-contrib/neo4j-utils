@@ -1,7 +1,12 @@
 package org.neo4j.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Test;
 import org.neo4j.kernel.impl.event.EventData;
 import org.neo4j.util.CrudEventBufferFilter;
 import org.neo4j.util.CrudEventData;
@@ -18,7 +23,8 @@ public class TestEventFilters extends Neo4jTest
 	/**
 	 * Tests the {@link CrudEventFilter} class.
 	 */
-	public void testCrudEventFilter()
+    @Test
+    public void testCrudEventFilter()
 	{
 		CrudEventFilter filter = new CrudEventFilter();
 		assertTrue( filter.pass( null, data( 0, AlterationMode.CREATED ) ) );
@@ -41,7 +47,8 @@ public class TestEventFilters extends Neo4jTest
 	/**
 	 * Tests the {@link CrudEventBufferFilter} class.
 	 */
-	public void testCrudEventBufferFilter()
+    @Test
+    public void testCrudEventBufferFilter()
 	{
 		List<EventContext> l = new ArrayList<EventContext>();
 		l.add( new EventContext( null, data( 0, AlterationMode.CREATED ) ) );

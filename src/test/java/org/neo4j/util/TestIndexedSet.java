@@ -1,5 +1,9 @@
 package org.neo4j.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -7,12 +11,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 public class TestIndexedSet extends TxNeo4jTest
 {
-	public void testIndexedSet() throws Exception
+    @Test
+    public void testIndexedSet() throws Exception
 	{
 		Node rootNode = graphDb().createNode();
 		Collection<AnItem> collection = new IndexedNodeCollection<AnItem>( graphDb(),
@@ -58,7 +64,7 @@ public class TestIndexedSet extends TxNeo4jTest
 		}
 	}
 	
-	private AnItem findItem( Collection<AnItem> collection, String name )
+    private AnItem findItem( Collection<AnItem> collection, String name )
 	{
 		for ( AnItem item : collection )
 		{
@@ -71,7 +77,7 @@ public class TestIndexedSet extends TxNeo4jTest
 		return null;
 	}
 	
-	private void assertCollectionSame( List<String> strings,
+    private void assertCollectionSame( List<String> strings,
 		Collection<AnItem> collection )
 	{
 		assertEquals( strings.size(), collection.size() );

@@ -1,18 +1,22 @@
 package org.neo4j.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Collection;
 
-import junit.framework.TestCase;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 /**
  * Super class of tests which handles Neo4j-specific things.
  * @author mattias
  */
-public abstract class Neo4jTest extends TestCase
+public abstract class Neo4jTest
 {
 	protected static enum TestRelTypes implements RelationshipType
 	{
@@ -23,36 +27,25 @@ public abstract class Neo4jTest extends TestCase
 	
 	private static GraphDatabaseService graphDb;
 	
-	@Override
-	protected void setUp() throws Exception
+	@BeforeClass
+	public static void setUpDb()
 	{
-		if ( graphDb() == null )
-		{
-			init();
-		}
+        String dbPath = "target/var/neo4j";
+        File path = new File( dbPath );
+        if ( path.exists() )
+        {
+            for ( File file : path.listFiles() )
+            {
+                file.delete();
+            }
+        }
+        graphDb = new EmbeddedGraphDatabase( dbPath );
 	}
 	
-	private void init() throws Exception
+	@AfterClass
+	public static void tearDownDb()
 	{
-		String dbPath = "target/var/neo4j";
-		File path = new File( dbPath );
-		if ( path.exists() )
-		{
-			for ( File file : path.listFiles() )
-			{
-				file.delete();
-			}
-		}
-		
-		graphDb = new EmbeddedGraphDatabase( dbPath );
-		Runtime.getRuntime().addShutdownHook( new Thread()
-		{
-			@Override
-			public void run()
-			{
-				graphDb.shutdown();
-			}
-		} );
+	    graphDb.shutdown();
 	}
 	
 	protected static GraphDatabaseService graphDb()
@@ -60,19 +53,7 @@ public abstract class Neo4jTest extends TestCase
 		return graphDb;
 	}
 	
-	/**
-	 * Relationships used in this test suite.
-	 * @author mattias
-	 */
-	public static enum Relationships implements RelationshipType
-	{
-		/**
-		 * A relationship type to use in tests.
-		 */
-		TESTREL
-	}
-	
-	protected <T> void assertCollection( Collection<T> collection, T... items )
+	protected static <T> void assertCollection( Collection<T> collection, T... items )
 	{
 		String collectionString = join( ", ", collection.toArray() );
 		assertEquals( collectionString, items.length, collection.size() );
@@ -82,7 +63,7 @@ public abstract class Neo4jTest extends TestCase
 		}
 	}
 
-	protected <T> String join( String delimiter, T... items )
+	protected static <T> String join( String delimiter, T... items )
 	{
 		StringBuffer buffer = new StringBuffer();
 		for ( T item : items )

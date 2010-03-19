@@ -1,15 +1,16 @@
 package org.neo4j.util;
 
+import org.junit.After;
+import org.junit.Before;
 import org.neo4j.graphdb.Transaction;
 
 public abstract class TxNeo4jTest extends Neo4jTest
 {
 	private Transaction tx;
 	
-	@Override
-	public void setUp() throws Exception
+	@Before
+	public void setUpTx()
 	{
-		super.setUp();
 		tx = graphDb().beginTx();
 	}
 	
@@ -20,11 +21,10 @@ public abstract class TxNeo4jTest extends Neo4jTest
 		tx = graphDb().beginTx();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDownTx() throws Exception
 	{
 		tx.success();
 		tx.finish();
-		super.tearDown();
 	}
 }

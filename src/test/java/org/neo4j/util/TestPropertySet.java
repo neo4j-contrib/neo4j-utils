@@ -1,9 +1,13 @@
 package org.neo4j.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -19,7 +23,8 @@ public class TestPropertySet extends Neo4jTest
 	/**
 	 * Tests some general use of the {@link PropertySet} class.
 	 */
-	public void testSome()
+    @Test
+    public void testSome()
 	{
 		Node node = null;
 		Transaction tx = graphDb().beginTx();

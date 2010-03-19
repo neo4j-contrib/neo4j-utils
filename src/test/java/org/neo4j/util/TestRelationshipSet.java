@@ -1,10 +1,16 @@
 package org.neo4j.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -19,6 +25,7 @@ public class TestRelationshipSet extends Neo4jTest
 	/**
 	 * Tests passing of illegal direction arguments.
 	 */
+    @Test
 	public void testIllegalDirection()
 	{
 		Transaction tx = graphDb().beginTx();
@@ -46,7 +53,8 @@ public class TestRelationshipSet extends Neo4jTest
 	/**
 	 * Tests some general use of collections.
 	 */
-	public void testSome()
+    @Test
+    public void testSome()
 	{
 		Transaction tx = graphDb().beginTx();
 		try
@@ -133,14 +141,15 @@ public class TestRelationshipSet extends Neo4jTest
 		}
 	}
 	
-	public void testRetain() throws Exception
+    @Test
+    public void testRetain() throws Exception
 	{
         Transaction tx = graphDb().beginTx();
         try
         {
             Node node = graphDb().createNode();
             Collection<Node> collection = new PureNodeRelationshipSet(
-                graphDb(), node, Relationships.TESTREL );
+                graphDb(), node, TestRelTypes.TEST_TYPE );
             
             Node node1 = graphDb().createNode();
             Node node2 = graphDb().createNode();
@@ -193,7 +202,8 @@ public class TestRelationshipSet extends Neo4jTest
 	 * transactions.
 	 * @throws Exception if something goes wrong.
 	 */
-	public void testWithoutTx() throws Exception
+	@Test
+    public void testWithoutTx() throws Exception
 	{
 		Node node = null;
 		SomeOtherContainer entity1 = null;
@@ -280,7 +290,7 @@ public class TestRelationshipSet extends Neo4jTest
 		
 		private ContainerSet( GraphDatabaseService graphDB, Node node, Direction direction )
 		{
-			super( graphDB, node, Relationships.TESTREL, direction );
+			super( graphDB, node, TestRelTypes.TEST_TYPE, direction );
 		}
 
 		@Override

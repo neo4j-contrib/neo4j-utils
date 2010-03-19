@@ -1,8 +1,12 @@
 package org.neo4j.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
@@ -15,7 +19,8 @@ public class TestNodeQueue extends Neo4jTest
 		TEST_QUEUE,
 	}
 	
-	public void testSome() throws Exception
+	@Test
+    public void testSome() throws Exception
 	{
 		// TODO Test diabled for now since it always fails.
 		if ( true )
@@ -66,7 +71,8 @@ public class TestNodeQueue extends Neo4jTest
         }
 	}
 	
-	public void testMany() throws Exception
+	@Test
+    public void testMany() throws Exception
 	{
 	    Transaction tx = graphDb().beginTx();
 	    
@@ -99,7 +105,8 @@ public class TestNodeQueue extends Neo4jTest
 	    tx.finish();
 	}
 	
-	public void testFixedLengthList() throws Exception
+	@Test
+    public void testFixedLengthList() throws Exception
 	{
 	    Transaction tx = graphDb().beginTx();
 	    
