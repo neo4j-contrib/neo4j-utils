@@ -15,89 +15,23 @@ GraphDatabaseServiceLifecycle
 	
 	So this code:
 	
----
-	GraphDatabaseLifecycle graphDb =
-		new GraphDatabaseLifecycle( new EmbeddedGraphDatabase( "path/to/db" ) );
-	graphDb.addLuceneIndexService();
----
+%{source-code|snippet=graphDbLifecycleUsage|file=src/test/java/examples/SiteExamples.java}
 
 	Will replace code like:
 	
----	
-	final GraphDatabaseService graphDb = new EmbeddedGraphDatabase( "path/to/db" );
-	final IndexService indexService = new LuceneIndexService( graphDb );
-	Runtime.getRuntime().addShutdownHook( new Thread()
-	{
-		@Override
-		public void run()
-		{
-			indexService.shutdown();
-			graphDb.shutdown();
-		}
-	} );
----
+%{source-code|snippet=graphDbLifecycleReplaces|file=src/test/java/examples/SiteExamples.java}
 
 GraphDatabaseUtil class
 
 	The <<org.neo4j.util.GraphDatabaseUtil>> class is a blob class with many very useful
-	methods, f.ex: methods for single has/get/set/remove property on
-	Node/Relationship which does that single call within a transaction.
+	methods, f.ex: methods for handling array values
 	
----
-	GraphDatabaseService graphDb = ...;
-	GraphDatabaseUtil graphDbUtil = new GraphDatabaseUtil( graphDb );
-	Node node = ...;
-	
-	// One transaction.
-	graphDbUtil.setProperty( node, "name", "Some name" );
-	
-	// Another transaction.
-	String name = ( String ) graphDbUtil.getProperty( node, "name" );
----
-	
-	Since Neo4j can handle property values which are arrays the GraphDatabaseUtil class
-	provides some useful array handling methods.
-	
----
-	graphDbUtil.setProperty( node, "numbers", 5 );
-	List<Object> oneNumber = graphDbUtil.getPropertyValues( node, "numbers" );
-	// Will contain one item (5).
-
-	graphDbUtil.setProperty( node, "numbers", new int[] { 5, 10, 15 } );
-	List<Object> numbers = graphDbUtil.getPropertyValues( node, "numbers" );
-	// Will contain three items (5, 10, 15).
-	
-	// There's also methods for adding/removing values to/from a property.
-	graphDbUtil.removeValueFromArray( node, "numbers", 10 );
-	graphDbUtil.addValueToArray( node, "numbers", 20 );
-	List<Object> newNumbers = graphDbUtil.getPropertyValues( node, "numbers" );
-	// Will contain three items (5, 15, 20).
----
-	
-	Furthermore some methods to deal directly with values returned from Neo4j
-	which may or may not be arrays.
-	
----
-	node.setProperty( "numbers", new int[] { 5, 10, 15 } );
-	Object numbers = node.getProperty( "numbers" );
-	List<Object> numbersAsList = graphDbUtil.propertyValueAsList( numbers );
-	numbersAsList.add( 20 );
-	Object newNumbers = graphDbUtil.asPropertyValue( numbersAsList );
-	node.setProperty( "numbers", newNumbers );
----
+%{source-code|snippet=handleArrayValues|file=src/test/java/examples/SiteExamples.java}
 
 	Often in a Neo4j graph you have some sort of sub-reference nodes
 	connected to the reference node (f.ex. one which all users are
-	connected to), there's one method to get or create those sub-reference
-	nodes.
-	
----
-	GraphDatabaseUtil graphDbUtil = new GraphDatabaseUtil( graphDb );
-	RelationshipType usersReferenceRelationshipType = ...;
-	Node usersReferenceNode =
-		graphDbUtil.getOrCreateSubReferenceNode( usersReferenceRelationshipType );
-	
----
+	connected to). To {{{http://components.neo4j.org/neo4j-utils/apidocs/org/neo4j/util/GraphDatabaseUtil.html#getOrCreateSubReferenceNode(org.neo4j.graphdb.RelationshipType)}get or create}}
+	(if it didn't exist) such a reference node:
 
 NodeWrapper
 
@@ -107,29 +41,20 @@ NodeWrapper
 
 Collection implementations
 
-	There are several implementations of the collection API, f.ex.
-	
-* PureNodeRelationshipSet
+	There are several implementations of the collection API. The concept here is
+	that you have a node and its relationships (of some specified type) which
+	represents its items. So adding and removing items to the collection is
+	handled underneath by creating and deleting relationships from that node
+	to the supplied nodes, f.ex:
 
-	See the collection itself as a Neo4j node and its items relationships
-	(of the same type) to other nodes.
-
-* NodeWrapperRelationshipSet
-
-	Same as the <<PureNodeRelationshipSet>>, but the items are NodeWrapper
-	instances. The collection is given a Class\<? extends NodeWrapper\> in the
-	constructor and the current implementation assumes the NodeWrapper class
-	to have a public constructor which takes a <<Node>>.
-
-* PropertyArraySet
-
-	Ability to see a property on a Node/Relationship as a collection of
-	values, using Neo4j's array abilities.
+%{source-code|snippet=nodeWrapperSetUsage|file=src/test/java/examples/SiteExamples.java}
 
 Link
 
-	Convenience class where there might be zero or one relationship between
-	two nodes.
+	{{{http://components.neo4j.org/neo4j-utils/apidocs/org/neo4j/util/Link.html}Convenience class}}
+	for where there might be zero or one relationship between two nodes. It manages such a
+	relationship. There's an implementation of a NodeWrapperLink so that you can manage
+	a relationship between two domain objects.
 
 Migration
 
@@ -146,43 +71,12 @@ Migration
 	migration framework will notice the differentiating versions and run the
 	appropriate migrators.
 	
----
-	// The migration class.
-	class MyMigrator extends SimpleMigration
-	{
-		public MyMigration( GraphDatabaseService graphDb )
-		{
-			super( graphDb );
-		}
-	
-		@Override
-		protected int getCodeVersion()
-		{
-			// Default version is 0, so the first version difference is 1.
-			return 1;
-		}
-	}
-	
-	// The migrator for version 1, notice that SimpleMigration class' default
-	// lookup method for finding a migrator is to find a class in the same
-	// package as itself named "Migrator" + <version>.
-	class Migrator1 implements Migrator
-	{
-		public void performMigration( GraphDatabaseService graphDb )
-		{
-			// Go ahead, do your thing... transactions are managed by the
-			// Migration instance.
-		}
-	}
----
+%{source-code|snippet=migration|file=src/test/java/examples/SiteExamples.java}
 
 	To use the migration framework, just have it sync the versions after a
 	GraphDatabaseService has been started.
 
----
-	GraphDatabaseService graphDb = new EmbeddedGraphDatabase( "path/to/db" );
-	new MyMigration( graphDb ).syncVersion();
----
+%{source-code|snippet=syncVersions|file=src/test/java/examples/SiteExamples.java}
 
 	Remember that the first time a <syncVersion> is performed on a Neo4j store
 	the version is set to that of returned from <getCodeVersion>, unless
