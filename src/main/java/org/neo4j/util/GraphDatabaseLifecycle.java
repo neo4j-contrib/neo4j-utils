@@ -17,6 +17,7 @@ public class GraphDatabaseLifecycle
      */
     private GraphDatabaseService graphDb;
     private IndexService indexService;
+    private Thread shutdownHook;
     
     /**
      * Constructs a new {@link GraphDatabaseLifecycle} instance with {@code graphDb}
@@ -28,14 +29,15 @@ public class GraphDatabaseLifecycle
     public GraphDatabaseLifecycle( GraphDatabaseService graphDb )
     {
         this.graphDb = graphDb;
-        Runtime.getRuntime().addShutdownHook( new Thread()
+        this.shutdownHook = new Thread()
         {
             @Override
             public void run()
             {
                 runJvmShutdownHook();
             }
-        } );
+        };
+        Runtime.getRuntime().addShutdownHook( this.shutdownHook );
     }
     
     /**
@@ -47,6 +49,18 @@ public class GraphDatabaseLifecycle
     public void manualShutdown()
     {
         runShutdown();
+        if ( this.shutdownHook != null )
+        {
+            try
+            {
+                Runtime.getRuntime().removeShutdownHook( this.shutdownHook );
+                this.shutdownHook = null;
+            }
+            catch ( IllegalStateException ise )
+            {
+                // already shutting down, so to late to remove hook
+            }
+        }
     }
     
     /**
