@@ -8,8 +8,10 @@ import java.util.Collection;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
 public class TestGraphDbUtils extends TxNeo4jTest
 {
@@ -117,4 +119,72 @@ public class TestGraphDbUtils extends TxNeo4jTest
         node3.delete();
         node4.delete();
 	}
+	
+	@Test
+	public void testRelationshipExistsBetween()
+	{
+	    RelationshipType type = TestRelTypes.TEST_TYPE;
+	    Node nodeWithFewRels = graphDb().createNode();
+	    Node otherNode = createRelationships( nodeWithFewRels, type, 3000 );
+	    createRelationships( otherNode, type, 50000 );
+	    newTransaction();
+	    
+	    int count = 100;
+	    
+	    for ( int i = 0; i < 1000; i++ )
+	    {
+	        graphDbUtil.relationshipExistsBetween( nodeWithFewRels, otherNode, type,
+	                Direction.BOTH );
+	    }
+
+        long total1 = 0;
+        for ( int i = 0; i < count; i++ )
+        {
+            long t = System.currentTimeMillis();
+            assertTrue( graphDbUtil.relationshipExistsBetween( nodeWithFewRels, otherNode, type,
+                    Direction.BOTH ) );
+            if ( i > 0 )
+            {
+                total1 += ( System.currentTimeMillis() - t );
+            }
+        }
+        
+	    long total2 = 0;
+        for ( int i = 0; i < count; i++ )
+        {
+            long t = System.currentTimeMillis();
+            assertTrue( graphDbUtil.relationshipExistsBetween( otherNode, nodeWithFewRels, type,
+                    Direction.BOTH ) );
+            if ( i > 0 )
+            {
+                total2 += ( System.currentTimeMillis() - t );
+            }
+        }
+        
+        System.out.println( "total1:" + total1 + ", total2:" + total2 );
+	}
+	
+	private boolean goodOldLook( Node node1, Node node2, RelationshipType type,
+	        Direction direction )
+	{
+	    for ( Relationship rel : node1.getRelationships( type, direction ) )
+	    {
+	        if ( rel.getOtherNode( node1 ).equals( node2 ) )
+	        {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+
+    private Node createRelationships( Node node, RelationshipType type, int count )
+    {
+        Node lastNode = null;
+        for ( int i = 0; i < count; i++ )
+        {
+            lastNode = graphDb().createNode();
+            node.createRelationshipTo( lastNode, type );
+        }
+        return lastNode;
+    }
 }

@@ -721,4 +721,153 @@ public class GraphDatabaseUtil
         }
         return result.toString();
 	}
+	
+    /**
+     * TODO Use RelationshipExpander later on
+     * 
+     * Looks to see if there exists a relationship between two given nodes.
+     * It starts iterating over relationships from the node which you think
+     * has the least amount of relationships of the two nodes. If it has
+     * iterated over a specified amount of relationships without finding
+     * a match it spawns a new thread which will iterate over relationships
+     * from the other node in the reverse direction. The loop will exit
+     * when/if any thread finds a match or when there are no more relationships
+     * left to iterate over.
+     * 
+     * @param nodeYouThinkHasLeastRelationships the node of the two which you
+     * think/know has the least amount of relationship (that will be
+     * iterated over).
+     * @param secondNode the node of the two you suspect has more relationships
+     * than the first node.
+     * @param type the type of relationships to iterate over.
+     * @param direction the direction from the first node that you expect for
+     * your relationships.
+     * @return if there's any relationship with the given criterias (type,
+     * direction, filter) from the first node to the second node.
+     */
+    public boolean relationshipExistsBetween( Node nodeYouThinkHasLeastRelationships,
+            Node secondNode, RelationshipType type, Direction direction )
+    {
+        return relationshipExistsBetween( nodeYouThinkHasLeastRelationships, secondNode, type,
+                direction, null, 50 );
+    }
+    
+	/**
+	 * TODO Use RelationshipExpander later on
+	 * 
+	 * Looks to see if there exists a relationship between two given nodes.
+	 * It starts iterating over relationships from the node which you think
+	 * has the least amount of relationships of the two nodes. If it has
+	 * iterated over a specified amount of relationships without finding
+	 * a match it spawns a new thread which will iterate over relationships
+	 * from the other node in the reverse direction. The loop will exit
+	 * when/if any thread finds a match or when there are no more relationships
+	 * left to iterate over.
+	 * 
+	 * @param nodeYouThinkHasLeastRelationships the node of the two which you
+	 * think/know has the least amount of relationship (that will be
+	 * iterated over).
+	 * @param secondNode the node of the two you suspect has more relationships
+	 * than the first node.
+	 * @param type the type of relationships to iterate over.
+	 * @param direction the direction from the first node that you expect for
+	 * your relationships.
+	 * @param filter a filter for which relationships to take into
+	 * consideration. Is allowed to be {@code null}.
+	 * @param spawnThreadThreshold the threshold for when to spawn the other
+	 * thread which iterates from the second node.
+	 * @return if there's any relationship with the given criterias (type,
+	 * direction, filter) from the first node to the second node.
+	 */
+	public boolean relationshipExistsBetween( Node nodeYouThinkHasLeastRelationships,
+	        Node secondNode, RelationshipType type, Direction direction,
+	        ObjectFilter<Relationship> filterOrNull, int spawnThreadThreshold )
+	{
+	    NodeFinder finderFromTheOtherNode = null;
+	    try
+	    {
+    	    int counter = 0;
+    	    for ( Relationship rel :
+    	            nodeYouThinkHasLeastRelationships.getRelationships( type, direction ) )
+    	    {
+    	        if ( finderFromTheOtherNode != null && finderFromTheOtherNode.found )
+    	        {
+    	            return true;
+    	        }
+    	        
+    	        counter++;
+    	        if ( filterOrNull != null && !filterOrNull.pass( rel ) )
+    	        {
+    	            continue;
+    	        }
+    	        
+    	        Node otherNode = rel.getOtherNode( nodeYouThinkHasLeastRelationships );
+    	        if ( otherNode.equals( secondNode ) )
+    	        {
+    	            return true;
+    	        }
+    	        
+    	        if ( counter == spawnThreadThreshold )
+    	        {
+    	            finderFromTheOtherNode = new NodeFinder( nodeYouThinkHasLeastRelationships,
+    	                    nodeYouThinkHasLeastRelationships.getRelationships( type,
+    	                            direction.reverse() ), secondNode, filterOrNull );
+    	            finderFromTheOtherNode.start();
+    	        }
+    	    }
+	    }
+	    finally
+	    {
+	        if ( finderFromTheOtherNode != null )
+	        {
+	            // To make it exit
+	            finderFromTheOtherNode.found = true;
+	        }
+	    }
+	    return false;
+	}
+	
+	private static class NodeFinder extends Thread
+	{
+	    private final Node node;
+	    private final Iterable<Relationship> relationships;
+        private final Node nodeToFind;
+        private final ObjectFilter<Relationship> filterOrNull;
+        private boolean found;
+
+        NodeFinder( Node node, Iterable<Relationship> relationships, Node nodeToFind,
+                ObjectFilter<Relationship> filterOrNull )
+	    {
+            this.node = node;
+            this.relationships = relationships;
+            this.nodeToFind = nodeToFind;
+            this.filterOrNull = filterOrNull;
+	    }
+        
+        @Override
+        public void run()
+        {
+            for ( Relationship rel : relationships )
+            {
+                // So that found can be set from outside to make it exit
+                // the loop
+                if ( found )
+                {
+                    break;
+                }
+                
+                if ( filterOrNull != null && !filterOrNull.pass( rel ) )
+                {
+                    continue;
+                }
+                
+                Node otherNode = rel.getOtherNode( node );
+                if ( otherNode.equals( nodeToFind ) )
+                {
+                    found = true;
+                    break;
+                }
+            }
+        }
+	}
 }
