@@ -122,7 +122,7 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 
 	public Iterator<T> iterator()
 	{
-		Iterator<T> iterator = new IterableWrapper<T, Node>(
+		return new IterableWrapper<T, Node>(
 			index().getSortedNodes() )
 		{
 			@Override
@@ -131,7 +131,6 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 				return instantiateItem( node );
 			}
 		}.iterator();
-		return new TxIterator<T>( graphDb(), iterator );
 	}
 
 	public boolean remove( Object item )

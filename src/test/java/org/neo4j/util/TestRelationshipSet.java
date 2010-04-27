@@ -148,7 +148,7 @@ public class TestRelationshipSet extends Neo4jTest
         try
         {
             Node node = graphDb().createNode();
-            Collection<Node> collection = new PureNodeRelationshipSet(
+            Collection<Node> collection = new NodeRelationshipSet(
                 graphDb(), node, TestRelTypes.TEST_TYPE );
             
             Node node1 = graphDb().createNode();

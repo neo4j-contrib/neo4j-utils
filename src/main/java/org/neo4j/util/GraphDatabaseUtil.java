@@ -4,7 +4,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.transaction.TransactionManager;
@@ -17,13 +16,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.neo4j.kernel.impl.event.Event;
-import org.neo4j.kernel.impl.event.EventData;
-import org.neo4j.kernel.impl.event.EventListenerAlreadyRegisteredException;
-import org.neo4j.kernel.impl.event.EventListenerNotRegisteredException;
-import org.neo4j.kernel.impl.event.EventManager;
-import org.neo4j.kernel.impl.event.ProActiveEventListener;
-import org.neo4j.kernel.impl.event.ReActiveEventListener;
 import org.neo4j.kernel.impl.transaction.LockManager;
 
 /**
@@ -42,24 +34,6 @@ import org.neo4j.kernel.impl.transaction.LockManager;
  */
 public class GraphDatabaseUtil
 {
-	/**
-	 * The type of event, Neo4j supports pro-active and re-active.
-	 */
-	public static enum EventType
-	{
-		/**
-		 * A pro-active event, which means that the event reaches its targets
-		 * synchronously.
-		 */
-		PRO_ACTIVE,
-		
-		/**
-		 * A re-active event, which means that the event may reach its targets
-		 * at a later time (a separate thread).
-		 */
-		RE_ACTIVE,
-	}
-	
 	private GraphDatabaseService graphDb;
 	
 	/**
@@ -84,78 +58,6 @@ public class GraphDatabaseUtil
 		if ( key == null )
 		{
 			throw new IllegalArgumentException( "Property key can't be null" );
-		}
-	}
-	
-	/**
-	 * Wraps a single {@link PropertyContainer#hasProperty(String)}
-	 * in a transaction.
-	 * @param container the {@link PropertyContainer}.
-	 * @param key the property key.
-	 * @return the result from {@link PropertyContainer#hasProperty(String)}.
-	 */
-	public boolean hasProperty( PropertyContainer container, String key )
-	{
-		assertPropertyKeyNotNull( key );
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			boolean result = container.hasProperty( key );
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
-		}
-	}
-
-	/**
-	 * Wraps a single {@link PropertyContainer#getProperty(String)}
-	 * in a transaction.
-	 * @param container the {@link PropertyContainer}.
-	 * @param key the property key.
-	 * @return the result from {@link PropertyContainer#getProperty(String)}.
-	 */
-	public Object getProperty( PropertyContainer container, String key )
-	{
-		assertPropertyKeyNotNull( key );
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Object result = container.getProperty( key );
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
-		}
-	}
-
-	/**
-	 * Wraps a single {@link PropertyContainer#getProperty(String, Object)}
-	 * in a transaction.
-	 * @param container the {@link PropertyContainer}.
-	 * @param key the property key.
-	 * @param defaultValue the value to return if the property doesn't exist.
-	 * @return the result from
-	 * {@link PropertyContainer#getProperty(String, Object)}.
-	 */
-	public Object getProperty( PropertyContainer container,
-		String key, Object defaultValue )
-	{
-		assertPropertyKeyNotNull( key );
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Object result = container.getProperty( key, defaultValue );
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
 		}
 	}
 
@@ -191,19 +93,9 @@ public class GraphDatabaseUtil
 	public List<Object> getPropertyValues( PropertyContainer container,
 		String key )
 	{
-		Transaction tx = graphDb.beginTx();
-		try
-		{
-			Object value = container.getProperty( key, null );
-			List<Object> result = value == null ?
-			    new ArrayList<Object>() : propertyValueAsList( value );
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
-		}
+		Object value = container.getProperty( key, null );
+		return value == null ?
+		    new ArrayList<Object>() : propertyValueAsList( value );
 	}	
 	
 	public boolean addValueToArray( PropertyContainer container,
@@ -280,111 +172,13 @@ public class GraphDatabaseUtil
 		}
 	}
 	
-	/**
-	 * Wraps a {@link Node#getSingleRelationship(RelationshipType, Direction)}
-	 * in a transaction.
-	 * @param node the {@link Node}.
-	 * @param type the {@link RelationshipType}
-	 * @param direction the {@link Direction}.
-	 * @return the result from
-	 * {@link Node#getSingleRelationship(RelationshipType, Direction)}.
-	 */
-	public Relationship getSingleRelationship( Node node, RelationshipType type,
-		Direction direction )
-	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Relationship singleRelationship =
-				node.getSingleRelationship( type, direction );
-			tx.success();
-			return singleRelationship;
-		}
-		finally
-		{
-			tx.finish();
-		}
-	}
-	
 	public Node getSingleOtherNode( Node node, RelationshipType type,
 		Direction direction )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Relationship rel = getSingleRelationship( node, type, direction );
-			Node result = rel == null ? null : rel.getOtherNode( node );
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
-		}
+		Relationship rel = node.getSingleRelationship( type, direction );
+		return rel == null ? null : rel.getOtherNode( node );
 	}
 	
-	public Relationship getSingleRelationship( Node node,
-		RelationshipType type )
-	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Iterator<Relationship> itr =
-				node.getRelationships( type ).iterator();
-			Relationship rel = null;
-			if ( itr.hasNext() )
-			{
-				rel = itr.next();
-				if ( itr.hasNext() )
-				{
-					throw new RuntimeException( node + " has more than one " +
-						"relationship of type '" + type.name() + "'" ); 
-				}
-			}
-			tx.success();
-			return rel;
-		}
-		finally
-		{
-			tx.finish();
-		}
-	}
-	
-	public Node getSingleOtherNode( Node node, RelationshipType type )
-	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Relationship rel = getSingleRelationship( node, type );
-			Node result = rel == null ? null : rel.getOtherNode( node );
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
-		}
-	}
-
-	/**
-	 * Wraps a {@link GraphDatabaseService#getReferenceNode()} in a transaction.
-	 * @return the result from {@link GraphDatabaseService#getReferenceNode()}.
-	 */
-	public Node getReferenceNode()
-	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Node referenceNode = graphDb().getReferenceNode();
-			tx.success();
-			return referenceNode;
-		}
-		finally
-		{
-			tx.finish();
-		}
-	}
-
 	/**
 	 * @see #getOrCreateSubReferenceNode(RelationshipType, Direction) .
 	 * @param type the relationship type.
@@ -412,7 +206,7 @@ public class GraphDatabaseUtil
 		Transaction tx = graphDb().beginTx();
 		try
 		{
-			Node referenceNode = getReferenceNode();
+			Node referenceNode = graphDb.getReferenceNode();
 			Node node = null;
 			Relationship singleRelationship =
 				referenceNode.getSingleRelationship( type, direction );
@@ -449,12 +243,6 @@ public class GraphDatabaseUtil
 			getOrCreateSubReferenceNode( type ), type, clazz );
 	}
 	
-	public EventManager getEventManager()
-	{
-		return ( ( EmbeddedGraphDatabase )
-			graphDb() ).getConfig().getEventModule().getEventManager();
-	}
-	
 	public LockManager getLockManager()
 	{
 		return ( ( EmbeddedGraphDatabase ) graphDb() ).getConfig().getLockManager();
@@ -464,148 +252,6 @@ public class GraphDatabaseUtil
 	{
 		return ( ( EmbeddedGraphDatabase )
 			graphDb() ).getConfig().getTxModule().getTxManager();
-	}
-	
-	/**
-	 * Convenience method for registering a re-active event listener.
-	 * Instead of throwing declared exceptions it throws runtime exceptions.
-	 * @param listener the listener to register with the event.
-	 * @param event the event to register the listener with.
-	 */
-	public void registerReActiveEventListener( ReActiveEventListener listener,
-		Event event )
-	{
-		try
-		{
-			getEventManager().registerReActiveEventListener( listener, event );
-		}
-		catch ( EventListenerAlreadyRegisteredException e )
-		{
-			throw new RuntimeException( e );
-		}
-		catch ( EventListenerNotRegisteredException e )
-		{
-			throw new RuntimeException( e );
-		}
-	}
-	
-	/**
-	 * Convenience method for unregistering a re-active event listener.
-	 * Instead of throwing declared exceptions it throws runtime exceptions.
-	 * @param listener the listener to unregister from the event.
-	 * @param event the event to unregister the listener from.
-	 */
-	public void unregisterReActiveEventListener(
-		ReActiveEventListener listener, Event event )
-	{
-		try
-		{
-			getEventManager().unregisterReActiveEventListener(
-				listener, event );
-		}
-		catch ( EventListenerNotRegisteredException e )
-		{
-			throw new RuntimeException( e );
-		}
-	}
-
-	/**
-	 * Convenience method for registering a pro-active event listener.
-	 * Instead of throwing declared exceptions it throws runtime exceptions.
-	 * @param listener the listener to register with the event.
-	 * @param event the event to register the listener with.
-	 */
-	public void registerProActiveEventListener(
-		ProActiveEventListener listener, Event event )
-	{
-		try
-		{
-			getEventManager().registerProActiveEventListener(
-				listener, event );
-		}
-		catch ( EventListenerAlreadyRegisteredException e )
-		{
-			throw new RuntimeException( e );
-		}
-		catch ( EventListenerNotRegisteredException e )
-		{
-			throw new RuntimeException( e );
-		}
-	}
-	
-	/**
-	 * Convenience method for unregistering a re-active event listener.
-	 * Instead of throwing declared exceptions it throws runtime exceptions.
-	 * @param listener the listener to unregister from the event.
-	 * @param event the event to unregister the listener from.
-	 */
-	public void unregisterProActiveEventListener(
-		ProActiveEventListener listener, Event event )
-	{
-		try
-		{
-			getEventManager().unregisterProActiveEventListener(
-				listener, event );
-		}
-		catch ( EventListenerNotRegisteredException e )
-		{
-			throw new RuntimeException( e );
-		}
-	}
-
-	/**
-	 * Convenience method for generating a pro-active event.
-	 * @param event the event type.
-	 * @param data the event data to send (it gets wrapped in an
-	 * {@link EventData}).
-	 * @return the result of
-	 * {@link EventManager#generateProActiveEvent(Event, EventData)}.
-	 */
-	public boolean proActiveEvent( Event event, Object data )
-	{
-		return event( event, data, EventType.PRO_ACTIVE );
-	}
-	
-	/**
-	 * Convenience method for generating a re-active event.
-	 * @param event the event type.
-	 * @param data the event data to send (it gets wrapped in an
-	 * {@link EventData}).
-	 */
-	public void reActiveEvent( Event event, Object data )
-	{
-		event( event, data, EventType.RE_ACTIVE );
-	}
-	
-	/**
-	 * Convenience method for generating an event (pro-active, re-active or
-	 * both)
-	 * @param event the event type.
-	 * @param data the event data to send (it gets wrapped in an
-	 * {@link EventData}).
-	 * @param types the types of event to send.
-	 * @return the result of
-	 * {@link EventManager#generateProActiveEvent(Event, EventData)} if any
-	 * of the types is {@link EventType#PRO_ACTIVE}, else {@code true}.
-	 */
-	public boolean event( Event event, Object data, EventType... types )
-	{
-		boolean result = true;
-		EventData eventData = new EventData( data );
-		EventManager eventManager = getEventManager();
-		for ( EventType type : types )
-		{
-			if ( type == EventType.PRO_ACTIVE )
-			{
-				result = eventManager.generateProActiveEvent(
-					event, eventData );
-			}
-			else
-			{
-				eventManager.generateReActiveEvent( event, eventData );
-			}
-		}
-		return result;
 	}
 	
 	public Object[] propertyValueAsArray( Object propertyValue )

@@ -5,14 +5,14 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 
-public class PureNodeLink extends AbstractLink<Node>
+public class NodeLink extends AbstractLink<Node>
 {
-    public PureNodeLink( GraphDatabaseService graphDb, Node node, RelationshipType type )
+    public NodeLink( GraphDatabaseService graphDb, Node node, RelationshipType type )
     {
         super( graphDb, node, type );
     }
 
-    public PureNodeLink( GraphDatabaseService graphDB, Node node, RelationshipType type,
+    public NodeLink( GraphDatabaseService graphDB, Node node, RelationshipType type,
         Direction direction )
     {
         super( graphDB, node, type, direction );

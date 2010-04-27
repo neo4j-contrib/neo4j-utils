@@ -174,7 +174,7 @@ public class TransactionNodeQueue
 		
 		public int getTxId()
 		{
-			return ( Integer ) graphDbUtil.getProperty( node, INDEX_TX_ID );
+			return ( Integer ) node.getProperty( INDEX_TX_ID );
 		}
 		
 		private void add( Map<String, Object> values )
