@@ -391,11 +391,12 @@ public class GraphDatabaseUtil
      * @return if there's any relationship with the given criterias (type,
      * direction, filter) from the first node to the second node.
      */
-    public boolean relationshipExistsBetween( Node nodeYouThinkHasLeastRelationships,
-            Node secondNode, RelationshipType type, Direction direction )
+    public Relationship getExistingRelationshipBetween( 
+            Node nodeYouThinkHasLeastRelationships, Node secondNode, 
+            RelationshipType type, Direction direction )
     {
-        return relationshipExistsBetween( nodeYouThinkHasLeastRelationships, secondNode, type,
-                direction, null, 50 );
+        return getExistingRelationshipBetween( nodeYouThinkHasLeastRelationships, 
+                secondNode, type, direction, null, 50 );
     }
     
 	/**
@@ -425,8 +426,9 @@ public class GraphDatabaseUtil
 	 * @return if there's any relationship with the given criterias (type,
 	 * direction, filter) from the first node to the second node.
 	 */
-	public boolean relationshipExistsBetween( Node nodeYouThinkHasLeastRelationships,
-	        Node secondNode, RelationshipType type, Direction direction,
+	public Relationship getExistingRelationshipBetween( 
+	        Node nodeYouThinkHasLeastRelationships, Node secondNode, 
+	        RelationshipType type, Direction direction,
 	        ObjectFilter<Relationship> filterOrNull, int spawnThreadThreshold )
 	{
 	    NodeFinder finderFromTheOtherNode = null;
@@ -436,9 +438,10 @@ public class GraphDatabaseUtil
     	    for ( Relationship rel :
     	            nodeYouThinkHasLeastRelationships.getRelationships( type, direction ) )
     	    {
-    	        if ( finderFromTheOtherNode != null && finderFromTheOtherNode.found )
+    	        if ( finderFromTheOtherNode != null && 
+    	                finderFromTheOtherNode.foundRelationship != null )
     	        {
-    	            return true;
+    	            return finderFromTheOtherNode.foundRelationship;
     	        }
     	        
     	        counter++;
@@ -450,7 +453,7 @@ public class GraphDatabaseUtil
     	        Node otherNode = rel.getOtherNode( nodeYouThinkHasLeastRelationships );
     	        if ( otherNode.equals( secondNode ) )
     	        {
-    	            return true;
+    	            return rel;
     	        }
     	        
     	        if ( counter == spawnThreadThreshold )
@@ -470,7 +473,7 @@ public class GraphDatabaseUtil
 	            finderFromTheOtherNode.found = true;
 	        }
 	    }
-	    return false;
+	    return null;
 	}
 	
 	private static class NodeFinder extends Thread
@@ -479,7 +482,8 @@ public class GraphDatabaseUtil
 	    private final Iterable<Relationship> relationships;
         private final Node nodeToFind;
         private final ObjectFilter<Relationship> filterOrNull;
-        private boolean found;
+        private volatile boolean found;
+        private volatile Relationship foundRelationship = null;
 
         NodeFinder( Node node, Iterable<Relationship> relationships, Node nodeToFind,
                 ObjectFilter<Relationship> filterOrNull )
@@ -510,7 +514,7 @@ public class GraphDatabaseUtil
                 Node otherNode = rel.getOtherNode( node );
                 if ( otherNode.equals( nodeToFind ) )
                 {
-                    found = true;
+                    foundRelationship = rel;
                     break;
                 }
             }

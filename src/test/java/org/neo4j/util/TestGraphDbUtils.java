@@ -133,7 +133,7 @@ public class TestGraphDbUtils extends TxNeo4jTest
 	    
 	    for ( int i = 0; i < 1000; i++ )
 	    {
-	        graphDbUtil.relationshipExistsBetween( nodeWithFewRels, otherNode, type,
+	        graphDbUtil.getExistingRelationshipBetween( nodeWithFewRels, otherNode, type,
 	                Direction.BOTH );
 	    }
 
@@ -141,8 +141,8 @@ public class TestGraphDbUtils extends TxNeo4jTest
         for ( int i = 0; i < count; i++ )
         {
             long t = System.currentTimeMillis();
-            assertTrue( graphDbUtil.relationshipExistsBetween( nodeWithFewRels, otherNode, type,
-                    Direction.BOTH ) );
+            assertTrue( graphDbUtil.getExistingRelationshipBetween( nodeWithFewRels, otherNode, type,
+                    Direction.BOTH ) != null );
             if ( i > 0 )
             {
                 total1 += ( System.currentTimeMillis() - t );
@@ -153,8 +153,8 @@ public class TestGraphDbUtils extends TxNeo4jTest
         for ( int i = 0; i < count; i++ )
         {
             long t = System.currentTimeMillis();
-            assertTrue( graphDbUtil.relationshipExistsBetween( otherNode, nodeWithFewRels, type,
-                    Direction.BOTH ) );
+            assertTrue( graphDbUtil.getExistingRelationshipBetween( otherNode, nodeWithFewRels, type,
+                    Direction.BOTH ) != null );
             if ( i > 0 )
             {
                 total2 += ( System.currentTimeMillis() - t );
