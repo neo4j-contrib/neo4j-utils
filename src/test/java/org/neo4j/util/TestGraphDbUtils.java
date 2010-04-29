@@ -1,6 +1,9 @@
 package org.neo4j.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -11,7 +14,9 @@ import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipExpander;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.kernel.TraversalFactory;
 
 public class TestGraphDbUtils extends TxNeo4jTest
 {
@@ -131,18 +136,18 @@ public class TestGraphDbUtils extends TxNeo4jTest
 	    
 	    int count = 100;
 	    
+	    RelationshipExpander expander = TraversalFactory.expanderForTypes( type, Direction.BOTH );
 	    for ( int i = 0; i < 1000; i++ )
 	    {
-	        graphDbUtil.getExistingRelationshipBetween( nodeWithFewRels, otherNode, type,
-	                Direction.BOTH );
+	        graphDbUtil.getExistingRelationshipBetween( nodeWithFewRels, otherNode, expander );
 	    }
 
         long total1 = 0;
         for ( int i = 0; i < count; i++ )
         {
             long t = System.currentTimeMillis();
-            assertTrue( graphDbUtil.getExistingRelationshipBetween( nodeWithFewRels, otherNode, type,
-                    Direction.BOTH ) != null );
+            assertTrue( graphDbUtil.getExistingRelationshipBetween(
+                    nodeWithFewRels, otherNode, expander ) != null );
             if ( i > 0 )
             {
                 total1 += ( System.currentTimeMillis() - t );
@@ -153,8 +158,8 @@ public class TestGraphDbUtils extends TxNeo4jTest
         for ( int i = 0; i < count; i++ )
         {
             long t = System.currentTimeMillis();
-            assertTrue( graphDbUtil.getExistingRelationshipBetween( otherNode, nodeWithFewRels, type,
-                    Direction.BOTH ) != null );
+            assertTrue( graphDbUtil.getExistingRelationshipBetween(
+                    otherNode, nodeWithFewRels,expander ) != null );
             if ( i > 0 )
             {
                 total2 += ( System.currentTimeMillis() - t );
@@ -186,5 +191,27 @@ public class TestGraphDbUtils extends TxNeo4jTest
             node.createRelationshipTo( lastNode, type );
         }
         return lastNode;
+    }
+    
+    @Test
+    public void testGetOrCreateSingleOtherNode()
+    {
+        Node node = graphDb().createNode();
+        assertNull( GraphDatabaseUtil.getSingleOtherNode( node,
+                TestRelTypes.TEST_TYPE, Direction.OUTGOING ) );
+        Node otherNode = GraphDatabaseUtil.getOrCreateSingleOtherNode( node,
+                TestRelTypes.TEST_TYPE, Direction.OUTGOING );
+        assertNotNull( otherNode );
+        assertEquals( otherNode, GraphDatabaseUtil.getSingleOtherNode(
+                node, TestRelTypes.TEST_TYPE, Direction.OUTGOING ) );
+        assertNull( GraphDatabaseUtil.getSingleOtherNode( node,
+                TestRelTypes.TEST_OTHER_TYPE, Direction.OUTGOING ) );
+        assertNull( GraphDatabaseUtil.getSingleOtherNode( node,
+                TestRelTypes.TEST_TYPE, Direction.INCOMING ) );
+        assertEquals( otherNode, GraphDatabaseUtil.getOrCreateSingleOtherNode(
+                node, TestRelTypes.TEST_TYPE, Direction.OUTGOING ) );
+        node.getSingleRelationship( TestRelTypes.TEST_TYPE, Direction.OUTGOING ).delete();
+        assertNull( GraphDatabaseUtil.getSingleOtherNode( node,
+                TestRelTypes.TEST_TYPE, Direction.OUTGOING ) );
     }
 }

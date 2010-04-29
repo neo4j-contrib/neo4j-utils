@@ -13,6 +13,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipExpander;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -53,7 +54,7 @@ public class GraphDatabaseUtil
 		return this.graphDb;
 	}
 	
-	private void assertPropertyKeyNotNull( String key )
+	private static void assertPropertyKeyNotNull( String key )
 	{
 		if ( key == null )
 		{
@@ -68,7 +69,7 @@ public class GraphDatabaseUtil
 	 * @param key the property key.
 	 * @param value the property value.
 	 */
-	public void setProperty( PropertyContainer container,
+	public static void setProperty( PropertyContainer container,
 		String key, Object value )
 	{
 		assertPropertyKeyNotNull( key );
@@ -78,7 +79,7 @@ public class GraphDatabaseUtil
 				key + "' can't be null" );
 		}
 		
-		Transaction tx = graphDb().beginTx();
+		Transaction tx = container.getGraphDatabase().beginTx();
 		try
 		{
 			container.setProperty( key, value );
@@ -90,7 +91,7 @@ public class GraphDatabaseUtil
 		}
 	}
 	
-	public List<Object> getPropertyValues( PropertyContainer container,
+	public static List<Object> getPropertyValues( PropertyContainer container,
 		String key )
 	{
 		Object value = container.getProperty( key, null );
@@ -98,10 +99,10 @@ public class GraphDatabaseUtil
 		    new ArrayList<Object>() : propertyValueAsList( value );
 	}	
 	
-	public boolean addValueToArray( PropertyContainer container,
+	public static boolean addValueToArray( PropertyContainer container,
 		String key, Object value )
 	{
-		Transaction tx = graphDb.beginTx();
+		Transaction tx = container.getGraphDatabase().beginTx();
 		try
 		{
 			Collection<Object> values = getPropertyValues( container, key );
@@ -120,10 +121,10 @@ public class GraphDatabaseUtil
 		}
 	}
 	
-	public boolean removeValueFromArray( PropertyContainer container,
+	public static boolean removeValueFromArray( PropertyContainer container,
 		String key, Object value )
 	{
-		Transaction tx = graphDb.beginTx();
+		Transaction tx = container.getGraphDatabase().beginTx();
 		try
 		{
 			Collection<Object> values = getPropertyValues( container, key );
@@ -156,10 +157,10 @@ public class GraphDatabaseUtil
 	 * @return the old value of the property or null if the property didn't
 	 * exist
 	 */
-	public Object removeProperty( PropertyContainer container, String key )
+	public static Object removeProperty( PropertyContainer container, String key )
 	{
 		assertPropertyKeyNotNull( key );
-		Transaction tx = graphDb().beginTx();
+		Transaction tx = container.getGraphDatabase().beginTx();
 		try
 		{
 			Object oldValue = container.removeProperty( key );
@@ -172,11 +173,40 @@ public class GraphDatabaseUtil
 		}
 	}
 	
-	public Node getSingleOtherNode( Node node, RelationshipType type,
+	public static Node getSingleOtherNode( Node node, RelationshipType type,
 		Direction direction )
 	{
 		Relationship rel = node.getSingleRelationship( type, direction );
 		return rel == null ? null : rel.getOtherNode( node );
+	}
+	
+	public static Node getOrCreateSingleOtherNode( Node fromNode, RelationshipType type,
+	        Direction direction )
+	{
+	    GraphDatabaseService graphDb = fromNode.getGraphDatabase();
+        Transaction tx = graphDb.beginTx();
+        try
+        {
+            Node otherNode = null;
+            Relationship singleRelationship =
+                fromNode.getSingleRelationship( type, direction );
+            if ( singleRelationship != null )
+            {
+                otherNode = singleRelationship.getOtherNode( fromNode );
+            }
+            else
+            {
+                otherNode = graphDb.createNode();
+                fromNode.createRelationshipTo( otherNode, type );
+            }
+            
+            tx.success();
+            return otherNode;
+        }
+        finally
+        {
+            tx.finish();
+        }
 	}
 	
 	/**
@@ -203,30 +233,8 @@ public class GraphDatabaseUtil
 	public Node getOrCreateSubReferenceNode( RelationshipType type,
 		Direction direction )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Node referenceNode = graphDb.getReferenceNode();
-			Node node = null;
-			Relationship singleRelationship =
-				referenceNode.getSingleRelationship( type, direction );
-			if ( singleRelationship != null )
-			{
-				node = singleRelationship.getOtherNode( referenceNode );
-			}
-			else
-			{
-				node = graphDb().createNode();
-				referenceNode.createRelationshipTo( node, type );
-			}
-			
-			tx.success();
-			return node;
-		}
-		finally
-		{
-			tx.finish();
-		}
+	    return getOrCreateSingleOtherNode( graphDb().getReferenceNode(),
+	            type, direction );
 	}
 	
 	/**
@@ -245,7 +253,12 @@ public class GraphDatabaseUtil
 	
 	public LockManager getLockManager()
 	{
-		return ( ( EmbeddedGraphDatabase ) graphDb() ).getConfig().getLockManager();
+	    return getLockManager( graphDb );
+	}
+	
+	public static LockManager getLockManager( GraphDatabaseService graphDb )
+	{
+        return ( ( EmbeddedGraphDatabase ) graphDb ).getConfig().getLockManager();
 	}
 	
 	public TransactionManager getTransactionManager()
@@ -254,7 +267,7 @@ public class GraphDatabaseUtil
 			graphDb() ).getConfig().getTxModule().getTxManager();
 	}
 	
-	public Object[] propertyValueAsArray( Object propertyValue )
+	public static Object[] propertyValueAsArray( Object propertyValue )
 	{
 		if ( propertyValue.getClass().isArray() )
 		{
@@ -272,13 +285,13 @@ public class GraphDatabaseUtil
 		}
 	}
 	
-	public List<Object> propertyValueAsList( Object propertyValue )
+	public static List<Object> propertyValueAsList( Object propertyValue )
 	{
 		return new ArrayList<Object>(
 			Arrays.asList( propertyValueAsArray( propertyValue ) ) );
 	}
 	
-	public Object asPropertyValue( Collection<?> values )
+	public static Object asPropertyValue( Collection<?> values )
 	{
 		if ( values.isEmpty() )
 		{
@@ -299,10 +312,11 @@ public class GraphDatabaseUtil
 		return array;
 	}
 	
-	public Integer incrementAndGetCounter( Node node, String propertyKey )
+	public static Integer incrementAndGetCounter( Node node, String propertyKey )
 	{
-		Transaction tx = graphDb.beginTx();
-		getLockManager().getWriteLock( node );
+		Transaction tx = node.getGraphDatabase().beginTx();
+		LockManager lockManager = getLockManager( node.getGraphDatabase() );
+		lockManager.getWriteLock( node );
 		try
 		{
 			int value = ( Integer ) node.getProperty( propertyKey, 0 );
@@ -313,16 +327,17 @@ public class GraphDatabaseUtil
 		}
 		finally
 		{
-			getLockManager().releaseWriteLock( node );
+			lockManager.releaseWriteLock( node );
 			tx.finish();
 		}
 	}
 
-	public Integer decrementAndGetCounter( Node node, String propertyKey,
+	public static Integer decrementAndGetCounter( Node node, String propertyKey,
 		int notLowerThan )
 	{
-		Transaction tx = graphDb.beginTx();
-		getLockManager().getWriteLock( node );
+		Transaction tx = node.getGraphDatabase().beginTx();
+		LockManager lockManager = getLockManager( node.getGraphDatabase() );
+		lockManager.getWriteLock( node );
 		try
 		{
 			int value = ( Integer ) node.getProperty( propertyKey, 0 );
@@ -334,12 +349,12 @@ public class GraphDatabaseUtil
 		}
 		finally
 		{
-			getLockManager().releaseWriteLock( node );
+			lockManager.releaseWriteLock( node );
 			tx.finish();
 		}
 	}
 	
-	public String sumNodeContents( Node node )
+	public static String sumNodeContents( Node node )
 	{
         StringBuffer result = new StringBuffer();
         for ( Relationship rel : node.getRelationships() )
@@ -369,8 +384,6 @@ public class GraphDatabaseUtil
 	}
 	
     /**
-     * TODO Use RelationshipExpander later on
-     * 
      * Looks to see if there exists a relationship between two given nodes.
      * It starts iterating over relationships from the node which you think
      * has the least amount of relationships of the two nodes. If it has
@@ -385,18 +398,17 @@ public class GraphDatabaseUtil
      * iterated over).
      * @param secondNode the node of the two you suspect has more relationships
      * than the first node.
-     * @param type the type of relationships to iterate over.
-     * @param direction the direction from the first node that you expect for
-     * your relationships.
-     * @return if there's any relationship with the given criterias (type,
-     * direction, filter) from the first node to the second node.
+     * @param expander the {@link RelationshipExpander} to use to expand the
+     * relationships to iterate over.
+     * @return the first relationship, if any, with the given criterias (type,
+     * direction, filter) between the two nodes.
      */
-    public Relationship getExistingRelationshipBetween( 
+    public static Relationship getExistingRelationshipBetween( 
             Node nodeYouThinkHasLeastRelationships, Node secondNode, 
-            RelationshipType type, Direction direction )
+            RelationshipExpander expander )
     {
         return getExistingRelationshipBetween( nodeYouThinkHasLeastRelationships, 
-                secondNode, type, direction, null, 50 );
+                secondNode, expander, null, 50 );
     }
     
 	/**
@@ -416,27 +428,25 @@ public class GraphDatabaseUtil
 	 * iterated over).
 	 * @param secondNode the node of the two you suspect has more relationships
 	 * than the first node.
-	 * @param type the type of relationships to iterate over.
-	 * @param direction the direction from the first node that you expect for
-	 * your relationships.
+	 * @param expander the {@link RelationshipExpander} to use to expand the
+	 * relationships to iterate over.
 	 * @param filter a filter for which relationships to take into
 	 * consideration. Is allowed to be {@code null}.
 	 * @param spawnThreadThreshold the threshold for when to spawn the other
 	 * thread which iterates from the second node.
-	 * @return if there's any relationship with the given criterias (type,
-	 * direction, filter) from the first node to the second node.
+	 * @return the first relationship, if any, with the given criterias (type,
+     * direction, filter) between the two nodes.
 	 */
-	public Relationship getExistingRelationshipBetween( 
+	public static Relationship getExistingRelationshipBetween( 
 	        Node nodeYouThinkHasLeastRelationships, Node secondNode, 
-	        RelationshipType type, Direction direction,
+	        RelationshipExpander expander,
 	        ObjectFilter<Relationship> filterOrNull, int spawnThreadThreshold )
 	{
 	    NodeFinder finderFromTheOtherNode = null;
 	    try
 	    {
     	    int counter = 0;
-    	    for ( Relationship rel :
-    	            nodeYouThinkHasLeastRelationships.getRelationships( type, direction ) )
+    	    for ( Relationship rel : expander.expand( nodeYouThinkHasLeastRelationships ) )
     	    {
     	        if ( finderFromTheOtherNode != null && 
     	                finderFromTheOtherNode.foundRelationship != null )
@@ -459,8 +469,7 @@ public class GraphDatabaseUtil
     	        if ( counter == spawnThreadThreshold )
     	        {
     	            finderFromTheOtherNode = new NodeFinder( nodeYouThinkHasLeastRelationships,
-    	                    nodeYouThinkHasLeastRelationships.getRelationships( type,
-    	                            direction.reverse() ), secondNode, filterOrNull );
+    	                    expander, secondNode, filterOrNull );
     	            finderFromTheOtherNode.start();
     	        }
     	    }
@@ -478,19 +487,19 @@ public class GraphDatabaseUtil
 	
 	private static class NodeFinder extends Thread
 	{
-	    private final Node node;
+	    private final Node nodeWithLeastRels;
 	    private final Iterable<Relationship> relationships;
-        private final Node nodeToFind;
+        private final Node secondNode;
         private final ObjectFilter<Relationship> filterOrNull;
         private volatile boolean found;
         private volatile Relationship foundRelationship = null;
 
-        NodeFinder( Node node, Iterable<Relationship> relationships, Node nodeToFind,
+        NodeFinder( Node nodeWithLeastRels, RelationshipExpander expander, Node secondNode,
                 ObjectFilter<Relationship> filterOrNull )
 	    {
-            this.node = node;
-            this.relationships = relationships;
-            this.nodeToFind = nodeToFind;
+            this.nodeWithLeastRels = nodeWithLeastRels;
+            this.relationships = expander.expand( secondNode, true );
+            this.secondNode = secondNode;
             this.filterOrNull = filterOrNull;
 	    }
         
@@ -511,8 +520,8 @@ public class GraphDatabaseUtil
                     continue;
                 }
                 
-                Node otherNode = rel.getOtherNode( node );
-                if ( otherNode.equals( nodeToFind ) )
+                Node otherNode = rel.getOtherNode( secondNode );
+                if ( otherNode.equals( nodeWithLeastRels ) )
                 {
                     foundRelationship = rel;
                     break;

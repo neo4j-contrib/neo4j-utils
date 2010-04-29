@@ -84,22 +84,21 @@ public class SiteExamples
     @Test
     public void handleArrayValues()
     {
-        GraphDatabaseUtil graphDbUtil = new GraphDatabaseUtil( graphDb );
         Node node = graphDb.createNode();
         
         // START SNIPPET: handleArrayValues
-        graphDbUtil.setProperty( node, "numbers", 5 );
-        List<Object> oneNumber = graphDbUtil.getPropertyValues( node, "numbers" );
+        GraphDatabaseUtil.setProperty( node, "numbers", 5 );
+        List<Object> oneNumber = GraphDatabaseUtil.getPropertyValues( node, "numbers" );
         // Will contain one item (5).
 
-        graphDbUtil.setProperty( node, "numbers", new int[] { 5, 10, 15 } );
-        List<Object> numbers = graphDbUtil.getPropertyValues( node, "numbers" );
+        GraphDatabaseUtil.setProperty( node, "numbers", new int[] { 5, 10, 15 } );
+        List<Object> numbers = GraphDatabaseUtil.getPropertyValues( node, "numbers" );
         // Will contain three items (5, 10, 15).
         
         // There's also methods for adding/removing values to/from a property.
-        graphDbUtil.removeValueFromArray( node, "numbers", 10 );
-        graphDbUtil.addValueToArray( node, "numbers", 20 );
-        List<Object> newNumbers = graphDbUtil.getPropertyValues( node, "numbers" );
+        GraphDatabaseUtil.removeValueFromArray( node, "numbers", 10 );
+        GraphDatabaseUtil.addValueToArray( node, "numbers", 20 );
+        List<Object> newNumbers = GraphDatabaseUtil.getPropertyValues( node, "numbers" );
         // Will contain three items (5, 15, 20).
         // END SNIPPET: handleArrayValues
     }
