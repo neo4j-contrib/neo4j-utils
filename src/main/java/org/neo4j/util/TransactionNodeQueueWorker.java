@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.impl.transaction.DeadlockDetectedException;
+import org.neo4j.kernel.DeadlockDetectedException;
 import org.neo4j.kernel.impl.transaction.UserTransactionImpl;
 import org.neo4j.util.TransactionNodeQueue.TxQueue;
 
