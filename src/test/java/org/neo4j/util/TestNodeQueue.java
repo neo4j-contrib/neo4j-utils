@@ -1,10 +1,14 @@
 package org.neo4j.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -142,4 +146,52 @@ public class TestNodeQueue extends Neo4jTest
 	    tx.success();
 	    tx.finish();
 	}
+	
+	@Test
+	public void testNodeStack()
+	{
+	    Transaction tx = graphDb().beginTx();
+	    Node rootNode = graphDb().createNode();
+	    RelationshipType type = DynamicRelationshipType.withName( "stack" );
+	    NodeStack stack = new NodeStack( rootNode, type );
+	    assertStackEmpty( stack );
+	    Node node = stack.push();
+	    node.setProperty( "name", "first" );
+	    assertFalse( stack.empty() );
+	    assertEquals( node, stack.peek() );
+	    assertEquals( node, stack.pop() );
+	    assertStackEmpty( stack );
+	    
+        node = stack.push();
+        node.setProperty( "name", "first" );
+        Node node2 = stack.push();
+        node.setProperty( "name", "second" );
+        assertFalse( stack.empty() );
+        assertEquals( node2, stack.peek() );
+        assertEquals( node2, stack.pop() );
+        assertEquals( node, stack.peek() );
+        assertEquals( node, stack.peek() );
+        assertEquals( node, stack.pop() );
+        assertStackEmpty( stack );
+        rootNode.delete();
+        tx.success();
+        tx.finish();
+	}
+
+    private void assertStackEmpty( NodeStack stack )
+    {
+        assertTrue( stack.empty() );
+	    try
+	    {
+	        stack.peek();
+	        fail( "Shouldn't be able to peek here" );
+	    }
+	    catch ( NoSuchElementException e ) {}
+        try
+        {
+            stack.pop();
+            fail( "Shouldn't be able to peek here" );
+        }
+        catch ( NoSuchElementException e ) {}
+    }
 }
