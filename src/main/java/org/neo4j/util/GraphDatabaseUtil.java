@@ -469,7 +469,7 @@ public class GraphDatabaseUtil
     	        if ( counter == spawnThreadThreshold )
     	        {
     	            finderFromTheOtherNode = new NodeFinder( nodeYouThinkHasLeastRelationships,
-    	                    expander, secondNode, filterOrNull );
+    	                    expander.reversed(), secondNode, filterOrNull );
     	            finderFromTheOtherNode.start();
     	        }
     	    }
@@ -498,7 +498,7 @@ public class GraphDatabaseUtil
                 ObjectFilter<Relationship> filterOrNull )
 	    {
             this.nodeWithLeastRels = nodeWithLeastRels;
-            this.relationships = expander.expand( secondNode, true );
+            this.relationships = expander.expand( secondNode );
             this.secondNode = secondNode;
             this.filterOrNull = filterOrNull;
 	    }
