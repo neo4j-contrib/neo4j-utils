@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.transaction.TransactionManager;
 
@@ -15,7 +16,6 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipExpander;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.impl.transaction.LockManager;
 
@@ -54,43 +54,6 @@ public class GraphDatabaseUtil
 		return this.graphDb;
 	}
 	
-	private static void assertPropertyKeyNotNull( String key )
-	{
-		if ( key == null )
-		{
-			throw new IllegalArgumentException( "Property key can't be null" );
-		}
-	}
-
-	/**
-	 * Wraps a single {@link PropertyContainer#setProperty(String, Object)}
-	 * in a transaction.
-	 * @param container the {@link PropertyContainer}.
-	 * @param key the property key.
-	 * @param value the property value.
-	 */
-	public static void setProperty( PropertyContainer container,
-		String key, Object value )
-	{
-		assertPropertyKeyNotNull( key );
-		if ( value == null )
-		{
-			throw new IllegalArgumentException( "Value for property '" +
-				key + "' can't be null" );
-		}
-		
-		Transaction tx = container.getGraphDatabase().beginTx();
-		try
-		{
-			container.setProperty( key, value );
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
-		}
-	}
-	
 	public static List<Object> getPropertyValues( PropertyContainer container,
 		String key )
 	{
@@ -102,75 +65,33 @@ public class GraphDatabaseUtil
 	public static boolean addValueToArray( PropertyContainer container,
 		String key, Object value )
 	{
-		Transaction tx = container.getGraphDatabase().beginTx();
-		try
+		Collection<Object> values = getPropertyValues( container, key );
+		boolean changed = values.contains( value ) ? false :
+		    values.add( value );
+		if ( changed )
 		{
-			Collection<Object> values = getPropertyValues( container, key );
-			boolean changed = values.contains( value ) ? false :
-			    values.add( value );
-			if ( changed )
-			{
-				container.setProperty( key, asPropertyValue( values ) );
-			}
-			tx.success();
-			return changed;
+			container.setProperty( key, asPropertyValue( values ) );
 		}
-		finally
-		{
-			tx.finish();
-		}
+		return changed;
 	}
 	
 	public static boolean removeValueFromArray( PropertyContainer container,
 		String key, Object value )
 	{
-		Transaction tx = container.getGraphDatabase().beginTx();
-		try
+		Collection<Object> values = getPropertyValues( container, key );
+		boolean changed = values.remove( value );
+		if ( changed )
 		{
-			Collection<Object> values = getPropertyValues( container, key );
-			boolean changed = values.remove( value );
-			if ( changed )
+			if ( values.isEmpty() )
 			{
-				if ( values.isEmpty() )
-				{
-					container.removeProperty( key );
-				}
-				else
-				{
-					container.setProperty( key, asPropertyValue( values ) );
-				}
+				container.removeProperty( key );
 			}
-			tx.success();
-			return changed;
+			else
+			{
+				container.setProperty( key, asPropertyValue( values ) );
+			}
 		}
-		finally
-		{
-			tx.finish();
-		}
-	}
-	
-	/**
-	 * Wraps a single {@link PropertyContainer#removeProperty(String)}
-	 * in a transaction.
-	 * @param container the {@link PropertyContainer}.
-	 * @param key the property key.
-	 * @return the old value of the property or null if the property didn't
-	 * exist
-	 */
-	public static Object removeProperty( PropertyContainer container, String key )
-	{
-		assertPropertyKeyNotNull( key );
-		Transaction tx = container.getGraphDatabase().beginTx();
-		try
-		{
-			Object oldValue = container.removeProperty( key );
-			tx.success();
-			return oldValue;
-		}
-		finally
-		{
-			tx.finish();
-		}
+		return changed;
 	}
 	
 	public static Node getSingleOtherNode( Node node, RelationshipType type,
@@ -183,30 +104,20 @@ public class GraphDatabaseUtil
 	public static Node getOrCreateSingleOtherNode( Node fromNode, RelationshipType type,
 	        Direction direction )
 	{
-	    GraphDatabaseService graphDb = fromNode.getGraphDatabase();
-        Transaction tx = graphDb.beginTx();
-        try
+        Node otherNode = null;
+        Relationship singleRelationship =
+            fromNode.getSingleRelationship( type, direction );
+        if ( singleRelationship != null )
         {
-            Node otherNode = null;
-            Relationship singleRelationship =
-                fromNode.getSingleRelationship( type, direction );
-            if ( singleRelationship != null )
-            {
-                otherNode = singleRelationship.getOtherNode( fromNode );
-            }
-            else
-            {
-                otherNode = graphDb.createNode();
-                fromNode.createRelationshipTo( otherNode, type );
-            }
-            
-            tx.success();
-            return otherNode;
+            otherNode = singleRelationship.getOtherNode( fromNode );
         }
-        finally
+        else
         {
-            tx.finish();
+            otherNode = fromNode.getGraphDatabase().createNode();
+            fromNode.createRelationshipTo( otherNode, type );
         }
+        
+        return otherNode;
 	}
 	
 	/**
@@ -216,7 +127,7 @@ public class GraphDatabaseUtil
 	 */
 	public Node getOrCreateSubReferenceNode( RelationshipType type )
 	{
-		return this.getOrCreateSubReferenceNode( type, Direction.OUTGOING );
+		return getOrCreateSubReferenceNode( type, Direction.OUTGOING );
 	}
 
 	/**
@@ -247,7 +158,7 @@ public class GraphDatabaseUtil
 	public <T extends NodeWrapper> Collection<T>
 		getSubReferenceNodeCollection( RelationshipType type, Class<T> clazz )
 	{
-		return new NodeWrapperRelationshipSet<T>( graphDb(),
+		return new NodeWrapperRelationshipSet<T>(
 			getOrCreateSubReferenceNode( type ), type, clazz );
 	}
 	
@@ -314,75 +225,81 @@ public class GraphDatabaseUtil
 	
 	public static Integer incrementAndGetCounter( Node node, String propertyKey )
 	{
-		Transaction tx = node.getGraphDatabase().beginTx();
-		LockManager lockManager = getLockManager( node.getGraphDatabase() );
-		lockManager.getWriteLock( node );
-		try
-		{
-			int value = ( Integer ) node.getProperty( propertyKey, 0 );
-			value++;
-			node.setProperty( propertyKey, value );
-			tx.success();
-			return value;
-		}
-		finally
-		{
-			lockManager.releaseWriteLock( node );
-			tx.finish();
-		}
+	    acquireWriteLock( node );
+		int value = ( Integer ) node.getProperty( propertyKey, 0 );
+		value++;
+		node.setProperty( propertyKey, value );
+		return value;
 	}
 
 	public static Integer decrementAndGetCounter( Node node, String propertyKey,
 		int notLowerThan )
 	{
-		Transaction tx = node.getGraphDatabase().beginTx();
-		LockManager lockManager = getLockManager( node.getGraphDatabase() );
-		lockManager.getWriteLock( node );
-		try
-		{
-			int value = ( Integer ) node.getProperty( propertyKey, 0 );
-			value--;
-			value = value < notLowerThan ? notLowerThan : value;
-			node.setProperty( propertyKey, value );
-			tx.success();
-			return value;
-		}
-		finally
-		{
-			lockManager.releaseWriteLock( node );
-			tx.finish();
-		}
+		int value = ( Integer ) node.getProperty( propertyKey, 0 );
+		value--;
+		value = value < notLowerThan ? notLowerThan : value;
+		node.setProperty( propertyKey, value );
+		return value;
 	}
 	
 	public static String sumNodeContents( Node node )
 	{
-        StringBuffer result = new StringBuffer();
-        for ( Relationship rel : node.getRelationships() )
+        StringBuilder result = new StringBuilder( "== Summary of " + node + " ==" );
+        appendRelationships( result, node, node.getRelationships( Direction.OUTGOING ) );
+        appendRelationships( result, node, node.getRelationships( Direction.INCOMING ) );
+        appendProperties( result, node );
+        return result.toString();
+	}
+	
+	public static String sumRelationshipContents( Relationship relationship )
+	{
+	    StringBuilder result = new StringBuilder( "== Summary of " + relationship + " ==" );
+	    appendProperties( result, relationship );
+	    return result.toString();
+	}
+	
+	private static void appendRelationships( StringBuilder result,
+	        Node fromNode, Iterable<Relationship> relationships )
+	{
+        for ( Relationship rel : relationships )
         {
-            if ( rel.getStartNode().equals( node ) )
+            if ( rel.getStartNode().equals( fromNode ) )
             {
-                result.append( rel.getStartNode() + " ---[" +
-                    rel.getType().name() + "]--> " + rel.getEndNode() );
+                result.append( fromNode + " --<" +
+                    rel.getType().name() + ">--> " + rel.getEndNode() );
             }
             else
             {
-                result.append( rel.getStartNode() + " <--[" +
-                    rel.getType().name() + "]--- " + rel.getEndNode() );
+                result.append( fromNode + " <--<" +
+                    rel.getType().name() + ">-- " + rel.getStartNode() );
             }
             result.append( "\n" );
         }
-        for ( String key : node.getPropertyKeys() )
+	}
+	
+    private static void appendProperties( StringBuilder result, PropertyContainer entity )
+    {
+        for ( String key : sort( entity.getPropertyKeys() ) )
         {
             for ( Object value : propertyValueAsArray(
-                node.getProperty( key ) ) )
+                    entity.getProperty( key ) ) )
             {
                 result.append( "*" + key + "=[" + value + "]" );
                 result.append( "\n" );
             }
         }
-        return result.toString();
-	}
-	
+    }
+
+    private static String[] sort( Iterable<String> keys )
+    {
+        TreeSet<String> set = new TreeSet<String>();
+        for ( String key : keys )
+        {
+            set.add( key );
+        }
+        return set.toArray( new String[ set.size() ] );
+    }
+    
     /**
      * Looks to see if there exists a relationship between two given nodes.
      * It starts iterating over relationships from the node which you think
@@ -430,7 +347,7 @@ public class GraphDatabaseUtil
 	 * than the first node.
 	 * @param expander the {@link RelationshipExpander} to use to expand the
 	 * relationships to iterate over.
-	 * @param filter a filter for which relationships to take into
+	 * @param filterOrNull a filter for which relationships to take into
 	 * consideration. Is allowed to be {@code null}.
 	 * @param spawnThreadThreshold the threshold for when to spawn the other
 	 * thread which iterates from the second node.
@@ -529,4 +446,11 @@ public class GraphDatabaseUtil
             }
         }
 	}
+
+    public static void acquireWriteLock( PropertyContainer entity )
+    {
+        // TODO At the moment this is the best way of doing it, if you don't want to use
+        // the LockManager (and release the lock yourself)
+        entity.removeProperty( "___dummy_property_for_locking___"  );
+    }
 }

@@ -1,7 +1,6 @@
 package org.neo4j.util;
 
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
@@ -16,33 +15,31 @@ import org.neo4j.graphdb.RelationshipType;
 public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	extends RelationshipSet<T>
 {
-	private Class<? extends T> instanceClass;
+	private final Class<? extends T> instanceClass;
 	
 	/**
-     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node with its relationships acting as a collection.
 	 * @param type the type of relationships to read/write. 
 	 * @param instanceClass the exact class of instances in the collection.
 	 */
-	public NodeWrapperRelationshipSet( GraphDatabaseService graphDb, Node node,
+	public NodeWrapperRelationshipSet( Node node,
 		RelationshipType type, Class<? extends T> instanceClass )
 	{
-		super( graphDb, node, type );
+		super( node, type );
 		this.instanceClass = instanceClass;
 	}
 	
 	/**
-     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node with its relationships acting as a collection.
 	 * @param type the type of relationships to read/write. 
 	 * @param direction the direction of relationships.
 	 * @param instanceClass the exact class of instances in the collection.
 	 */
-	public NodeWrapperRelationshipSet( GraphDatabaseService graphDb, Node node,
+	public NodeWrapperRelationshipSet( Node node,
 		RelationshipType type, Direction direction,
 		Class<? extends T> instanceClass )
 	{
-		super( graphDb, node, type, direction );
+		super( node, type, direction );
 		this.instanceClass = instanceClass;
 	}
 	
@@ -54,8 +51,7 @@ public class NodeWrapperRelationshipSet<T extends NodeWrapper>
 	@Override
 	protected T newObject( Node node, Relationship relationship )
 	{
-		return NodeWrapperImpl.newInstance( this.getInstanceClass(), graphDb(),
-			node );
+		return NodeWrapperImpl.newInstance( this.getInstanceClass(), node );
 	}
 	
 	@Override

@@ -1,39 +1,28 @@
 package org.neo4j.util;
 
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.impl.transaction.IllegalResourceException;
-import org.neo4j.kernel.impl.transaction.LockManager;
 
 public abstract class AbstractLink<T> implements Link<T>
 {
-    private final GraphDatabaseService graphDb;
     private final Node node;
     private final RelationshipType type;
     private final Direction direction;
     
-    public AbstractLink( GraphDatabaseService graphDb, Node node, RelationshipType type,
+    public AbstractLink( Node node, RelationshipType type,
         Direction direction )
     {
-        this.graphDb = graphDb;
         this.node = node;
         this.type = type;
         this.direction = direction;
     }
     
-    public AbstractLink( GraphDatabaseService graphDb, Node node, RelationshipType type )
+    public AbstractLink( Node node, RelationshipType type )
     {
-        this( graphDb, node, type, Direction.OUTGOING );
-    }
-    
-    protected GraphDatabaseService graphDb()
-    {
-        return this.graphDb;
+        this( node, type, Direction.OUTGOING );
     }
     
     protected Node node()
@@ -68,65 +57,33 @@ public abstract class AbstractLink<T> implements Link<T>
     
     public T get()
     {
-        Transaction tx = graphDb.beginTx();
-        try
-        {
-            Relationship relationship = getLinkRelationshipOrNull();
-            T result = relationship == null ? null : newObject( relationship );
-            tx.success();
-            return result;
-        }
-        finally
-        {
-            tx.finish();
-        }
+        Relationship relationship = getLinkRelationshipOrNull();
+        return relationship == null ? null : newObject( relationship );
     }
 
     public boolean has()
     {
-        Transaction tx = graphDb.beginTx();
-        try
-        {
-            boolean result = getLinkRelationshipOrNull() != null;
-            tx.success();
-            return result;
-        }
-        finally
-        {
-            tx.finish();
-        }
+        return getLinkRelationshipOrNull() != null;
     }
 
     public T remove()
     {
-        Transaction tx = graphDb.beginTx();
-        try
+        Relationship relationship = getLinkRelationshipOrNull();
+        T result = null;
+        if ( relationship != null )
         {
-            Relationship relationship = getLinkRelationshipOrNull();
-            T result = null;
-            if ( relationship != null )
-            {
-                result = newObject( relationship );
-                entityRemoved( result, relationship );
-                relationship.delete();
-            }
-            tx.success();
-            return result;
+            result = newObject( relationship );
+            entityRemoved( result, relationship );
+            relationship.delete();
         }
-        finally
-        {
-            tx.finish();
-        }
+        return result;
     }
 
     public T set( T object )
     {
-        Transaction tx = graphDb.beginTx();
-        LockManager lockManager =
-            ( ( EmbeddedGraphDatabase ) graphDb ).getConfig().getLockManager();
+        GraphDatabaseUtil.acquireWriteLock( node );
         try
         {
-            lockManager.getWriteLock( this.node() );
             Relationship existingRelationship = getLinkRelationshipOrNull();
             T existingObject = null;
             if ( existingRelationship != null )
@@ -144,24 +101,11 @@ public abstract class AbstractLink<T> implements Link<T>
             Relationship createdRelationship =
                 startNode.createRelationshipTo( endNode, this.type() );
             entitySet( object, createdRelationship );
-            tx.success();
             return existingObject;
         }
         catch ( IllegalResourceException e )
         {
             throw new RuntimeException( e );
-        }
-        finally
-        {
-            try
-            {
-                lockManager.releaseWriteLock( this.node() );
-            }
-            catch ( Exception e )
-            {
-                throw new RuntimeException( e );
-            }
-            tx.finish();
         }
     }
     

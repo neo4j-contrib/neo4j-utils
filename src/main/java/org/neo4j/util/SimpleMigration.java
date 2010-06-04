@@ -13,20 +13,20 @@ public abstract class SimpleMigration extends Migration
 	private String versionClassPrefix;
 	
 	/**
-	 * @param graphDB the {@link GraphDatabaseService} instance to store migration info in.
+	 * @param graphDb the {@link GraphDatabaseService} instance to store migration info in.
 	 * @param subReferenceType the {@link RelationshipType} to use a sub
 	 * reference type.
 	 */
-	public SimpleMigration( GraphDatabaseService graphDB,
+	public SimpleMigration( GraphDatabaseService graphDb,
 	        RelationshipType subReferenceType )
 	{
-		super( graphDB, getConfigNodeFromType( graphDB, subReferenceType ) );
+		super( graphDb, getConfigNodeFromType( graphDb, subReferenceType ) );
 		this.versionClassPrefix = this.getMigratorPrefix();
 	}
 	
-	public SimpleMigration( GraphDatabaseService graphDB )
+	public SimpleMigration( GraphDatabaseService graphDb )
 	{
-		this( graphDB, MigrationRelationshipTypes.REF_MIGRATION );
+		this( graphDb, MigrationRelationshipTypes.REF_MIGRATION );
 	}
 	
 	private static Node getConfigNodeFromType( GraphDatabaseService graphDb,

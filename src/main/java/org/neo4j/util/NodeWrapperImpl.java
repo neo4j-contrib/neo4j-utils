@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 
 /**
  * Wraps a {@link Node}, also overriding {@link #equals(Object)} and
@@ -13,7 +12,6 @@ import org.neo4j.graphdb.Transaction;
  */
 public abstract class NodeWrapperImpl implements NodeWrapper
 {
-	private final GraphDatabaseService graphDb;
 	private final Node node;
 	
 	/**
@@ -21,19 +19,26 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 	 * the class' constructor which takes a {@link Node}.
 	 * @param <T> the resulting instance's class type.
 	 * @param instanceClass the resulting instance's class type.
-     * @param graphDB the {@link GraphDatabaseService} used with the node.
 	 * @param node the node to wrap, the node returned from
 	 * {@link #getUnderlyingNode()}.
 	 * @return the new instance wrapping the node.
 	 */
 	public static <T extends NodeWrapper> T newInstance(
-		Class<T> instanceClass, GraphDatabaseService graphDB, Node node )
+		Class<T> instanceClass, Node node )
 	{
 		try
 		{
-			Constructor<T> constructor =
-				instanceClass.getConstructor( GraphDatabaseService.class, Node.class );
-			T result = constructor.newInstance( graphDB, node );
+			Constructor<T> constructor = null;
+			try
+			{
+                constructor = instanceClass.getConstructor( Node.class );
+			}
+			catch ( NoSuchMethodException e )
+			{
+                constructor = instanceClass.getConstructor( GraphDatabaseService.class,
+                        Node.class );
+			}
+			T result = constructor.newInstance( node );
 			return result;
 		}
 		catch ( RuntimeException e )
@@ -59,23 +64,11 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 	public static <T extends NodeWrapper> T newInstance(
 		Class<T> instanceClass, GraphDatabaseService graphDb, long nodeId )
 	{
-		Transaction tx = graphDb.beginTx();
-		try
-		{
-			Node node = graphDb.getNodeById( nodeId );
-			T result = newInstance( instanceClass, graphDb, node );
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
-		}
+		return newInstance( instanceClass, graphDb.getNodeById( nodeId ) );
 	}
 
-	protected NodeWrapperImpl( GraphDatabaseService graphDb, Node node )
+	protected NodeWrapperImpl( Node node )
 	{
-		this.graphDb = graphDb;
 		this.node = node;
 	}
 	
@@ -85,11 +78,6 @@ public abstract class NodeWrapperImpl implements NodeWrapper
 	public Node getUnderlyingNode()
 	{
 		return node;
-	}
-	
-	protected GraphDatabaseService getGraphDb()
-	{
-		return this.graphDb;
 	}
 	
 	@Override

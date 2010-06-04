@@ -88,7 +88,7 @@ public abstract class TransactionNodeQueueWorker extends Thread
 	
 	protected TransactionNodeQueue createQueue( Node rootNode )
 	{
-		return new TransactionNodeQueue( graphDb, rootNode );
+		return new TransactionNodeQueue( rootNode );
 	}
 	
 	public void setPaused( boolean paused )

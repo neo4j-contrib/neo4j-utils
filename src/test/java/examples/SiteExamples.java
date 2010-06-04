@@ -87,11 +87,11 @@ public class SiteExamples
         Node node = graphDb.createNode();
         
         // START SNIPPET: handleArrayValues
-        GraphDatabaseUtil.setProperty( node, "numbers", 5 );
+        node.setProperty( "numbers", 5 );
         List<Object> oneNumber = GraphDatabaseUtil.getPropertyValues( node, "numbers" );
         // Will contain one item (5).
 
-        GraphDatabaseUtil.setProperty( node, "numbers", new int[] { 5, 10, 15 } );
+        node.setProperty( "numbers", new int[] { 5, 10, 15 } );
         List<Object> numbers = GraphDatabaseUtil.getPropertyValues( node, "numbers" );
         // Will contain three items (5, 10, 15).
         
@@ -117,9 +117,9 @@ public class SiteExamples
          Node itemNode2 = graphDb.createNode();
          
          Collection<MyDomainObject> items = new NodeWrapperRelationshipSet<MyDomainObject>(
-                 graphDb, baseNode, ExampleTypes.MY_TYPE, MyDomainObject.class );
-         MyDomainObject item1 = new MyDomainObject( graphDb, itemNode1 );
-         MyDomainObject item2 = new MyDomainObject( graphDb, itemNode2 );
+                 baseNode, ExampleTypes.MY_TYPE, MyDomainObject.class );
+         MyDomainObject item1 = new MyDomainObject( itemNode1 );
+         MyDomainObject item2 = new MyDomainObject( itemNode2 );
          items.add( item1 );
          items.add( item2 );
          for ( MyDomainObject item : items )
@@ -130,9 +130,9 @@ public class SiteExamples
      
      public class MyDomainObject extends NodeWrapperImpl
      {
-        public MyDomainObject( GraphDatabaseService graphDb, Node node )
+        public MyDomainObject( Node node )
         {
-            super( graphDb, node );
+            super( node );
         }
      }
      // END SNIPPET: nodeWrapperSetUsage

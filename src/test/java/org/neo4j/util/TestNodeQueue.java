@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
@@ -23,55 +24,31 @@ public class TestNodeQueue extends Neo4jTest
 		TEST_QUEUE,
 	}
 	
+	@Ignore
 	@Test
     public void testSome() throws Exception
 	{
 		// TODO Test diabled for now since it always fails.
-		if ( true )
-		{
-			return;
-		}
-		
 		Collection<Node> rootNodes = new ArrayList<Node>();
 		for ( int i = 0; i < 10; i++ )
 		{
-			Transaction tx = graphDb().beginTx();
-	        try
+        	Node rootNode = graphDb().createNode();
+        	rootNodes.add( rootNode );
+	        NodeQueue q = new NodeQueue( rootNode, RelTypes.TEST_QUEUE );
+	        for ( int ii = 0; ii < 10000; ii++ )
 	        {
-	        	Node rootNode = graphDb().createNode();
-	        	rootNodes.add( rootNode );
-		        NodeQueue q = new NodeQueue( graphDb(),
-		        	rootNode, RelTypes.TEST_QUEUE );
-		        for ( int ii = 0; ii < 10000; ii++ )
-		        {
-		        	q.add();
-		        }
-		        tx.success();
-	        }
-	        finally
-	        {
-		        tx.finish();
+	        	q.add();
 	        }
 		}
 		
-		Transaction tx = graphDb().beginTx();
-        try
+        for ( Node node : rootNodes )
         {
-	        for ( Node node : rootNodes )
-	        {
-	        	NodeQueue q = new NodeQueue( graphDb(), node,
-	        		RelTypes.TEST_QUEUE );
-	        	while ( q.peek() != null )
-	        	{
-	        		q.remove();
-	        	}
-	        	node.delete();
-	        }
-	        tx.success();
-        }
-        finally
-        {
-	        tx.finish();
+        	NodeQueue q = new NodeQueue( node, RelTypes.TEST_QUEUE );
+        	while ( q.peek() != null )
+        	{
+        		q.remove();
+        	}
+        	node.delete();
         }
 	}
 	
@@ -81,7 +58,7 @@ public class TestNodeQueue extends Neo4jTest
 	    Transaction tx = graphDb().beginTx();
 	    
 	    Node rootNode = graphDb().createNode();
-	    NodeQueue q = new NodeQueue( graphDb(), rootNode, RelTypes.TEST_QUEUE );
+	    NodeQueue q = new NodeQueue( rootNode, RelTypes.TEST_QUEUE );
 	    for ( int i = 0; i < 10; i++ )
 	    {
 	        Node node = q.add();
@@ -115,7 +92,7 @@ public class TestNodeQueue extends Neo4jTest
 	    Transaction tx = graphDb().beginTx();
 	    
 	    Node rootNode = graphDb().createNode();
-	    FixedLengthNodeList list = new FixedLengthNodeList( graphDb(), rootNode,
+	    FixedLengthNodeList list = new FixedLengthNodeList( rootNode,
 	        DynamicRelationshipType.withName( "LIST_TEST" ), 5 );
 	    assertNull( list.peek() );
 	    Node a = list.add();

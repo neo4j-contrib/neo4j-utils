@@ -5,16 +5,14 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import org.neo4j.commons.iterator.IterableWrapper;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.index.impl.btree.BTree.RelTypes;
 import org.neo4j.index.impl.sortedtree.SortedTree;
-import org.neo4j.commons.iterator.IterableWrapper;
 
-public class IndexedNodeCollection<T extends NodeWrapper>
+public class SortedNodeCollection<T extends NodeWrapper>
 	extends AbstractSet<T>
 {
 	private Node rootNode;
@@ -22,10 +20,9 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 	private Comparator<T> comparator;
 	private SortedTree index;
 	
-	public IndexedNodeCollection( GraphDatabaseService graphDb, Node rootNode,
+	public SortedNodeCollection( Node rootNode,
 		Comparator<T> comparator, Class<T> instanceClass )
 	{
-		super( graphDb );
 		this.rootNode = rootNode;
 		this.instanceClass = instanceClass;
 		this.comparator = comparator;
@@ -34,44 +31,26 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 	
 	private Node ensureTheresARoot()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		Node result = null;
+		Relationship relationship = rootNode.getSingleRelationship(
+			RelTypes.TREE_ROOT, Direction.OUTGOING );
+		if ( relationship != null )
 		{
-			Node result = null;
-			Relationship relationship = rootNode.getSingleRelationship(
-				RelTypes.TREE_ROOT, Direction.OUTGOING );
-			if ( relationship != null )
-			{
-				result = relationship.getOtherNode( rootNode );
-			}
-			else
-			{
-				result = graphDb().createNode();
-				rootNode.createRelationshipTo( result, RelTypes.TREE_ROOT );
-			}
-			tx.success();
-			return result;
+			result = relationship.getOtherNode( rootNode );
 		}
-		finally
+		else
 		{
-			tx.finish();
+			result = rootNode.getGraphDatabase().createNode();
+			rootNode.createRelationshipTo( result, RelTypes.TREE_ROOT );
 		}
+		return result;
 	}
 	
 	private void instantiateIndex()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Node treeRootNode = ensureTheresARoot();
-			this.index = new SortedTree( graphDb(), treeRootNode,
-				new ComparatorWrapper( this.comparator ) );
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
-		}
+		Node treeRootNode = ensureTheresARoot();
+		this.index = new SortedTree( rootNode.getGraphDatabase(), treeRootNode,
+			new ComparatorWrapper( this.comparator ) );
 	}
 	
 	protected Node rootNode()
@@ -86,7 +65,7 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 	
 	protected T instantiateItem( Node itemNode )
 	{
-		return NodeWrapperImpl.newInstance( instanceClass, graphDb(), itemNode );
+		return NodeWrapperImpl.newInstance( instanceClass, itemNode );
 	}
 	
 	public boolean add( T item )
@@ -96,17 +75,8 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 
 	public void clear()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			index().delete();
-			instantiateIndex();
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
-		}
+		index().delete();
+		instantiateIndex();
 	}
 
 	public boolean contains( Object item )
@@ -151,21 +121,12 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 	
 	private <R> Collection<R> toCollection()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		Collection<R> result = new ArrayList<R>();
+		for ( Node node : index().getSortedNodes() )
 		{
-			Collection<R> result = new ArrayList<R>();
-			for ( Node node : index().getSortedNodes() )
-			{
-				result.add( ( R ) instantiateItem( node ) );
-			}
-			tx.success();
-			return result;
+			result.add( ( R ) instantiateItem( node ) );
 		}
-		finally
-		{
-			tx.finish();
-		}
+		return result;
 	}
 
 	public Object[] toArray()
@@ -185,16 +146,7 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 	 */
 	public void delete()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			index().delete();
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
-		}
+		index().delete();
 	}
 	
 	private class ComparatorWrapper implements Comparator<Node>
@@ -210,8 +162,8 @@ public class IndexedNodeCollection<T extends NodeWrapper>
 		{
 			// This is slow, I guess
 			return source.compare(
-				NodeWrapperImpl.newInstance( instanceClass, graphDb(), o1 ),
-				NodeWrapperImpl.newInstance( instanceClass, graphDb(), o2 ) );
+				NodeWrapperImpl.newInstance( instanceClass, o1 ),
+				NodeWrapperImpl.newInstance( instanceClass, o2 ) );
 		}
 	}
 }

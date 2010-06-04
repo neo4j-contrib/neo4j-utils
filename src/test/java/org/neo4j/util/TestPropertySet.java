@@ -8,10 +8,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.util.PropertySet;
 
 
 /**
@@ -26,19 +23,8 @@ public class TestPropertySet extends Neo4jTest
     @Test
     public void testSome()
 	{
-		Node node = null;
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			node = graphDb().createNode();
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
-		}
-		
-		Collection<Integer> set = new TestSet( graphDb(), node, "ids" );
+		Node node = graphDb().createNode();
+		Collection<Integer> set = new TestSet( node, "ids" );
 		Integer item = 10;
 		Integer item2 = 21211;
 		
@@ -119,23 +105,14 @@ public class TestPropertySet extends Neo4jTest
 		assertEquals( 1, set.toArray().length );
 		assertEquals( item2, set.toArray( new Integer[ 1 ] )[ 0 ] );
 		
-		tx = graphDb().beginTx();
-		try
-		{
-			node.delete();
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
-		}
+		node.delete();
 	}
 	
 	private static class TestSet extends PropertySet<Integer>
 	{
-		TestSet( GraphDatabaseService graphDb, Node node, String key )
+		TestSet( Node node, String key )
 		{
-			super( graphDb, node, key, "," );
+			super( node, key, "," );
 		}
 
 		@Override

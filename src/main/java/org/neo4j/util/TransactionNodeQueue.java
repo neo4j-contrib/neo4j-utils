@@ -7,12 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
 
 /**
  * Wraps several {@link NodeQueue} instances (per transaction).
@@ -32,49 +30,36 @@ public class TransactionNodeQueue
 	private static Map<Integer, TxQueue> queueNodes =
 		Collections.synchronizedMap( new HashMap<Integer, TxQueue>() );
 	
-	private GraphDatabaseService graphDb;
-	private GraphDatabaseUtil graphDbUtil;
-	private Node rootNode;
+	private final Node rootNode;
 	
-	public TransactionNodeQueue( GraphDatabaseService graphDb, Node rootNode )
+	public TransactionNodeQueue( Node rootNode )
 	{
-		this.graphDb = graphDb;
-		this.graphDbUtil = new GraphDatabaseUtil( graphDb );
 		this.rootNode = rootNode;
 		initialize();
 	}
 	
 	private void initialize()
 	{
-		Transaction tx = graphDb.beginTx();
-		try
+		Collection<Relationship> toDelete = new ArrayList<Relationship>();
+		for ( Relationship rel : getRefNode().getRelationships(
+			QueueRelTypes.UPDATE_QUEUE, Direction.OUTGOING ) )
 		{
-			Collection<Relationship> toDelete = new ArrayList<Relationship>();
-			for ( Relationship rel : getRefNode().getRelationships(
-				QueueRelTypes.UPDATE_QUEUE, Direction.OUTGOING ) )
+			TxQueue queue = new TxQueue( rel.getEndNode() );
+			if ( queue.peek() != null )
 			{
-				TxQueue queue = new TxQueue( rel.getEndNode() );
-				if ( queue.peek() != null )
-				{
-					queueNodes.put( queue.getTxId(), queue );
-				}
-				else
-				{
-					toDelete.add( rel );
-				}
+				queueNodes.put( queue.getTxId(), queue );
 			}
-
-			for ( Relationship rel : toDelete )
+			else
 			{
-				Node node = rel.getEndNode();
-				rel.delete();
-				node.delete();
+				toDelete.add( rel );
 			}
-			tx.success();
 		}
-		finally
+
+		for ( Relationship rel : toDelete )
 		{
-			tx.finish();
+			Node node = rel.getEndNode();
+			rel.delete();
+			node.delete();
 		}
 	}
 	
@@ -106,7 +91,7 @@ public class TransactionNodeQueue
 		
 		if ( allowCreate )
 		{
-			Node queueNode = graphDb.createNode();
+			Node queueNode = rootNode.getGraphDatabase().createNode();
 			queueNode.setProperty( INDEX_TX_ID, txId );
 			getRefNode().createRelationshipTo( queueNode,
 				QueueRelTypes.UPDATE_QUEUE );
@@ -119,52 +104,43 @@ public class TransactionNodeQueue
 	
 	public Map<Integer, TxQueue> getQueues()
 	{
-		Transaction tx = graphDb.beginTx();
-		try
+		Map<Integer, TxQueue> map = new HashMap<Integer, TxQueue>();
+		Map.Entry<Integer, TxQueue>[] entries = queueNodes.entrySet().
+			toArray( new Map.Entry[ queueNodes.size() ] );
+		for ( Map.Entry<Integer, TxQueue> entry : entries )
 		{
-			Map<Integer, TxQueue> map = new HashMap<Integer, TxQueue>();
-			Map.Entry<Integer, TxQueue>[] entries = queueNodes.entrySet().
-				toArray( new Map.Entry[ queueNodes.size() ] );
-			for ( Map.Entry<Integer, TxQueue> entry : entries )
+			TxQueue queue = entry.getValue();
+			try
 			{
-				TxQueue queue = entry.getValue();
-				try
+				if ( queue.peek() != null )
 				{
-					if ( queue.peek() != null )
-					{
-						map.put( queue.getTxId(), queue );
-					}
-				}
-				catch ( NotFoundException e )
-				{
-					// Since queueNodes is a cache which is filled inside
-					// transactions it may be the case that a queue is created
-					// and then the transaction is rolled back... then the
-					// queueNodes map would still have a queue instance for
-					// the node which was created in the transaction, but
-					// not committed.
-					queueNodes.remove( entry.getKey() );
+					map.put( queue.getTxId(), queue );
 				}
 			}
-			tx.success();
-			return Collections.unmodifiableMap( map );
+			catch ( NotFoundException e )
+			{
+				// Since queueNodes is a cache which is filled inside
+				// transactions it may be the case that a queue is created
+				// and then the transaction is rolled back... then the
+				// queueNodes map would still have a queue instance for
+				// the node which was created in the transaction, but
+				// not committed.
+				queueNodes.remove( entry.getKey() );
+			}
 		}
-		finally
-		{
-			tx.finish();
-		}
+		return Collections.unmodifiableMap( map );
 	}
 	
 	public class TxQueue
 	{
-		private NodeQueue queue;
-		private Node node;
+		private final NodeQueue queue;
+		private final Node node;
 		private boolean deleted;
 		
 		public TxQueue( Node rootNode )
 		{
-			queue = new NodeQueue( graphDb, rootNode, QueueRelTypes.INTERNAL_QUEUE );
-			this.node = rootNode;
+			queue = new NodeQueue( rootNode, QueueRelTypes.INTERNAL_QUEUE );
+			node = rootNode;
 		}
 		
 		Node getRootNode()
@@ -199,23 +175,14 @@ public class TransactionNodeQueue
                 return null;
             }
             
-            Transaction tx = graphDb.beginTx();
-            try
+            Collection<Map<String, Object>> result =
+                new ArrayList<Map<String,Object>>( max );
+            Node[] nodes = queue.peek( max );
+            for ( Node node : nodes )
             {
-                Collection<Map<String, Object>> result =
-                    new ArrayList<Map<String,Object>>( max );
-                Node[] nodes = queue.peek( max );
-                for ( Node node : nodes )
-                {
-                    result.add( readEntry( node ) );
-                }
-                tx.success();
-                return result;
+                result.add( readEntry( node ) );
             }
-            finally
-            {
-                tx.finish();
-            }
+            return result;
 		}
 		
 		private Map<String, Object> readEntry( Node node )
@@ -240,20 +207,11 @@ public class TransactionNodeQueue
 				throw new IllegalStateException( "Deleted" );
 			}
 			
-			Transaction tx = graphDb.beginTx();
-			try
+			queue.remove( max );
+			if ( queue.peek() == null )
 			{
-				queue.remove( max );
-				if ( queue.peek() == null )
-				{
-					TransactionNodeQueue.this.remove( this );
-					deleted = true;
-				}
-				tx.success();
-			}
-			finally
-			{
-				tx.finish();
+				TransactionNodeQueue.this.remove( this );
+				deleted = true;
 			}
 		}
 	}

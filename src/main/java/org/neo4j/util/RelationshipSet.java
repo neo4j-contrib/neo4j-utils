@@ -6,14 +6,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.neo4j.commons.iterator.FilteringIterator;
+import org.neo4j.commons.iterator.IteratorWrapper;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.commons.iterator.FilteringIterator;
-import org.neo4j.commons.iterator.IteratorWrapper;
 
 /**
  * A {@link Set} implemented on top of Neo4j primitives.
@@ -24,32 +22,27 @@ import org.neo4j.commons.iterator.IteratorWrapper;
 public abstract class RelationshipSet<T> extends AbstractSet<T>
 	implements Set<T>
 {
-	private Node node;
-	private RelationshipType type;
-	private Direction direction;
+	private final Node node;
+	private final RelationshipType type;
+	private final Direction direction;
 	
 	/**
-     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the {@link Node} to act as the collection.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public RelationshipSet( GraphDatabaseService graphDb, Node node,
-		RelationshipType type )
+	public RelationshipSet( Node node, RelationshipType type )
 	{
-		this( graphDb, node, type, Direction.OUTGOING );
+		this( node, type, Direction.OUTGOING );
 	}
 	
 	/**
-     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the {@link Node} to act as the collection.
 	 * @param direction the direction to use for the relationships.
 	 * @param type the relationship type to use internally for each object.
 	 */
-	public RelationshipSet( GraphDatabaseService graphDb, Node node, 
+	public RelationshipSet( Node node, 
 	    RelationshipType type, Direction direction )
 	{
-		super( graphDb );
-		
 		if ( direction == null || direction == Direction.BOTH )
 		{
 			throw new IllegalArgumentException(
@@ -89,27 +82,18 @@ public abstract class RelationshipSet<T> extends AbstractSet<T>
 	
 	public boolean add( T item )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		if ( contains( item ) )
 		{
-			if ( contains( item ) )
-			{
-				return false;
-			}
-			
-			Node otherNode = getNodeFromItem( item );
-			Node startNode = directionIsOut() ? node : otherNode;
-			Node endNode = directionIsOut() ? otherNode : node;
-			Relationship relationship =
-				startNode.createRelationshipTo( endNode, type );
-			itemAdded( item, relationship );
-			tx.success();
-			return true;
+			return false;
 		}
-		finally
-		{
-			tx.finish();
-		}
+		
+		Node otherNode = getNodeFromItem( item );
+		Node startNode = directionIsOut() ? node : otherNode;
+		Node endNode = directionIsOut() ? otherNode : node;
+		Relationship relationship =
+			startNode.createRelationshipTo( endNode, type );
+		itemAdded( item, relationship );
+		return true;
 	}
 	
 	protected void itemAdded( T item, Relationship relationship )
@@ -120,35 +104,16 @@ public abstract class RelationshipSet<T> extends AbstractSet<T>
 
 	public void clear()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		Iterator<Relationship> itr = getAllRelationships();
+		while ( itr.hasNext() )
 		{
-			Iterator<Relationship> itr = getAllRelationships();
-			while ( itr.hasNext() )
-			{
-				removeItem( itr.next() );
-			}
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
+			removeItem( itr.next() );
 		}
 	}
 
 	public boolean contains( Object item )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			boolean result = findRelationship( item ) != null;
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
-		}
+		return findRelationship( item ) != null;
 	}
 	
 	protected boolean shouldIncludeRelationship( Relationship rel )
@@ -192,39 +157,22 @@ public abstract class RelationshipSet<T> extends AbstractSet<T>
 
 	public boolean isEmpty()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			return !getAllRelationships().hasNext();
-		}
-		finally
-		{
-			tx.finish();
-		}
+	    return !getAllRelationships().hasNext();
 	}
 
 	public Iterator<T> iterator()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Iterator<T> result = new IteratorWrapper<T, Relationship>(
-			    getAllRelationships() )
-		    {
-                @Override
-                protected T underlyingObjectToObject( Relationship rel )
-                {
-                    return newObject( rel.getOtherNode(
-                        RelationshipSet.this.node ), rel );
-                }
-		    };
-			tx.success();
-			return result;
-		}
-		finally
-		{
-			tx.finish();
-		}
+		Iterator<T> result = new IteratorWrapper<T, Relationship>(
+		    getAllRelationships() )
+	    {
+            @Override
+            protected T underlyingObjectToObject( Relationship rel )
+            {
+                return newObject( rel.getOtherNode(
+                    RelationshipSet.this.node ), rel );
+            }
+	    };
+		return result;
 	}
 	
 	protected void removeItem( Relationship rel )
@@ -234,82 +182,55 @@ public abstract class RelationshipSet<T> extends AbstractSet<T>
 
 	public boolean remove( Object item )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		Relationship rel = findRelationship( item );
+		boolean changed = false;
+		if ( rel != null )
 		{
-			Relationship rel = findRelationship( item );
-			boolean changed = false;
-			if ( rel != null )
-			{
-				removeItem( rel );
-				changed = true;
-			}
-			tx.success();
-			return changed;
+			removeItem( rel );
+			changed = true;
 		}
-		finally
-		{
-			tx.finish();
-		}
+		return changed;
 	}
 
 	public boolean retainAll( Collection<?> items )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+	    Collection<Relationship> relationships =
+	        new HashSet<Relationship>();
+	    Iterator<Relationship> allRelationships = getAllRelationships();
+	    while ( allRelationships.hasNext() )
+	    {
+	        relationships.add( allRelationships.next() );
+	    }
+	    
+		for ( Object item : items )
 		{
-		    Collection<Relationship> relationships =
-		        new HashSet<Relationship>();
-		    Iterator<Relationship> allRelationships = getAllRelationships();
-		    while ( allRelationships.hasNext() )
-		    {
-		        relationships.add( allRelationships.next() );
-		    }
-		    
-			for ( Object item : items )
+			Relationship rel = findRelationship( item );
+			if ( rel != null )
 			{
-				Relationship rel = findRelationship( item );
-				if ( rel != null )
-				{
-				    relationships.remove( rel );
-				}
+			    relationships.remove( rel );
 			}
-		    
-			Collection<T> itemsToRemove = new HashSet<T>();
-			for ( Relationship rel : relationships )
-			{
-			    itemsToRemove.add( newObject( getOtherNode( rel ), rel ) );
-			}
-			
-			boolean result = this.removeAll( itemsToRemove );
-			tx.success();
-			return result;
 		}
-		finally
+	    
+		Collection<T> itemsToRemove = new HashSet<T>();
+		for ( Relationship rel : relationships )
 		{
-			tx.finish();
+		    itemsToRemove.add( newObject( getOtherNode( rel ), rel ) );
 		}
+		
+		boolean result = this.removeAll( itemsToRemove );
+		return result;
 	}
 
 	public int size()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		int counter = 0;
+		Iterator<Relationship> itr = getAllRelationships();
+		while ( itr.hasNext() )
 		{
-			int counter = 0;
-			Iterator<Relationship> itr = getAllRelationships();
-			while ( itr.hasNext() )
-			{
-				itr.next();
-				counter++;
-			}
-			tx.success();
-			return counter;
+			itr.next();
+			counter++;
 		}
-		finally
-		{
-			tx.finish();
-		}
+		return counter;
 	}
 	
 	protected abstract T newObject( Node node, Relationship relationship );
@@ -321,50 +242,32 @@ public abstract class RelationshipSet<T> extends AbstractSet<T>
 
 	public Object[] toArray()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		Iterator<Relationship> itr = getAllRelationships();
+		Collection<Object> result = newArrayCollection();
+		while ( itr.hasNext() )
 		{
-			Iterator<Relationship> itr = getAllRelationships();
-			Collection<Object> result = newArrayCollection();
-			while ( itr.hasNext() )
-			{
-				Relationship rel = itr.next();
-				result.add( newObject( getOtherNode( rel ), rel ) );
-			}
-			tx.success();
-			return result.toArray();
+			Relationship rel = itr.next();
+			result.add( newObject( getOtherNode( rel ), rel ) );
 		}
-		finally
-		{
-			tx.finish();
-		}
+		return result.toArray();
 	}
 
 	public <R> R[] toArray( R[] array )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		Iterator<Relationship> itr = getAllRelationships();
+		Collection<R> result = newArrayCollection();
+		while ( itr.hasNext() )
 		{
-			Iterator<Relationship> itr = getAllRelationships();
-			Collection<R> result = newArrayCollection();
-			while ( itr.hasNext() )
-			{
-				Relationship rel = itr.next();
-				result.add( ( R ) newObject( getOtherNode( rel ), rel ) );
-			}
-			
-			int i = 0;
-			for ( R item : result )
-			{
-				array[ i++ ] = item;
-			}
-			tx.success();
-			return array;
+			Relationship rel = itr.next();
+			result.add( ( R ) newObject( getOtherNode( rel ), rel ) );
 		}
-		finally
+		
+		int i = 0;
+		for ( R item : result )
 		{
-			tx.finish();
+			array[ i++ ] = item;
 		}
+		return array;
 	}
 	
 	protected <R> Collection<R> newArrayCollection()

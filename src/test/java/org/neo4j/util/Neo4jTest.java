@@ -6,10 +6,13 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Collection;
 
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 /**
@@ -26,6 +29,7 @@ public abstract class Neo4jTest
 	}
 	
 	private static GraphDatabaseService graphDb;
+	private Transaction tx;
 	
 	@BeforeClass
 	public static void setUpDb()
@@ -51,6 +55,26 @@ public abstract class Neo4jTest
 	protected static GraphDatabaseService graphDb()
 	{
 		return graphDb;
+	}
+	
+	@Before
+	public void beginTx()
+	{
+	    if ( tx == null )
+	    {
+	        tx = graphDb.beginTx();
+	    }
+	}
+	
+	@After
+	public void commitTx()
+	{
+	    if ( tx != null )
+	    {
+    	    tx.success();
+    	    tx.finish();
+    	    tx = null;
+	    }
 	}
 	
 	protected static <T> void assertCollection( Collection<T> collection, T... items )

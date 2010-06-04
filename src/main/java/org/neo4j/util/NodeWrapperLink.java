@@ -12,19 +12,18 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public class NodeWrapperLink<T extends NodeWrapper> extends AbstractLink<T>
 {
-	private Class<? extends T> theClass;
+	private final Class<? extends T> theClass;
 	
 	/**
-	 * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node to act as the link.
 	 * @param type the relationship type to be the link relationship.
 	 * @param thisIsGenericsFault well, even if we have T we must send the
 	 * same class here to make instantiation work.
 	 */
-	public NodeWrapperLink( GraphDatabaseService graphDb, Node node, RelationshipType type,
+	public NodeWrapperLink( Node node, RelationshipType type,
 		Class<? extends T> thisIsGenericsFault )
 	{
-	    super( graphDb, node, type );
+	    super( node, type );
 		this.theClass = thisIsGenericsFault;
 	}
 	
@@ -39,7 +38,7 @@ public class NodeWrapperLink<T extends NodeWrapper> extends AbstractLink<T>
 	public NodeWrapperLink( GraphDatabaseService graphDb, Node node, RelationshipType type,
 		Direction direction, Class<T> thisIsGenericsFault )
 	{
-	    super( graphDb, node, type, direction );
+	    super( node, type, direction );
 	    this.theClass = thisIsGenericsFault;
 	}
 	
@@ -51,7 +50,7 @@ public class NodeWrapperLink<T extends NodeWrapper> extends AbstractLink<T>
 	@Override
 	protected T newObject( Node node )
 	{
-		return NodeWrapperImpl.newInstance( this.classType(), graphDb(), node );
+		return NodeWrapperImpl.newInstance( this.classType(), node );
 	}
 	
 	@Override

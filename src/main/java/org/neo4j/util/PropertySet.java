@@ -7,9 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 
 /**
  * A collection implemented with one property where the values are separated
@@ -26,32 +24,29 @@ public abstract class PropertySet<T> extends AbstractSet<T>
 	 */
 	public static final String DEFAULT_DELIMITER = "|";
 	
-	private Node node;
-	private String key;
-	private String delimiter;
+	private final Node node;
+	private final String key;
+	private final String delimiter;
 	
 	/**
-     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node to act as the collection.
 	 * @param propertyKey the property key to use for the collection node to
 	 * store the values.
 	 */
-	public PropertySet( GraphDatabaseService graphDb, Node node, String propertyKey )
+	public PropertySet( Node node, String propertyKey )
 	{
-		this( graphDb, node, propertyKey, DEFAULT_DELIMITER );
+		this( node, propertyKey, DEFAULT_DELIMITER );
 	}
 	
 	/**
-     * @param graphDb the {@link GraphDatabaseService}.
 	 * @param node the node to act as the collection.
 	 * @param propertyKey the property key to use for the collection node to
 	 * store the values.
 	 * @param delimiter custom delimiter instead of {@link #DEFAULT_DELIMITER}.
 	 */
-	public PropertySet( GraphDatabaseService graphDb, Node node, String propertyKey,
+	public PropertySet( Node node, String propertyKey,
 		String delimiter )
 	{
-		super( graphDb );
 		this.node = node;
 		this.key = propertyKey;
 		this.delimiter = delimiter;
@@ -63,29 +58,20 @@ public abstract class PropertySet<T> extends AbstractSet<T>
 	
 	private Set<String> tokenize()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		Set<String> set = new HashSet<String>();
+		if ( this.node.hasProperty( this.key ) )
 		{
-			Set<String> set = new HashSet<String>();
-			if ( this.node.hasProperty( this.key ) )
+			String value = ( String ) this.node.getProperty( this.key );
+			if ( value.length() > 0 )
 			{
-				String value = ( String ) this.node.getProperty( this.key );
-				if ( value.length() > 0 )
+				for ( String token :
+					value.split( Pattern.quote( this.delimiter ) ) )
 				{
-					for ( String token :
-						value.split( Pattern.quote( this.delimiter ) ) )
-					{
-						set.add( token );
-					}
+					set.add( token );
 				}
 			}
-			tx.success();
-			return set;
 		}
-		finally
-		{
-			tx.finish();
-		}
+		return set;
 	}
 	
 	private String glue( Set<String> set )
@@ -109,49 +95,22 @@ public abstract class PropertySet<T> extends AbstractSet<T>
 			return;
 		}
 		
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			this.node.setProperty( this.key, value );
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
-		}
+		this.node.setProperty( this.key, value );
 	}
 	
 	public boolean add( T item )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Set<String> set = tokenize();
-			boolean changed = set.add( itemToString( item ) );
-			store( glue( set ), changed );
-			tx.success();
-			return changed;
-		}
-		finally
-		{
-			tx.finish();
-		}
+		Set<String> set = tokenize();
+		boolean changed = set.add( itemToString( item ) );
+		store( glue( set ), changed );
+		return changed;
 	}
 
 	public void clear()
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		if ( this.node.hasProperty( this.key ) )
 		{
-			if ( this.node.hasProperty( this.key ) )
-			{
-				this.node.removeProperty( this.key );
-			}
-			tx.success();
-		}
-		finally
-		{
-			tx.finish();
+			this.node.removeProperty( this.key );
 		}
 	}
 
@@ -172,42 +131,24 @@ public abstract class PropertySet<T> extends AbstractSet<T>
 
 	public boolean remove( Object item )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
-		{
-			Set<String> set = tokenize();
-			boolean changed = set.remove( itemToString( item ) );
-			store( glue( set ), changed );
-			tx.success();
-			return changed;
-		}
-		finally
-		{
-			tx.finish();
-		}
+		Set<String> set = tokenize();
+		boolean changed = set.remove( itemToString( item ) );
+		store( glue( set ), changed );
+		return changed;
 	}
 
 	public boolean retainAll( Collection<?> realItems )
 	{
-		Transaction tx = graphDb().beginTx();
-		try
+		Collection<String> items = new ArrayList<String>();
+		for ( Object item : realItems )
 		{
-			Collection<String> items = new ArrayList<String>();
-			for ( Object item : realItems )
-			{
-				items.add( itemToString( item ) );
-			}
-			
-			Set<String> set = tokenize();
-			boolean changed = set.retainAll( items );
-			store( glue( set ), changed );
-			tx.success();
-			return changed;
+			items.add( itemToString( item ) );
 		}
-		finally
-		{
-			tx.finish();
-		}
+		
+		Set<String> set = tokenize();
+		boolean changed = set.retainAll( items );
+		store( glue( set ), changed );
+		return changed;
 	}
 
 	public int size()

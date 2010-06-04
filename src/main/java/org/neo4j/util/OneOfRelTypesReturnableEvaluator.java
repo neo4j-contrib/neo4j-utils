@@ -11,7 +11,7 @@ import org.neo4j.graphdb.TraversalPosition;
 
 public class OneOfRelTypesReturnableEvaluator implements ReturnableEvaluator
 {
-	private Set<String> types;
+	private final Set<String> types;
 	
 	public OneOfRelTypesReturnableEvaluator( RelationshipType... types )
 	{

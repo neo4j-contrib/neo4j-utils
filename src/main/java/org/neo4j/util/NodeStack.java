@@ -25,7 +25,7 @@ public class NodeStack
     
     public Node push()
     {
-        rootNode.removeProperty( "___this is a dummy property for locking___" );
+        GraphDatabaseUtil.acquireWriteLock( rootNode );
         Node node = rootNode.getGraphDatabase().createNode();
         Relationship firstRel = nextRel( rootNode );
         if ( firstRel != null )
@@ -40,7 +40,7 @@ public class NodeStack
     
     public Node pop()
     {
-        rootNode.removeProperty( "___this is a dummy property for locking___" );
+        GraphDatabaseUtil.acquireWriteLock( rootNode );
         Relationship firstRel = nextRel( rootNode );
         if ( firstRel == null )
         {
@@ -60,7 +60,7 @@ public class NodeStack
     
     public Node peek()
     {
-        rootNode.removeProperty( "___this is a dummy property for locking___" );
+        GraphDatabaseUtil.acquireWriteLock( rootNode );
         Relationship firstRel = nextRel( rootNode );
         if ( firstRel == null )
         {

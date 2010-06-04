@@ -5,10 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.commons.iterator.CollectionWrapper;
+import org.neo4j.graphdb.PropertyContainer;
 
 /**
  * This class uses the fact that node property values can be arrays.
@@ -19,22 +17,14 @@ import org.neo4j.commons.iterator.CollectionWrapper;
 public class PropertyArraySet<T> extends AbstractSet<T>
     implements List<T>
 {
-	private PropertyContainer container;
-	private String key;
-	private GraphDatabaseUtil graphDBUtil;
+	private final PropertyContainer container;
+	private final String key;
 
-	public PropertyArraySet( GraphDatabaseService graphDb, PropertyContainer container,
+	public PropertyArraySet( PropertyContainer container,
 	    String key )
 	{
-		super( graphDb );
-		this.graphDBUtil = new GraphDatabaseUtil( graphDb );
 		this.container = container;
 		this.key = key;
-	}
-
-	protected GraphDatabaseUtil graphDbUtil()
-	{
-		return this.graphDBUtil;
 	}
 
 	protected PropertyContainer container()
@@ -49,23 +39,22 @@ public class PropertyArraySet<T> extends AbstractSet<T>
 
 	public boolean add( T o )
 	{
-		return graphDbUtil().addValueToArray( container(), key(), o );
+		return GraphDatabaseUtil.addValueToArray( container(), key(), o );
 	}
 
 	public void clear()
 	{
-		graphDbUtil().removeProperty( container(), key() );
+	    container().removeProperty( key() );
 	}
 
 	private List<Object> values()
 	{
-	    return graphDbUtil().getPropertyValues( container(), key() );
+	    return GraphDatabaseUtil.getPropertyValues( container(), key() );
 	}
 
 	private void setValues( Collection<?> collection )
 	{
-		graphDbUtil().setProperty( container(), key(),
-			graphDbUtil().asPropertyValue( collection ) );
+	    container().setProperty( key(), GraphDatabaseUtil.asPropertyValue( collection ) );
 	}
 
 	public boolean contains( Object o )
@@ -81,7 +70,7 @@ public class PropertyArraySet<T> extends AbstractSet<T>
 	public Iterator<T> iterator()
 	{
 		return new CollectionWrapper<T, Object>(
-			graphDbUtil().getPropertyValues( container(), key() ) )
+			GraphDatabaseUtil.getPropertyValues( container(), key() ) )
 		{
 			@Override
 			protected Object objectToUnderlyingObject( T object )
@@ -99,35 +88,26 @@ public class PropertyArraySet<T> extends AbstractSet<T>
 
 	public boolean remove( Object o )
 	{
-		return graphDbUtil().removeValueFromArray( container(), key(), o );
+		return GraphDatabaseUtil.removeValueFromArray( container(), key(), o );
 	}
 
 	public boolean retainAll( Collection<?> c )
 	{
-		Transaction tx = graphDbUtil().graphDb().beginTx();
-		try
+		Collection<Object> values = values();
+		boolean altered = values.retainAll( c );
+		if ( altered )
 		{
-			Collection<Object> values = values();
-			boolean altered = values.retainAll( c );
-			if ( altered )
+			if ( values.isEmpty() )
 			{
-				if ( values.isEmpty() )
-				{
-					container().removeProperty( key() );
-				}
-				else
-				{
-					container().setProperty( key(),
-						graphDbUtil().asPropertyValue( values ) );
-				}
+				container().removeProperty( key() );
 			}
-			tx.success();
-			return altered;
+			else
+			{
+				container().setProperty( key(),
+					GraphDatabaseUtil.asPropertyValue( values ) );
+			}
 		}
-		finally
-		{
-			tx.finish();
-		}
+		return altered;
 	}
 
 	public int size()

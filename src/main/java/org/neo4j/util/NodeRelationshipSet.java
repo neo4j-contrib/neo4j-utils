@@ -3,7 +3,6 @@ package org.neo4j.util;
 import java.util.Set;
 
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
@@ -15,16 +14,16 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public class NodeRelationshipSet extends RelationshipSet<Node>
 {
-	public NodeRelationshipSet( GraphDatabaseService graphDB, Node node,
+	public NodeRelationshipSet( Node node,
 		RelationshipType type )
 	{
-		super( graphDB, node, type );
+		super( node, type );
 	}
 	
-	public NodeRelationshipSet( GraphDatabaseService graphDB, Node node,
+	public NodeRelationshipSet( Node node,
 		RelationshipType type, Direction direction )
 	{
-		super( graphDB, node, type, direction );
+		super( node, type, direction );
 	}
 	
 	@Override

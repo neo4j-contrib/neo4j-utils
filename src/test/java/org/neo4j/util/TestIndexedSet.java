@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 public class TestIndexedSet extends TxNeo4jTest
@@ -21,7 +20,7 @@ public class TestIndexedSet extends TxNeo4jTest
     public void testIndexedSet() throws Exception
 	{
 		Node rootNode = graphDb().createNode();
-		Collection<AnItem> collection = new IndexedNodeCollection<AnItem>( graphDb(),
+		Collection<AnItem> collection = new SortedNodeCollection<AnItem>(
 			rootNode, new AnItemComparator(), AnItem.class );
 		
 		List<String> strings = new ArrayList<String>( Arrays.asList(
@@ -56,7 +55,7 @@ public class TestIndexedSet extends TxNeo4jTest
 		assertCollectionSame( strings, collection );
 		
 		collection.clear();
-		( ( IndexedNodeCollection<AnItem> ) collection ).delete();
+		( ( SortedNodeCollection<AnItem> ) collection ).delete();
 		rootNode.delete();
 		for ( Node node : AnItem.createdNodes )
 		{
@@ -94,9 +93,9 @@ public class TestIndexedSet extends TxNeo4jTest
 	{
 		static Collection<Node> createdNodes = new ArrayList<Node>();
 		
-		public AnItem( GraphDatabaseService graphDb, Node node )
+		public AnItem( Node node )
 		{
-			super( graphDb, node );
+			super( node );
 		}
 		
 		public AnItem( String name )
@@ -113,7 +112,7 @@ public class TestIndexedSet extends TxNeo4jTest
 		
 		public AnItem( Node node, String name )
 		{
-			this( graphDb(), node );
+			this( node );
 			node.setProperty( "name", name );
 		}
 		
