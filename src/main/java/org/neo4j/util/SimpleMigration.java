@@ -3,6 +3,7 @@ package org.neo4j.util;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Migration unit with a simple default implementation using reflection to
@@ -32,7 +33,17 @@ public abstract class SimpleMigration extends Migration
 	private static Node getConfigNodeFromType( GraphDatabaseService graphDb,
 		RelationshipType type )
 	{
-		return new GraphDatabaseUtil( graphDb ).getOrCreateSubReferenceNode( type );
+	    Transaction tx = graphDb.beginTx();
+	    try
+	    {
+	        Node result = new GraphDatabaseUtil( graphDb ).getOrCreateSubReferenceNode( type );
+	        tx.success();
+	        return result;
+	    }
+	    finally
+	    {
+	        tx.finish();
+	    }
 	}
 	
 	protected String getMigratorPrefix()
