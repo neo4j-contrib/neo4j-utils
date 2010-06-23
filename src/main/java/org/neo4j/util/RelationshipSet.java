@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.neo4j.commons.Predicate;
 import org.neo4j.commons.iterator.FilteringIterator;
 import org.neo4j.commons.iterator.IteratorWrapper;
 import org.neo4j.graphdb.Direction;
@@ -124,14 +125,13 @@ public abstract class RelationshipSet<T> extends AbstractSet<T>
 	protected Iterator<Relationship> getAllRelationships()
 	{
 		return new FilteringIterator<Relationship>(
-			node.getRelationships( type, getDirection() ).iterator() )
-		{
-            @Override
-            protected boolean passes( Relationship item )
+			node.getRelationships( type, getDirection() ).iterator(), new Predicate<Relationship>()
             {
-                return shouldIncludeRelationship( item );
-            }
-		};
+			    public boolean accept(Relationship item)
+			    {
+			        return shouldIncludeRelationship( item );
+			    }
+            } );
 	}
 	
 	protected Relationship findRelationship( Object item )
