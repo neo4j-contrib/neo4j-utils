@@ -1,0 +1,14 @@
+1.1 (2010-06)
+----------------
+
+o Added a relationshipExistsBetween (between two nodes) which can spawn
+  a thread going from the other side at the same time if there should be
+  many relationships from the first side.
+o Removed utilities for the old event framework, since they were removed
+  from the kernel.
+o Added a NodeStack class.
+o Removed almost all transaction handling, it was inconsistently scattered
+  all over the code.
+o Removed the passing of GraphDatabaseService references from many places,
+  it can now be retrieved from PropertyContainer#getGraphDatabase() instead.
+ 
