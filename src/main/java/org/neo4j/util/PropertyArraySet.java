@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.neo4j.commons.iterator.CollectionWrapper;
 import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.helpers.collection.CollectionWrapper;
 
 /**
  * This class uses the fact that node property values can be arrays.
