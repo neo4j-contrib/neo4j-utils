@@ -15,7 +15,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipExpander;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.kernel.TraversalFactory;
+import org.neo4j.kernel.Traversal;
 
 public class TestGraphDbUtils extends TxNeo4jTest
 {
@@ -127,7 +127,7 @@ public class TestGraphDbUtils extends TxNeo4jTest
 	    
 	    int count = 100;
 	    
-	    RelationshipExpander expander = TraversalFactory.expanderForTypes( type, Direction.BOTH );
+	    RelationshipExpander expander = Traversal.expanderForTypes( type, Direction.BOTH );
 	    for ( int i = 0; i < 1000; i++ )
 	    {
 	        GraphDatabaseUtil.getExistingRelationshipBetween( nodeWithFewRels, otherNode, expander );
