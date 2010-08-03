@@ -64,6 +64,13 @@ A set of convenience method and classes built on top of Neo4j.
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>false</skip>
+          <argLine>-Xmx300m</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
           <tagBase>https://svn.neo4j.org/components/${short-name}/tags</tagBase>
