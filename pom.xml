@@ -29,13 +29,6 @@ A set of convenience method and classes built on top of Neo4j.
     <url>https://trac.neo4j.org/browser/components/${short-name}</url>
   </scm>
 
-  <licenses>
-    <license>
-      <name>GNU Affero General Public License, Version 3</name>
-      <url>https://svn.neo4j.org/components/${short-name}/trunk/LICENSE.txt</url>
-    </license>
-  </licenses>
-
   <developers>
     <developer>
       <id>mattias</id>
