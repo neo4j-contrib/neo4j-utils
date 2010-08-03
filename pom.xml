@@ -25,18 +25,14 @@ A set of convenience method and classes built on top of Neo4j.
   <packaging>bundle</packaging>
 
   <scm>
-    <connection>
-            scm:svn:https://svn.neo4j.org/components/${short-name}/trunk/
-        </connection>
-    <url>https://trac.neo4j.org/browser/components/${short-name}
-        </url>
+    <connection>scm:svn:https://svn.neo4j.org/components/${short-name}/trunk/</connection>
+    <url>https://trac.neo4j.org/browser/components/${short-name}</url>
   </scm>
 
   <licenses>
     <license>
       <name>GNU Affero General Public License, Version 3</name>
-      <url>https://svn.neo4j.org/components/${short-name}/trunk/LICENSE.txt
-            </url>
+      <url>https://svn.neo4j.org/components/${short-name}/trunk/LICENSE.txt</url>
     </license>
   </licenses>
 
@@ -56,12 +52,12 @@ A set of convenience method and classes built on top of Neo4j.
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-kernel</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-index</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1</version>
     </dependency>
   </dependencies>
 
