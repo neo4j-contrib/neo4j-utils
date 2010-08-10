@@ -7,7 +7,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * Deletes an entire graph, i.e. all connected nodes (and their connected nodes)
+ * Deletes an entire graph, that is all connected nodes (and their connected nodes)
  * from a start node (any start node in that graph). It is mostly used in
  * some test cases.
  */

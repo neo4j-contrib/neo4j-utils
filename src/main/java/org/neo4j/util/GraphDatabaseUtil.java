@@ -20,7 +20,7 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.impl.transaction.LockManager;
 
 /**
- * Contains some convenience methods for f.ex. set/get/remove one property
+ * Contains some convenience methods, for instance set/get/remove one property
  * wrapped in a transaction.
  * 
  * Some event helper methods.
