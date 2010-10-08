@@ -25,6 +25,7 @@ A set of convenience method and classes built on top of Neo4j.
 
   <scm>
     <connection>scm:svn:https://svn.neo4j.org/components/utils/trunk/</connection>
+    <developerConnection>scm:svn:https://svn.neo4j.org/components/utils/trunk/</developerConnection>
     <url>https://trac.neo4j.org/browser/components/utils</url>
   </scm>
 
@@ -44,12 +45,12 @@ A set of convenience method and classes built on top of Neo4j.
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-kernel</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2-1.2.M01</version>
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-index</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2-1.2.M01</version>
     </dependency>
   </dependencies>
 
