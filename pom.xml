@@ -3,17 +3,15 @@
   <parent>
     <groupId>org.neo4j</groupId>
     <artifactId>parent-central</artifactId>
-    <version>2</version>
+    <version>3</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.neo4j</groupId>
   <artifactId>neo4j-utils</artifactId>
   <version>1.2-SNAPSHOT</version>
-  <name>Neo4j - utilities</name>
-  <description>
-A set of convenience method and classes built on top of Neo4j.
-    </description>
+  <name>Neo4j - Utilities</name>
+  <description>A set of convenience methods and classes built on top of Neo4j.</description>
   <url>http://components.neo4j.org/${project.artifactId}/</url>
 
   <properties>
@@ -51,6 +49,10 @@ A set of convenience method and classes built on top of Neo4j.
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-index</artifactId>
       <version>1.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
 
