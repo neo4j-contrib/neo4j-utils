@@ -12,7 +12,7 @@
   <version>1.2-SNAPSHOT</version>
   <name>Neo4j - Utilities</name>
   <description>A set of convenience methods and classes built on top of Neo4j.</description>
-  <url>http://components.neo4j.org/${project.artifactId}/</url>
+  <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
   <properties>
     <bundle.namespace>org.neo4j.util</bundle.namespace>
@@ -73,4 +73,13 @@
       </plugin>
     </plugins>
   </build>
+
+  <distributionManagement>
+    <site>
+      <id>neo4j-site</id>
+      <url>scpexe://components.neo4j.org/home/neo/components/${project.artifactId}/${project.version}</url>
+    </site>
+  </distributionManagement>
+
 </project>
+
